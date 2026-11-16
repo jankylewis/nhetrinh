@@ -79,3 +79,34 @@ func moveRefuses(run: RefusedMove) {
     #expect(throws: run.failure) { try tree.move(from: run.from, to: run.to) }
     #expect(tree == before)
 }
+
+// P7-FIX-1 (REVIEW_P7 P4 ruling), red first on a stub: Move Tab Up / Down, one row within its container.
+private func steps(_ items: [Tree<String>.Item]) -> Tree<String> { Tree(items: items) }
+private func box(_ name: String, _ tabs: [String]) -> Tree<String>.Item { .folder(TreeFolder(name: name, tabs: tabs)) }
+
+@Test(arguments: [
+    (at(1), true, [Tree<String>.Item.tab("b"), .tab("a")], at(0)),
+    (at(0), false, [.tab("b"), .tab("a")], at(1)),
+    (at(0), true, [.tab("a"), .tab("b")], nil),
+    (at(1), false, [.tab("a"), .tab("b")], nil),
+] as [(TabPath, Bool, [Tree<String>.Item], TabPath?)])
+func aRootTabStepsAlongTheRoot(path: TabPath, up: Bool, expected: [Tree<String>.Item], placed: TabPath?) {
+    var tree = steps([.tab("a"), .tab("b")])
+    #expect(tree.step(path, up: up) == placed && tree == steps(expected))
+}
+
+/// In `r | F (f1, f2) | s`: inside the folder a tab swaps; at its edge it steps out next to the folder;
+/// a root tab passes the folder whole, never into it; a folder's own path does not move.
+@Test(arguments: [
+    (at(1, 1), true, [Tree<String>.Item.tab("r"), box("F", ["f2", "f1"]), .tab("s")], at(1, 0)),
+    (at(1, 0), false, [.tab("r"), box("F", ["f2", "f1"]), .tab("s")], at(1, 1)),
+    (at(1, 0), true, [.tab("r"), .tab("f1"), box("F", ["f2"]), .tab("s")], at(1)),
+    (at(1, 1), false, [.tab("r"), box("F", ["f1"]), .tab("f2"), .tab("s")], at(2)),
+    (at(2), true, [.tab("r"), .tab("s"), box("F", ["f1", "f2"])], at(1)),
+    (at(0), false, [box("F", ["f1", "f2"]), .tab("r"), .tab("s")], at(1)),
+    (at(1), true, [.tab("r"), box("F", ["f1", "f2"]), .tab("s")], nil),
+] as [(TabPath, Bool, [Tree<String>.Item], TabPath?)])
+func aFolderTabStepsOutAtItsEdge(path: TabPath, up: Bool, expected: [Tree<String>.Item], placed: TabPath?) {
+    var tree = steps([.tab("r"), box("F", ["f1", "f2"]), .tab("s")])
+    #expect(tree.step(path, up: up) == placed && tree == steps(expected))
+}

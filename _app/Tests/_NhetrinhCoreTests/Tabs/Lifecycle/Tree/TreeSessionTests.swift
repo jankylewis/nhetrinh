@@ -96,3 +96,17 @@ func nothingToRestoreGivesAHomeTab(v1WithoutTabs: Bool) throws {
         #expect(loaded.selected == TabPath(item: 0) && TreeSession.version == 2)
     }
 }
+
+/// P7-FIX-1 (REVIEW_P7 P3 ruling), red first: a session of folders and no tab (the last tab closed, the
+/// app quit) keeps its folders, with one home tab at the root's end, selected.
+@Test func foldersWithoutATabAreKept() throws {
+    try inFolder { folder in
+        let empty = TreeSession(tree: TabTree(items: [.folder(TabFolder(name: "work", collapsed: true))]),
+                                selected: TabPath(item: 0), sidebarWidth: 220, collapsed: false)
+        try TreeSessionStore.save(empty, in: folder)
+        let loaded = TreeSessionStore.load(from: folder, home: home)
+        let homeTab = SessionTab(url: home, title: "www.google.com")
+        #expect(loaded.tree.items == [.folder(TabFolder(name: "work", collapsed: true)), .tab(homeTab)])
+        #expect(loaded.selected == TabPath(item: 1))
+    }
+}

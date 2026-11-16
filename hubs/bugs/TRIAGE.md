@@ -17,3 +17,7 @@ Grep the signature in the report or log.
 | NT-BUG-010 | `clearAllForgetsTheZoom` | OBSERVED | Clear All keeps the zoomed sites: see the fix entry (P4P6-FIX-1) |
 | NT-BUG-011 | `zoomReachesEveryLoadedTabOfTheHost` | OBSERVED | The zoom stays on one tab of a site: see the fix entry (P4P6-FIX-1) |
 | NT-BUG-012 | `zoomInHasBothKeys` | OBSERVED | Command-equals does not zoom in: see the fix entry (P4P6-FIX-1) |
+| NT-BUG-013 | `reopenPutsTheTabBackWhereItWas` | OBSERVED | Did the closed tab keep its path and folder name? `ClosedTab.path`, `Tree.reinsert` |
+| NT-BUG-014 | `closingTheSelectedTabSelectsAVisibleTab` | OBSERVED | Is the chosen tab in a collapsed folder? `close(at:)` must use `Tree.nearestVisible` |
+| NT-BUG-015 | `foldersWithoutATabAreKept` | OBSERVED | A session of folders and no tab: `TreeSession.withHomeTab` keeps them |
+| NT-BUG-016 | `moveTabStepsOneRow` | OBSERVED | Did Move use the flat index? It must be `Tree.step` on the path |

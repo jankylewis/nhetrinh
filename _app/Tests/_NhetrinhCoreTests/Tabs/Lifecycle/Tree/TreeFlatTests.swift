@@ -82,3 +82,54 @@ func captureLeavesOutTabsWithoutAnAddress(selected: Int, path: TabPath) {
     #expect(session.tree.items == [treeRoot("a"), treeFolder("work", ["c"])])
     #expect(session.selected == path)
 }
+
+// P7-FIX-1 (REVIEW_P7 P1, P2 rulings), red first on stubs. Trees of names: "r" a root tab, "A:a1,a2" a
+// folder, "A*:a1" a collapsed one.
+private func names(_ spec: [String]) -> Tree<String> {
+    Tree(items: spec.map { item in
+        let parts = item.split(separator: ":", maxSplits: 1).map(String.init)
+        guard parts.count == 2 else { return .tab(item) }
+        let tabs = parts[1].split(separator: ",").map(String.init)
+        return .folder(TreeFolder(name: parts[0].replacingOccurrences(of: "*", with: ""),
+                                  collapsed: parts[0].hasSuffix("*"), tabs: tabs))
+    })
+}
+
+/// P1: a tab taken out at flat `flat` and reinserted at its path comes back where it was; its folder found
+/// by name when the folder moved; at the root where the folder was when no folder has that name.
+@Test(arguments: [
+    (["A:a1", "B:b1,b2"], 1, ["A:a1", "B:b1,b2"]), (["A:a1", "r", "s"], 1, ["A:a1", "r", "s"]),
+    (["A:a1", "B:b1", "r"], 1, ["A:a1", "B:b1", "r"]), (["r", "A:a1,a2"], 2, ["r", "A:a1,a2"]),
+    (["r", "A:a1,a2,a3"], 2, ["r", "A:a1,a2,a3"]), (["x", "y"], 1, ["x", "y"]),
+] as [([String], Int, [String])])
+func aClosedTabComesBackWhereItWas(spec: [String], flat: Int, expected: [String]) throws {
+    var tree = names(spec)
+    let path = try #require(tree.path(ofFlat: flat))
+    let folder = path.tab.flatMap { _ in try? tree.folder(at: path.item).name }
+    let removed = tree.removeTab(atFlat: flat)
+    let tab = try #require(removed)
+    let placed = tree.reinsert(tab, at: path, folder: folder)
+    #expect(tree == names(expected) && placed == path)
+}
+
+/// P1: the folder was moved (found by name), or deleted (its tabs at the root: back among them).
+@Test(arguments: [
+    (["C:c1", "B:b2"], TabPath(item: 0, tab: 0), "B", ["C:c1", "B:b1,b2"], TabPath(item: 1, tab: 0)),
+    (["b2", "r"], TabPath(item: 0, tab: 0), "B", ["b1", "b2", "r"], TabPath(item: 0)),
+    (["A:a1", "b2"], TabPath(item: 1, tab: 0), "B", ["A:a1", "b1", "b2"], TabPath(item: 1)),
+    (["r"], TabPath(item: 5), nil, ["r", "b1"], TabPath(item: 1)),
+] as [([String], TabPath, String?, [String], TabPath)])
+func aClosedTabFindsItsFolderOrItsPlace(spec: [String], path: TabPath, folder: String?, expected: [String],
+                                        placed: TabPath) {
+    var tree = names(spec)
+    #expect(tree.reinsert("b1", at: path, folder: folder) == placed && tree == names(expected))
+}
+
+/// P2: after the tab at `removed` is taken out, the nearest visible tab above, else below, else hidden.
+@Test(arguments: [
+    (["r0", "A*:a1"], 1, 0), (["A*:a1", "r1"], 0, 1), (["A*:a1,a2"], 0, 0), (["r0", "r1"], 1, 0),
+    (["r0", "A:a1"], 1, 0), (["A:a1", "B*:b1", "r"], 1, 0), ([String](), 0, nil),
+] as [([String], Int, Int?)])
+func closingSelectsTheNearestVisibleTab(spec: [String], removed: Int, expected: Int?) {
+    #expect(names(spec).nearestVisible(afterRemoving: removed) == expected)
+}

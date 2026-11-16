@@ -98,7 +98,7 @@ public enum TreeSessionStore {
             return .home(home)
         }
         if version(of: bytes) == 1 { report(keepOnce(bytes, in: folder)) }
-        guard !session.tree.allTabs.isEmpty else { return .home(home) }
+        guard !session.tree.allTabs.isEmpty else { return session.withHomeTab(home) }
         session.selected = session.tree.path(ofFlat: session.selectedIndex) ?? TabPath(item: 0)
         return session
     }

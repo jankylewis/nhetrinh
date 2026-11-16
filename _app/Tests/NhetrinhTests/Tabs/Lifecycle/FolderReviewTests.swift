@@ -61,4 +61,29 @@ struct FolderReviewTests {
                 "selected flat \(browser.selected) (\(browser.tabs[browser.selected].title)), hidden in A")
         browser.tabs.forEach { $0.unload() }
     }
+
+    /// P7-FIX-1 (P4): Move Tab Up / Down step one row in the container; a root tab passes a folder whole;
+    /// at a folder's edge a tab steps out. The menu item is off when nothing would move.
+    @Test(arguments: [
+        (3, true, ["r", "s", "A:f1,f2"], "s"), (1, true, ["r", "f1", "A:f2", "s"], "f1"),
+        (2, false, ["r", "A:f1", "f2", "s"], "f2"), (1, false, ["r", "A:f2,f1", "s"], "f1"),
+    ])
+    func moveTabStepsOneRow(selected: Int, up: Bool, expected: [String], title: String) {
+        let browser = browser(["r", "A:f1,f2", "s"])
+        browser.select(selected)
+        up ? browser.moveTabUp(nil) : browser.moveTabDown(nil)
+        #expect(shape(browser) == expected && browser.tabs[browser.selected].title == title)
+        browser.tabs.forEach { $0.unload() }
+    }
+
+    @Test(arguments: [
+        (["r", "A:f1,f2", "s"], 0, true, false), (["r", "A:f1,f2", "s"], 3, false, false),
+        (["r", "A:f1,f2", "s"], 3, true, true), (["A:f1"], 0, true, true), (["A:f1"], 0, false, true),
+    ])
+    func moveTabItemIsOffWhenNothingMoves(spec: [String], selected: Int, up: Bool, enabled: Bool) {
+        let browser = browser(spec)
+        browser.select(selected)
+        #expect(browser.canMoveSelectedTab(up: up) == enabled)
+        browser.tabs.forEach { $0.unload() }
+    }
 }

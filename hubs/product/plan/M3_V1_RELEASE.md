@@ -64,6 +64,13 @@ Readback adds:
 
 Exit: the gate, R1-R43 PASS.
 
+Rulings after the P7 review (P7-FIX-1, NT-BUG-013 to 016): Reopen Closed Tab goes back into its folder
+(by name; a deleted folder: the root at its place); closing the selected tab selects the nearest visible
+tab; folders with no tab come back with one home tab; Move Tab Up / Down step one row in the container.
+Notes: R41 collapses by the row menu only (the disclosure triangle and the outline's own selection change
+are not read back; a drag is unit-tested only). A build before P7 reads a version 2 file as newer and
+keeps it as `session.bad.json` (no downgrade is planned).
+
 Note: this is the largest phase. It can move after 1.0 without blocking it (`DECISIONS.md` Q2).
 
 ## P8 — Release 1.0 (1.0.0, size S, status TODO)
