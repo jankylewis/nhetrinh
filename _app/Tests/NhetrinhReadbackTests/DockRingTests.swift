@@ -99,3 +99,49 @@ func ringIsWholePointsInsideTheDock(item: CGRect) {
     }
     #expect(rect == rect.integral && halfPointDock.contains(rect), "\(rect) in \(halfPointDock)")
 }
+
+/// NT-GAT-005. R2 took the last Dock item titled nhetrinh: a pinned copy that is not running shows
+/// its bundle icon on a tile, and R2 measured it. Only the launched app's item counts: running,
+/// and of the launched bundle (`AXURL`). None: NOT READ BACK. More than one: FAIL.
+enum ItemChoice: String, CaseIterable {
+    case pinnedCopyAfterRunningApp = "the running app, then a pinned copy not running (P0-RUN-1)"
+    case appNotRunning = "the launched app pinned but not running, and a pinned copy"
+    case copyAlsoRunning = "the running app and a running copy of another bundle"
+    case twoRunning = "two running items of the launched bundle"
+    case runningWithoutURL = "a running item without a bundle URL"
+    case none = "no Dock item"
+
+    static let app = URL(fileURLWithPath: "/Users/someone/Applications/nhetrinh.app")
+
+    /// The Dock items, and the y of the item R2 must take; nil: NOT READ BACK; -1: FAIL.
+    var setup: (items: [DockItem], chosen: CGFloat?) {
+        let dock = CGRect(x: 0, y: 100, width: 40, height: 800)
+        func item(_ y: CGFloat, _ running: Bool, _ url: URL?) -> DockItem {
+            DockItem(frame: CGRect(x: 4, y: y, width: 32, height: 32), dock: dock, isRunning: running, url: url)
+        }
+        let appItem = URL(string: "file:///Users/someone/Applications/nhetrinh.app/")  // AXURL ends with a slash
+        let copy = URL(fileURLWithPath: "/private/tmp/F/nhetrinh.app")
+        switch self {
+        case .pinnedCopyAfterRunningApp: return ([item(200, true, appItem), item(300, false, copy)], 200)
+        case .appNotRunning: return ([item(200, false, appItem), item(300, false, copy)], nil)
+        case .copyAlsoRunning: return ([item(200, true, appItem), item(300, true, copy)], 200)
+        case .twoRunning: return ([item(200, true, appItem), item(300, true, Self.app)], -1)
+        case .runningWithoutURL: return ([item(200, true, nil)], nil)
+        case .none: return ([], nil)
+        }
+    }
+}
+
+@Test(arguments: ItemChoice.allCases)
+func r2MeasuresOnlyTheLaunchedApp(choice: ItemChoice) {
+    do {
+        let item = try DockIcon.launchedItem(choice.setup.items, app: ItemChoice.app)
+        #expect(item.frame.minY == choice.setup.chosen, "chose the item at y \(item.frame.minY)")
+    } catch StepError.cannotDrive(let why) {
+        #expect(choice.setup.chosen == nil, "NOT READ BACK: \(why)")
+    } catch StepError.fail(let why) {
+        #expect(choice.setup.chosen == -1, "FAIL: \(why)")
+    } catch {
+        Issue.record("unexpected error: \(error)")
+    }
+}

@@ -1,9 +1,12 @@
 import AppKit
 
-/// One Dock item and the Dock list that holds it (screen points, origin top left).
+/// One Dock item and the Dock list that holds it (screen points, origin top left), whether its app
+/// runs (`AXIsApplicationRunning`) and the bundle it stands for (`AXURL`; nil for a separator).
 struct DockItem {
     let frame: CGRect
     let dock: CGRect
+    var isRunning = false
+    var url: URL?
 }
 
 /// The app's item in the Dock: where it is, and a picture of it.
@@ -11,8 +14,8 @@ struct DockItem {
 /// frame: no pixel outside the Dock, never the screen. The Dock is always on top, so no window of
 /// another app can be inside it (NT-TG-002). The picture is a temporary file, deleted at once.
 enum DockIcon {
-    /// The Dock items with this title, each with the frame of the Dock list that holds it.
-    static func items(title: String) throws -> [DockItem] {
+    /// Every Dock item on screen, each with the frame of the Dock list that holds it.
+    static func items() throws -> [DockItem] {
         if UserDefaults(suiteName: "com.apple.dock")?.bool(forKey: "autohide") == true {
             throw StepError.cannotDrive("the Dock hides itself; a capture of its place could show other windows")
         }
@@ -22,9 +25,33 @@ enum DockIcon {
         let lists = AXNode.application(pid: dock.processIdentifier).children
         return lists.flatMap { list -> [DockItem] in
             guard let dock = list.frame else { return [] }
-            let frames = list.children.filter { $0.title == title }.compactMap(\.frame).filter(isOnScreen)
-            return frames.map { DockItem(frame: $0, dock: dock) }
+            return list.children.compactMap { node in
+                guard let frame = node.frame, isOnScreen(frame) else { return nil }
+                return DockItem(frame: frame, dock: dock, isRunning: node.flag("AXIsApplicationRunning"), url: node.url)
+            }
         }
+    }
+
+    /// The one item of the launched app: running, and of its bundle. A pinned copy of the app has
+    /// the same title but is not running; it shows its bundle icon on a tile (NT-GAT-005).
+    /// None is NOT READ BACK; more than one is a FAIL. The reasons hold counts, never a path.
+    static func launchedItem(_ items: [DockItem], app: URL) throws -> DockItem {
+        let ours = items.filter { $0.url.map { sameBundle($0, app) } ?? false }
+        let running = ours.filter(\.isRunning)
+        if running.count > 1 {
+            throw StepError.fail("\(running.count) running Dock items of the launched app; one is expected")
+        }
+        guard let item = running.first else {
+            throw StepError.cannotDrive("no running Dock item of the launched app: \(ours.count) of its bundle "
+                + "(none running), \(items.filter(\.isRunning).count) running of \(items.count) items read")
+        }
+        return item
+    }
+
+    /// `AXURL` ends a bundle with a slash; the launched app's URL may not.
+    private static func sameBundle(_ first: URL, _ second: URL) -> Bool {
+        let path = { (url: URL) in url.standardizedFileURL.resolvingSymlinksInPath().path }
+        return path(first) == path(second)
     }
 
     private static func isOnScreen(_ frame: CGRect) -> Bool {

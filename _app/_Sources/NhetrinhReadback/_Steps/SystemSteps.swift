@@ -7,13 +7,9 @@ enum SystemSteps {
     static func dockIconHasNoTile(_ app: AppSession) throws -> String {
         try app.requireAccessibility()
         try app.ensureRunning()
-        var items: [DockItem] = []
-        waitUntil(5) {
-            items = (try? DockIcon.items(title: "nhetrinh")) ?? []
-            return !items.isEmpty
-        }
-        if items.isEmpty { items = try DockIcon.items(title: "nhetrinh") }
-        guard let item = items.last else { throw StepError.fail("no Dock item named nhetrinh") }
+        // Only the launched app's own item: a pinned copy that is not running is on a tile (NT-GAT-005).
+        waitUntil(5) { (try? DockIcon.launchedItem(DockIcon.items(), app: app.appURL)) != nil }
+        let item = try DockIcon.launchedItem(DockIcon.items(), app: app.appURL)
         let iconFile = app.appURL.appendingPathComponent("Contents/Resources/AppIcon.png")
         guard let icon = NSBitmapImageRep(data: (try? Data(contentsOf: iconFile)) ?? Data()) else {
             throw StepError.fail("the app bundle has no AppIcon.png")
