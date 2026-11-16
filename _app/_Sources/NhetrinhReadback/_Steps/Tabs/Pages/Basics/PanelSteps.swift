@@ -4,16 +4,32 @@ import NhetrinhCore
 
 /// R22, R25, R26: the open panel, the print panel, a link to another app.
 enum PanelSteps {
-    /// The open panel is the system's: the readback sees it shown and cancels it. Picking a file in it
-    /// is not driven (the panel runs outside the app), so the detail says "not read back" for that part.
+    /// What R22's line says of the file choice (ruling on NT-TG-006): the open panel is the system's, the
+    /// readback cannot pick in it; the choice is the unit test `UploadTests` (`uploadAnswer`).
+    static let fileChoiceUnitOnly = "file choice: unit test only"
+
+    /// R22: the open panel is shown for the page's file input, and Cancel gives the page nothing chosen.
     static func fileInput(_ app: AppSession) throws -> String {
         _ = try PageSteps.openTest(app, "/upload", title: BasicPages.uploadTitle)
         try SheetDriving.click(app, "#pick", "the file input's label")
         _ = try SheetDriving.sheet(app, kind: "open")
         try SheetDriving.press(app, "Cancel")
-        let state = try SheetDriving.gone(app, after: "Cancel")
-        return "the file input: the open panel shown as a sheet; Cancel closed it (title \"\(state.title)\"); "
-            + "picking a file in the panel: not read back"
+        var state = try SheetDriving.gone(app, after: "Cancel")
+        waitUntil(3) {
+            state = (try? app.state()) ?? state
+            return state.title == BasicPages.uploadCancelTitle
+        }
+        let cancel = try cancelPart(title: state.title)
+        return "the file input: the open panel shown as a sheet; \(cancel); \(fileChoiceUnitOnly)"
+    }
+
+    /// The page's title after Cancel: "file: cancel" (WebKit's `cancel` event) or unchanged is nothing
+    /// chosen; "file: <name>" means the page got a file: FAIL.
+    static func cancelPart(title: String) throws -> String {
+        if title == BasicPages.uploadCancelTitle { return "Cancel: the page heard cancel, nothing chosen" }
+        try expect(title == BasicPages.uploadTitle || title == "file: none",
+                   "after Cancel the page's title is \"\(title)\": the input got a file")
+        return "Cancel: nothing chosen (the page's title stays \"\(title)\")"
     }
 
     /// Only the kind and Cancel are read: the print panel's other buttons name the Mac's printers.

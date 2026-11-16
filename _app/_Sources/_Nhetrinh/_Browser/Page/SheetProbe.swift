@@ -18,6 +18,17 @@ extension BrowserWindowController {
         state.hubShown = hub?.window?.isVisible ?? false
     }
 
+    /// P4's probe ops: the find bar's field, a Settings Hub control.
+    func toolAnswer(_ request: ProbeRequest) -> ProbeResponse {
+        switch request {
+        case .find(let text): return typeInFindBar(text)
+        case .setting(let name, let value):
+            guard let hub, hub.window?.isVisible == true else { return .failed("the Settings Hub is not shown") }
+            return hub.set(name, to: value) ? .done : .failed("the Settings Hub has no \(name) \(value)")
+        default: return .failed("not a tool request")
+        }
+    }
+
     /// The probe's `find`: typed into the shown bar, then Return.
     func typeInFindBar(_ text: String) -> ProbeResponse {
         guard !findBar.isHidden else { return .failed("the find bar is not shown") }

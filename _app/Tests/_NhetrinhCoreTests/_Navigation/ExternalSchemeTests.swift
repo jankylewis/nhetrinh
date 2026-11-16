@@ -41,3 +41,10 @@ func linksAreReadByTheirScheme(link: String, leaves: Bool) throws {
     #expect(ExternalScheme.leaves(url) == leaves)
     #expect(ExternalScheme.leaves(scheme: leaves ? "https" : "mailto") == !leaves, "the control")
 }
+
+/// `javascript:` runs in its own page: never an ask sheet ("No app on this Mac opens javascript: links"),
+/// never handed to macOS. Found by the P3-FIX-1 merge: P2's ⌘-click test let it run, P3 refused it.
+@Test(arguments: ["javascript", "JavaScript", "JAVASCRIPT"])
+func javascriptStays(scheme: String) {
+    expectDecision(scheme, leaves: false)
+}

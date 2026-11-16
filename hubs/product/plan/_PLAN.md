@@ -80,7 +80,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 | R-3 | WebKit limits: no find match count; some sites refuse non-Safari WebKit apps | Listed as known limits; the user agent already ends like Safari's |
 | R-4 | P7 (tab folders) is the largest phase | It can move after 1.0 without blocking it (`DECISIONS.md` Q2) |
 | R-5 | A feature costs memory | The budget gate stops the phase |
-| R-6 | P2: the link's menu is WebKit's own; the probe opens it with an in-app right click | R17 says NOT READ BACK when no menu is seen; at 22:34 the menu opened and R17 PASS |
+| R-6 | P2: the link's menu is WebKit's own; the probe opens it with an in-app right click. The probe's in-app ⌘-click did not reach the page (23:00) | R17 says NOT READ BACK when no menu is seen; at 22:34 the menu opened and R17 PASS. ⌘-click: unit test `commandClickOpensABackgroundTab` only (ruling READBACK P2-2); a ⌘-click that does not arrive is said in R17's line, never NOT READ BACK; one that arrives wrong is a FAIL. Why it did not arrive: not proven |
 | R-7 | P2: favicons fetch in the app process (URLSession) and keep images | 32 px each, 200 at most (800 KB); R8 22:34: app 30.5 MB with example.com's icon request (the P2 cost alone not measured) |
 | R-8 | P2: ⌃⇥ / ⌃⇧⇥ may be taken by the web view before the menu; hover and drag are not read back (D18) | Tested on the menu items only; reported as not read back |
 

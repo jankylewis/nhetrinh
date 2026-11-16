@@ -2,7 +2,7 @@
 # _AppIcon.png (1024, transparent) -> bundle/AppIcon.icns (Finder, Launchpad).
 # 16, 32 and 64 px are smoothed by sips (a nearest-neighbour downscale would drop grid cells);
 # 128 px and up are the 80 px grid drawn nearest-neighbour (tools/nearest.swift): the hard pixels of the
-# master at a third of the old size (NT-PRF-003). The result is checked against the master, pixel for pixel.
+# master at a third of the old size (NT-PRF-005). The result is checked against the master, pixel for pixel.
 set -euo pipefail
 cd "${0:A:h}/.."
 WORK=$(mktemp -d)

@@ -1,9 +1,10 @@
-# NT-PRF-003 — Binary exports and speed optimised
+# NT-PRF-005 — Binary exports and speed optimised
 
-id: NT-PRF-003
+id: NT-PRF-005
 family: PRF
 status: OBSERVED
 date: 2026-11-16
+note: filed as NT-PRF-003 on p4/tools; renumbered at the P3 merge (P4-MERGE-1): p3/pages had taken 003 and 004
 signature: bundle 864 KB (max 1024)
 source: hubs/failures/evidence/readback/_LATEST.md (R8 row, P4 run 23:20, build 3fd21ed)
 source: _app/scripts/_build.sh (`-Xswiftc "$OPT" -Xlinker -no_exported_symbols`, the export check after `strip`)

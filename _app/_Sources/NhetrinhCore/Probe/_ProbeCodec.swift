@@ -27,6 +27,10 @@ public enum ProbeRequest: Equatable, Sendable {
     case find(String)
     /// The Settings Hub's control `name` set to `value` as a user picks it ("Search engine", "DuckDuckGo") (P4).
     case setting(name: String, value: String)
+    /// A middle click on a sidebar row (R13).
+    case middleClick(row: Int)
+    /// A ⌘-click on the first link in the selected page (R17).
+    case commandClickLink
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -57,6 +61,8 @@ public enum ProbeCodec {
         case .front: return try line(["op": "front"])
         case .find(let text): return try line(["op": "find", "text": text])
         case .setting(let name, let value): return try line(["op": "setting", "name": name, "text": value])
+        case .middleClick(let row): return try line(["op": "middleClick", "index": row])
+        case .commandClickLink: return try line(["op": "commandClickLink"])
         }
     }
 
@@ -89,6 +95,8 @@ public enum ProbeCodec {
         case ("sheetButton", .some(let label), _) where !label.isEmpty: return .sheetButton(label)
         case ("sheetField", .some(let text), .some(let index)) where index >= 0:
             return .sheetField(index: index, text: text)
+        case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
+        case ("commandClickLink", _, _): return .commandClickLink
         case ("menu", _, _):
             guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
             return .menu(path)

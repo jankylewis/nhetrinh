@@ -3,7 +3,7 @@
 // The master (_AppIcon.png, 1024 px) is an 80 x 80 grid scaled nearest-neighbour (_pixelate.swift). Its grid
 // is read back from the centre of each block; drawing it at 1024 gives the master again (checked first).
 // Sizes from 128 up are upscales of the grid, so they keep the hard pixels; 16, 32 and 64 stay smoothed
-// (make_icns.sh, NT-PRF-003). The PNG is written with the ImageIO filter that gives the smallest file.
+// (make_icns.sh, NT-PRF-005). The PNG is written with the ImageIO filter that gives the smallest file.
 import AppKit
 import ImageIO
 import UniformTypeIdentifiers
