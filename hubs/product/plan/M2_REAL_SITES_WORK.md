@@ -3,7 +3,7 @@
 After M2 nhetrinh does what every site expects from a browser. The gate is in `_PLAN.md`.
 The readback tool serves its own local test pages, so these steps do not depend on the network.
 
-## P3 — Page basics: sites must not break (0.4.0, size L, status TODO)
+## P3 — Page basics: sites must not break (0.4.0, size L, status WIP: P3-BUILD-1, not merged)
 
 Goal: the things below work. Today each one fails without a message, because a WebKit view
 does nothing for them until the app adds the code.
@@ -35,8 +35,8 @@ Readback adds:
 - R24 a Basic sign-in page: the sheet; the right password loads the page, a wrong one asks again.
 - R25 File > Print…: the print panel opens; cancel.
 - R26 a `mailto:` link: the ask sheet appears; cancel; nothing leaves the app.
-- Camera, microphone and fullscreen: the readback tries them on a local page. If the macOS
-  prompt cannot be driven, the report says "not read back".
+- R26a camera and microphone, R26b fullscreen: the readback tries them on a local page. If the
+  macOS prompt cannot be driven, the report says "not read back" (since P3-BUILD-1: NT-TG-005).
 
 Exit: the gate, R1-R26 PASS. Risk R-2 (permission grants after a rebuild) is checked here.
 

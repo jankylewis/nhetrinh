@@ -12,7 +12,7 @@ struct AppMenuTests {
         ["View", "Toggle Sidebar"], ["View", "Reload"],
         ["Tabs", "Back"], ["Tabs", "Forward"], ["Tabs", "Tab 1"], ["Tabs", "Tab 9"],
         ["File", "Reopen Closed Tab"], ["View", "Stop"], ["Tabs", "Select Next Tab"], ["Tabs", "Select Previous Tab"],
-        ["Tabs", "Move Tab Up"], ["Tabs", "Move Tab Down"],
+        ["Tabs", "Move Tab Up"], ["Tabs", "Move Tab Down"], ["File", "Print…"],
     ]
 
     @Test(arguments: browserItems)
@@ -31,6 +31,7 @@ struct AppMenuTests {
         (["File", "New Tab"], "t"), (["File", "Close Tab"], "w"), (["File", "Open Location"], "l"),
         (["View", "Toggle Sidebar"], "s"), (["View", "Reload"], "r"), (["Tabs", "Back"], "["),
         (["Tabs", "Forward"], "]"), (["Tabs", "Tab 1"], "1"), (["Tabs", "Tab 9"], "9"),
+        (["File", "Print…"], "p"),
     ])
     func browserItemKeepsItsShortcut(path: [String], key: String) throws {
         let menu = AppMenu.build(browser: BrowserWindowController())

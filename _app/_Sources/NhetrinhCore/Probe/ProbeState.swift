@@ -1,6 +1,6 @@
 import Foundation
 
-/// What the app shows, as the readback needs it (R1, R3-R7, R9-R18). Every field has a default, so an
+/// What the app shows, as the readback needs it (R1, R3-R7, R9-R26). Every field has a default, so an
 /// answer from an older app still decodes; the readback then sees the default and says so.
 public struct ProbeState: Equatable, Sendable {
     public var title = ""
@@ -25,6 +25,14 @@ public struct ProbeState: Equatable, Sendable {
     public var reloadButton = ""
     /// The items of the page's last context menu, as it was shown (P2).
     public var webMenu: [String] = []
+    /// The window's sheet (P3): its text ("" when none), its kind ("alert", "open", "print"; "" none),
+    /// its buttons, and how many sheets were shown since launch (a sheet asked again counts again).
+    public var sheet = ""
+    public var sheetKind = ""
+    public var sheetButtons: [String] = []
+    public var sheetsShown = 0
+    /// How many links were handed to another app through macOS since launch (P3).
+    public var handedOff = 0
 
     public init() {}
 }
@@ -34,7 +42,9 @@ extension ProbeState {
         var object: [String: Any] = ["title": title, "rows": rows, "loaded": loaded, "address": address,
                                      "windowShown": windowShown, "sidebarWidth": sidebarWidth,
                                      "addressShown": addressShown, "shortcuts": shortcuts, "icons": icons,
-                                     "loading": loading, "reloadButton": reloadButton, "webMenu": webMenu]
+                                     "loading": loading, "reloadButton": reloadButton, "webMenu": webMenu,
+                                     "sheet": sheet, "sheetKind": sheetKind, "sheetButtons": sheetButtons,
+                                     "sheetsShown": sheetsShown, "handedOff": handedOff]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -54,5 +64,10 @@ extension ProbeState {
         loading = object["loading"] as? Bool ?? false
         reloadButton = object["reloadButton"] as? String ?? ""
         webMenu = object["webMenu"] as? [String] ?? []
+        sheet = object["sheet"] as? String ?? ""
+        sheetKind = object["sheetKind"] as? String ?? ""
+        sheetButtons = object["sheetButtons"] as? [String] ?? []
+        sheetsShown = object["sheetsShown"] as? Int ?? 0
+        handedOff = object["handedOff"] as? Int ?? 0
     }
 }

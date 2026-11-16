@@ -5,3 +5,4 @@ Index of this folder; `_SCHEMA.md` has the rules.
 | Entry | What |
 |---|---|
 | `NT_GAT_009_RUNLOOP_IN_A_MAIN_ACTOR_TEST_RAN_OTHER_TESTS.md` | OBSERVED |
+| `NT_GAT_010_PROBE_READ_SHEET_BUTTONS_IN_VIEW_ORDER.md` | OBSERVED |

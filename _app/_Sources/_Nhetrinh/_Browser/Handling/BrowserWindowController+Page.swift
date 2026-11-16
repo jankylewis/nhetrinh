@@ -28,22 +28,33 @@ extension BrowserWindowController {
     /// The probe's R17: a right click on the first link of the selected page, in this app only (no
     /// system event, D18); `item` is pressed once WebKit shows the menu. The answer comes before.
     func showLinkMenu(pressing item: String) -> String? {
-        guard let webView = current as? BrowserWebView, let window else { return "no page is shown" }
-        webView.evaluateJavaScript(Self.firstLinkCenter) { [weak webView] result, _ in
-            guard let webView, let center = result as? [Double], center.count == 2 else {
+        guard let webView = current as? BrowserWebView else { return "no page is shown" }
+        webView.evaluateJavaScript(Self.firstLinkCenter) { [weak self, weak webView] result, _ in
+            guard let self, let webView, let center = result as? [Double], center.count == 2 else {
                 return Log.app.error("probe: the page has no link to show a menu on")
             }
-            let y = webView.isFlipped ? center[1] : webView.bounds.height - center[1]
-            let point = webView.convert(NSPoint(x: center[0], y: y), to: nil)
             webView.pressOnOpen = item
-            for type in [NSEvent.EventType.rightMouseDown, .rightMouseUp] {
-                guard let event = NSEvent.mouseEvent(with: type, location: point, modifierFlags: [],
-                                                     timestamp: ProcessInfo.processInfo.systemUptime,
-                                                     windowNumber: window.windowNumber, context: nil,
-                                                     eventNumber: 0, clickCount: 1, pressure: 1) else { continue }
-                type == .rightMouseDown ? webView.rightMouseDown(with: event) : webView.rightMouseUp(with: event)
-            }
+            self.sendMouse([.rightMouseDown, .rightMouseUp], to: webView, at: center)
         }
         return nil
+    }
+
+    /// Mouse events at `center` (page coordinates), to this web view only: no system event (D18).
+    func sendMouse(_ types: [NSEvent.EventType], to webView: WKWebView, at center: [Double]) {
+        guard let window = webView.window else { return Log.app.error("probe: the page is not in a window") }
+        let y = webView.isFlipped ? center[1] : webView.bounds.height - center[1]
+        let point = webView.convert(NSPoint(x: center[0], y: y), to: nil)
+        for type in types {
+            guard let event = NSEvent.mouseEvent(with: type, location: point, modifierFlags: [],
+                                                 timestamp: ProcessInfo.processInfo.systemUptime,
+                                                 windowNumber: window.windowNumber, context: nil,
+                                                 eventNumber: 0, clickCount: 1, pressure: 1) else { continue }
+            switch type {
+            case .rightMouseDown: webView.rightMouseDown(with: event)
+            case .rightMouseUp: webView.rightMouseUp(with: event)
+            case .leftMouseDown: webView.mouseDown(with: event)
+            default: webView.mouseUp(with: event)
+            }
+        }
     }
 }

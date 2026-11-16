@@ -58,6 +58,7 @@ extension BrowserWindowController {
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        if #available(macOS 13.3, *) { webView.isInspectable = true }  // Safari's Develop menu (DECISIONS.md Q3)
         tab.webView = webView
         observe(webView, for: tab)
         guard adopted == nil else { return }

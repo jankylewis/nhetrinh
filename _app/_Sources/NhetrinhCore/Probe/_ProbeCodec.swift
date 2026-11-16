@@ -15,6 +15,12 @@ public enum ProbeRequest: Equatable, Sendable {
     case linkMenu(item: String)
     /// A toolbar button by its label ("Stop"), pressed (R18).
     case button(String)
+    /// A left click on the first element the CSS selector finds in the selected page (P3).
+    case click(String)
+    /// The window's sheet: press its button `label` (P3: a page dialog, the open or print panel).
+    case sheetButton(String)
+    /// The window's sheet: type `text` into its text field `index` (0 first), as a user replaces it (P3).
+    case sheetField(index: Int, text: String)
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -39,6 +45,9 @@ public enum ProbeCodec {
         case .rowMenu(let row, let item): return try line(["op": "rowMenu", "index": row, "text": item])
         case .linkMenu(let item): return try line(["op": "linkMenu", "text": item])
         case .button(let label): return try line(["op": "button", "text": label])
+        case .click(let selector): return try line(["op": "click", "text": selector])
+        case .sheetButton(let label): return try line(["op": "sheetButton", "text": label])
+        case .sheetField(let index, let text): return try line(["op": "sheetField", "index": index, "text": text])
         }
     }
 
@@ -62,6 +71,10 @@ public enum ProbeCodec {
             return .rowMenu(row: row, item: item)
         case ("linkMenu", .some(let item), _) where !item.isEmpty: return .linkMenu(item: item)
         case ("button", .some(let label), _) where !label.isEmpty: return .button(label)
+        case ("click", .some(let selector), _) where !selector.isEmpty: return .click(selector)
+        case ("sheetButton", .some(let label), _) where !label.isEmpty: return .sheetButton(label)
+        case ("sheetField", .some(let text), .some(let index)) where index >= 0:
+            return .sheetField(index: index, text: text)
         case ("menu", _, _):
             guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
             return .menu(path)

@@ -24,6 +24,9 @@ extension BrowserWindowController {
         case .linkMenu(let item): return showLinkMenu(pressing: item).map { .failed($0) } ?? .done
         case .button(let label):
             return toolbar.press(label) ? .done : .failed("the toolbar has no button \(label)")
+        case .click(let selector): return clickInPage(selector)
+        case .sheetButton(let label): return pressSheetButton(label)
+        case .sheetField(let index, let text): return typeInSheet(field: index, text)
         }
     }
 
@@ -43,6 +46,7 @@ extension BrowserWindowController {
         state.loading = current?.isLoading ?? false
         state.reloadButton = toolbar.reloadLabel
         state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
+        readSheet(into: &state)
         return state
     }
 

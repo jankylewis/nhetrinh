@@ -8,6 +8,7 @@ enum WebConfig {
         config.websiteDataStore = dataStore()
         // A Safari-like user agent tail, so sites treat nhetrinh as Safari.
         config.applicationNameForUserAgent = "Version/18.0 Safari/605.1.15"
+        config.preferences.isElementFullscreenEnabled = true  // fullscreen video (P3)
         return config
     }()
 
