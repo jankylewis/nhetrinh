@@ -7,14 +7,19 @@
 #   readback_app.sh run [flags]  also run it (flags as for nhetrinh-readback: --steps, --app);
 #                                exits with the readback's own exit code
 #
-# A rebuild changes the ad-hoc signature, and macOS may then forget the grant (risk R-2), so the
-# app is rebuilt only when the hash of the readback's sources changes (kept as NHTSourceHash).
+# An ad-hoc signature changes with every rebuild, and macOS then drops the grants (risk R-2, seen
+# 2026-11-16). So the app is signed with the local identity of signing.sh when it exists (ad hoc
+# otherwise), and rebuilt only when the hash of the readback's sources and of that identity
+# changes (kept as NHTSourceHash). Creating the identity is the headmate's step: signing.sh create.
 set -euo pipefail
 cd "${0:A:h}/../.."
 REPO="${PWD:h}"
 APP=~/Applications/nhetrinh-readback.app
-HASH=$(find Package.swift _Sources/NhetrinhReadback -type f -name '*.swift' -print0 | LC_ALL=C sort -z \
-  | xargs -0 shasum -a 256 | shasum -a 256 | cut -c1-16)
+SIGN=$(scripts/install/signing.sh identity)  # SHA-1 of the local identity, or empty: ad hoc
+SOURCES=$(find Package.swift _Sources/NhetrinhReadback -type f -name '*.swift' -print0 | LC_ALL=C sort -z \
+  | xargs -0 shasum -a 256)
+[[ -z "$SIGN" ]] || SOURCES+=$'\n'"signing $SIGN"  # without an identity the hash stays as before
+HASH=$(print -r -- "$SOURCES" | shasum -a 256 | cut -c1-16)
 INSTALLED=$(/usr/libexec/PlistBuddy -c 'Print :NHTSourceHash' "$APP/Contents/Info.plist" 2>/dev/null || true)
 
 if [[ "$INSTALLED" == "$HASH" && -x "$APP/Contents/MacOS/nhetrinh-readback" ]]; then
@@ -41,7 +46,8 @@ else
   <key>LSUIElement</key><true/>
 </dict></plist>
 PLIST
-  codesign --force --sign - "$BUILT"
+  codesign --force --sign "${SIGN:--}" "$BUILT"
+  echo "signed with ${SIGN:+the local identity $SIGN}${SIGN:-an ad-hoc signature (no local identity: signing.sh)}"
   mkdir -p ~/Applications
   rm -rf "$APP"
   cp -R "$BUILT" "$APP"

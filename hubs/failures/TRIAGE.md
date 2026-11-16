@@ -21,4 +21,4 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |
 | NT-TG-002 | `screenshot shows other windows` | OPEN | Capture one window by id, never a screen region |
-| NT-TG-003 | `AXIsProcessTrusted` false in an agent session | OPEN | Run the readback as its own granted app: `_app/scripts/install/readback_app.sh run` |
+| NT-TG-003 | `has no Accessibility permission` | OPEN | Which app does the reason name? Run as the granted app: `readback_app.sh run`; after a rebuild grant again (R-2) |

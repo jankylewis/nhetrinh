@@ -73,3 +73,26 @@ func homeFolderIsWrittenAsTilde(path: (text: String, written: String)) {
     #expect(!text.contains(home))
     #expect(text.contains("~/Applications/nhetrinh.app") && text.contains("saved ~/capture.png"))
 }
+
+/// P0-SIGN-1. A step without a grant is NOT READ BACK; its reason must name the app that lacks
+/// the grant: nhetrinh-readback.app when the tool runs as that app, the terminal otherwise.
+/// Only a name, never a path (the report is public).
+let granteeCases: [(bundlePath: String, grantee: String)] = [
+    ("/Applications/nhetrinh-readback.app", "nhetrinh-readback.app"),
+    ("/repo/_app/build/nhetrinh-readback.app", "nhetrinh-readback.app"),
+    ("/repo/_app/.build/arm64-apple-macosx/release", "the terminal app"),
+    ("/repo/_app/.build/debug", "the terminal app"),
+]
+
+@Test(arguments: granteeCases)
+func granteeIsTheAppThatRuns(bundlePath: String, grantee: String) {
+    #expect(Grant.grantee(bundlePath: bundlePath) == grantee)
+}
+
+@Test(arguments: granteeCases)
+func missingGrantNamesTheGranteeAndNoPath(bundlePath: String, grantee: String) {
+    for reason in [Grant.noAccessibility(bundlePath: bundlePath), Grant.noScreenRecording(bundlePath: bundlePath)] {
+        #expect(reason.hasPrefix(grantee + " has no "), "\(reason)")
+        #expect(!reason.contains("/"), "\(reason)")
+    }
+}

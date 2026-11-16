@@ -56,7 +56,7 @@ final class AppSession {
     /// the step is NOT READ BACK; it must never look like a failure of the app, or like a pass.
     func requireAccessibility() throws {
         guard AXNode.isTrusted else {
-            throw StepError.cannotDrive("the terminal app has no Accessibility permission (System Settings)")
+            throw StepError.cannotDrive(Grant.noAccessibility())
         }
     }
 
@@ -97,5 +97,23 @@ final class AppSession {
         let field = try element("nhetrinh.address")
         try field.set(kAXValueAttribute, to: text as CFString)
         try field.confirm()
+    }
+}
+
+/// macOS grants Accessibility and Screen Recording per app (NT-TG-003). A step without a grant is
+/// NOT READ BACK, and its reason names the app that lacks it: nhetrinh-readback.app when the tool
+/// runs as that app (readback_app.sh run), else the terminal that started it. A name, never a path.
+enum Grant {
+    static func grantee(bundlePath: String = Bundle.main.bundlePath) -> String {
+        let bundle = URL(fileURLWithPath: bundlePath)
+        return bundle.pathExtension == "app" ? bundle.lastPathComponent : "the terminal app"
+    }
+
+    static func noAccessibility(bundlePath: String = Bundle.main.bundlePath) -> String {
+        grantee(bundlePath: bundlePath) + " has no Accessibility permission (System Settings, Privacy & Security)"
+    }
+
+    static func noScreenRecording(bundlePath: String = Bundle.main.bundlePath) -> String {
+        grantee(bundlePath: bundlePath) + " has no Screen Recording permission (System Settings, Privacy & Security)"
     }
 }

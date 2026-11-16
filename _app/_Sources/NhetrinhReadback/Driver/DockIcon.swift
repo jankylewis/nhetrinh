@@ -92,7 +92,7 @@ enum DockIcon {
         tool.waitUntilExit()
         guard tool.terminationStatus == 0, let data = try? Data(contentsOf: file),
               let image = NSBitmapImageRep(data: data) else {
-            throw StepError.cannotDrive("the Dock item could not be captured (Screen Recording permission?)")
+            throw StepError.cannotDrive("the Dock item could not be captured; " + Grant.noScreenRecording() + "?")
         }
         let scale = Double(image.pixelsWide) / frame.width, inner = item.frame.intersection(frame)
         let inside = CGRect(x: (inner.minX - frame.minX) * scale, y: (inner.minY - frame.minY) * scale,
