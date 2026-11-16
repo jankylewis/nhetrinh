@@ -85,7 +85,8 @@ func bitmap(wide: Int, high: Int, _ body: (NSRect) -> Void) -> NSBitmapImageRep 
 @Test(arguments: DockCapture.allCases, [0.85, 0.25])
 func dockCaptureVerdict(capture: DockCapture, dock: CGFloat) {
     let drawn = capture.draw(dock: dock)
-    let match = IconMatch.measure(capture: drawn.image, icon: bitmap(side: 256) { drawIcon(in: $0) }, item: drawn.item)
+    let match = IconMatch.measure(capture: drawn.image, icon: bitmap(side: 256) { drawIcon(in: $0) }, item: drawn.item,
+                                  axis: .horizontal)
     #expect(match.showsBareIcon == capture.showsBareIcon,
             "\(capture.rawValue), Dock \(dock): agreement \(match.agreement), scale \(match.scale)")
 }

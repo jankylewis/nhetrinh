@@ -15,7 +15,8 @@ enum SystemSteps {
             throw StepError.fail("the app bundle has no AppIcon.png")
         }
         let capture = try DockIcon.capture(item)
-        let match = IconMatch.measure(capture: capture.image, icon: icon, item: capture.item)
+        let match = IconMatch.measure(capture: capture.image, icon: icon, item: capture.item,
+                                      axis: DockAxis.of(item.dock))
         let seen = String(format: "silhouette agreement %.0f %%, icon at %.0f %% of the Dock item",
                           match.agreement * 100, match.scale * 100)
             + kept(capture.png, DockIcon.note(match, item: item), in: app)
