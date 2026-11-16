@@ -19,6 +19,9 @@ let package = Package(
         // Pure logic, no AppKit/WebKit: address parsing, session model. Unit tested.
         .target(name: "NhetrinhCore", path: "_Sources/NhetrinhCore"),
         .testTarget(name: "NhetrinhCoreTests", dependencies: ["NhetrinhCore"], path: "Tests/_NhetrinhCoreTests"),
+        // The pure parts of the readback tool: icon match, report, options.
+        .testTarget(name: "NhetrinhReadbackTests", dependencies: ["NhetrinhReadback"],
+                    path: "Tests/NhetrinhReadbackTests"),
     ],
     swiftLanguageModes: [.v5]
 )

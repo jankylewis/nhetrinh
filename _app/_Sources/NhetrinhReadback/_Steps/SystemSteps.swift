@@ -31,7 +31,7 @@ enum SystemSteps {
         let match = IconMatch.measure(capture: capture, icon: icon)
         let seen = String(format: "silhouette agreement %.0f %%, icon at %.0f %% of the Dock item",
                           match.agreement * 100, match.scale * 100)
-        try expect(match.agreement >= 0.90 && match.scale >= 0.60, "the Dock item does not show the bare icon: \(seen)")
+        try expect(match.showsBareIcon, "the Dock item does not show the bare icon: \(seen)")
         return "captured only the Dock item (\(Int(frame.width)) x \(Int(frame.height)) pt): \(seen)"
     }
 

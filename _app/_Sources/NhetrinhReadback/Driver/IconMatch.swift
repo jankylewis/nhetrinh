@@ -14,6 +14,9 @@ struct IconMatch {
     static let grid = 48
     static let colourDistance = 30.0
 
+    /// R2 passes only here: the shape matches the icon, and the icon fills most of the Dock item.
+    var showsBareIcon: Bool { agreement >= 0.90 && scale >= 0.60 }
+
     static func measure(capture: NSBitmapImageRep, icon: NSBitmapImageRep) -> IconMatch {
         let occupied = occupiedCells(of: capture)
         let opaque = opaqueTable(of: icon)

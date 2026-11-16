@@ -23,7 +23,7 @@ CLAUDE.md      briefing for every agent: the laws and the commands
 _app/          the app (Swift Package Manager, Command Line Tools only, no Xcode)
   _Sources/    _Nhetrinh (AppKit + WebKit UI), NhetrinhCore (pure logic, unit tested),
                NhetrinhReadback (the readback tool)
-  Tests/       Swift Testing tests of NhetrinhCore
+  Tests/       Swift Testing tests of NhetrinhCore and of the readback tool's pure parts
   scripts/     _build.sh, install.sh, test.sh, conventions/ (the checker), VERSION
   assets/      _icon (Hirono, pixel style)
 hubs/          learnings (bugs, failures, lessons, tool gaps) and product (features, plan, rnd);

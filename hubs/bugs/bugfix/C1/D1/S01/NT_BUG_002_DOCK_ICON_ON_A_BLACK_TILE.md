@@ -6,6 +6,7 @@ status: OBSERVED
 date: 2026-11-16
 source: _app/_Sources/_Nhetrinh/AppDelegate.swift (`NSApp.applicationIconImage`)
 source: _app/assets/_icon/tools/_pixelate.swift (pixel style, hard alpha, fills the canvas)
+source: headmate Dock screenshot 2026-11-16 (the running app, after the change)
 links: fix=yes lesson=yes evidence=yes toolgap=NT-TG-001
 
 ## Change
@@ -15,4 +16,10 @@ links: fix=yes lesson=yes evidence=yes toolgap=NT-TG-001
 
 ## Proof
 
-Not proven: no Dock readback after the change. The headmate's two other apps use the same call (`setApplicationIconImage` found in both binaries) and show no tile.
+The headmate confirmed on 2026-11-16, by a Dock screenshot, that the running app shows Hirono
+with no tile. Not proven by the readback: R2 has not passed yet (NT-TG-001), so the status stays
+OBSERVED. The headmate's two other apps use the same call (`setApplicationIconImage` found in
+both binaries) and show no tile.
+
+Not fixed: when the app is not running, macOS draws the bundle `.icns` on a tile (see the
+bugfacing entry, "Known limit"; headmate ruling pending).

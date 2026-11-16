@@ -71,6 +71,7 @@ Past 5 entries, group by meaning; never widen a folder.
 | `_app/_Sources/NhetrinhCore/` | pure logic, unit tested |
 | `_app/_Sources/NhetrinhReadback/` | the readback tool |
 | `_app/Tests/_NhetrinhCoreTests/` | tests of `NhetrinhCore` |
+| `_app/Tests/NhetrinhReadbackTests/` | tests of the readback tool's pure parts (icon match, report, options) |
 
 ## Report
 

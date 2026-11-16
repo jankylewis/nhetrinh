@@ -18,7 +18,7 @@ Build (App, the WebKit delegate files in `_Browser/`):
    page; there is no "proceed anyway" in v1 (`DECISIONS.md` Q5).
 5. Camera and microphone: a permission prompt per site, and the two usage texts in Info.plist.
 6. Fullscreen video.
-7. Print, ⌘P.
+7. Print: File > Print… (⌘P).
 8. Links to other apps (`mailto:`, meeting apps and so on): ask, then hand the link to macOS.
 9. Web Inspector through the public API (`isInspectable`: inspect from Safari's Develop menu).
    An "Inspect Element" item inside nhetrinh needs a private WebKit key (`DECISIONS.md` Q3).
@@ -33,7 +33,7 @@ Readback adds:
 - R22 file input: the panel opens; pick a fixture file; the page shows its name.
 - R23 a closed port: the error page with Retry. Start the server, press Retry: the page loads.
 - R24 a Basic sign-in page: the sheet; the right password loads the page, a wrong one asks again.
-- R25 ⌘P: the print panel opens; cancel.
+- R25 File > Print…: the print panel opens; cancel.
 - R26 a `mailto:` link: the ask sheet appears; cancel; nothing leaves the app.
 - Camera, microphone and fullscreen: the readback tries them on a local page. If the macOS
   prompt cannot be driven, the report says "not read back".
@@ -45,11 +45,11 @@ Exit: the gate, R1-R26 PASS. Risk R-2 (permission grants after a rebuild) is che
 Goal: find text, zoom per site, and one place for the few settings.
 
 Build:
-- Find bar under the toolbar: ⌘F opens it, ⌘G and ⇧⌘G go to the next and previous match,
-  Esc closes it and gives the focus back to the page. WebKit's find API answers found or
-  not found only, so v1 shows no match count.
-- Zoom: ⌘+, ⌘-, ⌘0 and pinch. The level is kept per site (host). A zoom badge shows in the
-  address bar when the level is not 100 %.
+- Find bar under the toolbar, from Edit > Find > Find… (⌘F), Find Next (⌘G), Find Previous (⇧⌘G).
+  Esc or the bar's Close button closes it and gives the focus back to the page. WebKit's find
+  API answers found or not found only, so v1 shows no match count.
+- Zoom: View > Zoom In (⌘+), Zoom Out (⌘-), Actual Size (⌘0), and pinch. The level is kept per
+  site (host). A zoom badge shows in the address bar when the level is not 100 %.
 - Core `Prefs`, saved as `prefs.json`: zoom levels, search engine (Google, DuckDuckGo, Bing),
   idle-unload minutes. A corrupt file gives the defaults and the bad file is kept.
 - Settings Hub (D19): one small native window, opened with ⌘, (menu nhetrinh > Settings Hub…).
@@ -62,8 +62,8 @@ Tests: zoom steps (50 % to 300 %, clamped at both ends); host key (lower case, p
 System; the search URL per engine through `AddressParser`.
 
 Readback adds:
-- R27 ⌘F, type "Example": found. Type "zzzz": the not-found state. Esc: the bar is gone.
-- R28 ⌘+ twice: the badge shows 125 %. Relaunch: still 125 % on that host, 100 % on another.
+- R27 Edit > Find > Find…, set "Example": found; "zzzz": not found. Close button: the bar is gone.
+- R28 View > Zoom In twice: the badge shows 125 %. Relaunch: still 125 % on that host, 100 % on another.
 - R29 change the search engine: the next search goes to that engine's URL.
 - R30 Clear Website Data: a cookie set by a local page is gone.
 - R30a nhetrinh > Settings Hub…, Appearance Dark: the window is dark and a local page that reads
