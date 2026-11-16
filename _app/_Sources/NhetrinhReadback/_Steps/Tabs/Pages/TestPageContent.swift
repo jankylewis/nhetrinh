@@ -1,6 +1,6 @@
 import Foundation
 
-/// What the readback's local test server answers (R9-R30a): never a site on the Internet.
+/// What the readback's local test server answers (R9-R35): never a site on the Internet.
 ///   /page/<n>      a page titled "nhetrinh test <n>"
 ///   /play          a page that plays /silence.wav in a loop; its title says when it plays
 ///   /silence.wav   2 s of silence (digital zero: nothing is heard on the shared machine)

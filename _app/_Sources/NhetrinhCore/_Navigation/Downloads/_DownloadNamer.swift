@@ -18,6 +18,16 @@ public enum DownloadNamer {
         return (0...maxTries).lazy.map { candidate(name, number: $0) }.first { !isTaken($0) }
     }
 
+    /// Whether `name` can be written in `folder`: the file is made empty and removed at once. macOS asks
+    /// for ~/Downloads on the thread that first writes there, so the app calls this off the main thread.
+    public static func canWrite(_ name: String, in folder: URL) -> Bool {
+        let path = folder.appendingPathComponent(name).path
+        let file = open(path, O_WRONLY | O_CREAT | O_EXCL, 0o600)  // never an existing file
+        guard file >= 0 else { return false }
+        close(file)
+        return unlink(path) == 0
+    }
+
     /// Clash `number` of `suggested` (0: the name itself), cut to `maxBytes`.
     public static func candidate(_ suggested: String, number: Int) -> String {
         var (base, ext) = split(suggested)

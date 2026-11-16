@@ -69,3 +69,23 @@ func cleansTheSiteName(suggested: String, expected: String) {
     #expect(name == nil)
     #expect(asked == DownloadNamer.maxTries + 1)
 }
+
+/// P5-BUILD-1 readback: macOS asks for ~/Downloads on the thread that first writes there; WebKit did that
+/// on the main thread and the app froze. `canWrite` writes first, on the caller's thread, and leaves nothing.
+@Test(arguments: [(true, true), (false, false)])
+func canWriteMakesAndRemovesTheFile(writable: Bool, expected: Bool) throws {
+    let folder = FileManager.default.temporaryDirectory.appendingPathComponent("nhetrinh-namer-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+    defer {
+        try? FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: folder.path)
+        try? FileManager.default.removeItem(at: folder)
+    }
+    if !writable { try FileManager.default.setAttributes([.posixPermissions: 0o500], ofItemAtPath: folder.path) }
+    #expect(DownloadNamer.canWrite("a.pdf", in: folder) == expected)
+    #expect(try FileManager.default.contentsOfDirectory(atPath: folder.path).isEmpty, "nothing is left")
+}
+
+@Test func canWriteIsFalseWithoutTheFolder() {
+    let missing = FileManager.default.temporaryDirectory.appendingPathComponent("nhetrinh-none-\(UUID().uuidString)")
+    #expect(!DownloadNamer.canWrite("a.pdf", in: missing))
+}

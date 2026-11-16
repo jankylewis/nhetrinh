@@ -4,8 +4,9 @@ import WebKit
 
 /// P5: every download of this launch. The file goes to ~/Downloads under the first free name
 /// (`DownloadNamer`); a file there is never replaced. A cancelled or failed download leaves no file.
-/// The name is chosen off the main thread: macOS may hold the first look into ~/Downloads while it
-/// asks for access (Info.plist: NSDownloadsFolderUsageDescription).
+/// The name is chosen, and the file first written, off the main thread: macOS holds the first write into
+/// ~/Downloads while it asks for access (Info.plist: NSDownloadsFolderUsageDescription); inside WebKit that
+/// wait was on the main thread and froze the app (P5-BUILD-1 readback).
 final class Downloads: NSObject, WKDownloadDelegate {
     private final class Entry {
         let id: Int
@@ -50,9 +51,12 @@ final class Downloads: NSObject, WKDownloadDelegate {
                     || FileManager.default.fileExists(atPath: folder.appendingPathComponent(name).path)
             }
             if let name { self?.reserved.insert(name) }
+            // macOS asks for ~/Downloads here, not on the main thread inside WebKit (P5-BUILD-1 readback).
+            let writable = name.map { DownloadNamer.canWrite($0, in: folder) } ?? false
             DispatchQueue.main.async {
-                guard let self, let name else {
-                    self?.end(entry, .failed("every name is taken in Downloads"))
+                guard let self, let name, writable else {
+                    let why = name == nil ? "every name is taken in Downloads" : "no access to the Downloads folder"
+                    self?.end(entry, .failed(why))
                     return completionHandler(nil)
                 }
                 entry.file = folder.appendingPathComponent(name)

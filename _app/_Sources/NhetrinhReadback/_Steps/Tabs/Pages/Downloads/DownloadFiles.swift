@@ -42,11 +42,16 @@ enum DownloadFiles {
         let url = try LifecycleSteps.pages().url(path)
         try app.act(.navigate(url), "address bar: \(path), Return")
         var state = try app.state()
+        var answers = true
         waitUntil(timeout) {
-            state = (try? app.state()) ?? state
+            let read = try? app.state()
+            answers = read != nil
+            state = read ?? state
             return state.downloads.first == name && ["done", "cancelled"].contains(state.downloadStates.first)
                 || state.downloadStates.first?.hasPrefix("failed") == true
         }
+        // Before the fix, macOS's question froze the app inside WebKit: its last answer was the state before.
+        guard answers else { throw StepError.cannotDrive(noAccess + "; the app stopped answering the probe") }
         try check(state, name: name, after: path)
         return state
     }
@@ -54,7 +59,10 @@ enum DownloadFiles {
     /// FAIL, or NOT READ BACK when macOS kept nhetrinh out of ~/Downloads, unless the top row is `name`, done.
     static func check(_ state: ProbeState, name: String, after path: String) throws {
         let shown = zip(state.downloads, state.downloadStates).map { "\($0) (\($1))" }
-        guard let top = state.downloadStates.first else { throw StepError.fail("\(path): no download row") }
+        guard let top = state.downloadStates.first else {
+            throw StepError.fail("\(path): no download row (downloads \(state.downloads), rows \(state.rows), "
+                + "address \(state.address))")
+        }
         if top.contains("no access to the Downloads folder") { throw StepError.cannotDrive(noAccess) }
         if top == "…" || top == "0 %" {
             throw StepError.cannotDrive(noAccess + "; the row stayed \"\(top)\": " + shown.joined(separator: ", "))
