@@ -30,7 +30,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
 | P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | TODO | `M2_REAL_SITES_WORK.md` |
 | P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DOING (P6-BUILD-1 on p6/memory: built, tests green, not read back) | `M3_V1_RELEASE.md` |
-| P7 Tab folders | 0.8.0 | L | collapsible tab groups in the sidebar | TODO | `M3_V1_RELEASE.md` |
+| P7 Tab folders | 0.8.0 | L | collapsible tab groups in the sidebar | DOING (P7-BUILD-1 on p7/prep: built, tests green, not read back) | `M3_V1_RELEASE.md` |
 | P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | TODO | `M3_V1_RELEASE.md` |
 
 Size is relative effort (S, M, L). No dates: a phase ends when its gate passes, not on a day.
@@ -86,6 +86,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 | R-8 | P2: ⌃⇥ / ⌃⇧⇥ may be taken by the web view before the menu; hover and drag are not read back (D18) | Tested on the menu items only; reported as not read back |
 | R-9 | P6: WebKit may keep the page process of an unloaded tab (a process cache), so R36 sees more than 1 | R36 counts the page processes before and after; a cache is not proven or ruled out until R36 runs |
 | R-10 | P6: a warning takes tabs idle past 1 min, so R36 and R37 wait 63 s each | Accepted: a warning sent at once proves nothing; R36 sends one at once too and expects no unload |
+| R-11 | P7: a drag is not read back (D18); R40 moves by the row menu (same tree move). The outline reloads at every chrome refresh: cost not measured | Drop unit tested (`FoldersTests`); R38 and R8 read the budget |
 
 ## Not in v1 (only when the headmate asks)
 

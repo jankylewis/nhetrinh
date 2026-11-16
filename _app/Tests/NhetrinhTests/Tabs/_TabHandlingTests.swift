@@ -41,10 +41,11 @@ struct TabHandlingTests {
         #expect(browser.probeState(menu: menu).selected == after)
     }
 
+    /// A row dropped above the row `to` names (P7: the outline's drop at the root, `to + 1` when it moves down).
     @Test(arguments: [(0, 2), (1, 0), (2, 3)])
     func dragMoveFollowsTheSelection(from: Int, to: Int) {
         let (browser, _) = browser(4, selected: from)
-        browser.sidebar.onMove?(from, to)
+        #expect(browser.sidebar.drop(TabPath(item: from), onto: nil, at: to > from ? to + 1 : to))
         #expect(browser.selected == to && browser.tabs[to].title == "t\(from + 1)")
     }
 

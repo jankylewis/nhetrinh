@@ -33,6 +33,7 @@ if let log = Options.logPath(CommandLine.arguments) {
 }
 let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicSteps.all + ToolSteps.all
     + PressureSteps.all  // P6: R36-R38
+    + FolderSteps.all  // P7: R39-R43
 let options: Options
 do {
     options = try Options(CommandLine.arguments, known: Set(allSteps.map(\.id)))

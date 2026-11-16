@@ -8,7 +8,14 @@ import WebKit
 final class BrowserWindowController: NSWindowController {
     static let homeURL = URL(string: "https://www.google.com")
 
-    var tabs: [Tab] = []
+    /// P7 (`../Tab/Folders.swift`): the tabs as the sidebar holds them, folders included. `tabs` is its
+    /// flat list, top to bottom, folders opened: the index the selection and the menu items count.
+    var tree = Tree<Tab>() { didSet { flatTabs = tree.allTabs } }
+    private var flatTabs: [Tab] = []
+    var tabs: [Tab] {
+        get { flatTabs }
+        set { tree = Tree(tabs: newValue) }  // every tab at the root (a seeded launch, a test)
+    }
     var selected = -1
     let sidebar = SidebarView()
     let toolbar = ToolbarView()
@@ -102,7 +109,7 @@ final class BrowserWindowController: NSWindowController {
         sidebar.onSelect = { [weak self] index in self?.select(index) }
         sidebar.onClose = { [weak self] index in self?.close(at: index) }
         sidebar.onNewTab = { [weak self] in self?.newTab(nil) }
-        sidebar.onMove = { [weak self] from, to in self?.moveTab(from: from, to: to) }
+        sidebar.onAction = { [weak self] action in self?.sidebarAction(action) }
         toolbar.onBack = { [weak self] in self?.goBack(nil) }
         toolbar.onForward = { [weak self] in self?.goForward(nil) }
         toolbar.onReload = { [weak self] in self?.reload(nil) }
@@ -121,8 +128,7 @@ final class BrowserWindowController: NSWindowController {
     /// passes here, so this is also where the session save is scheduled.
     func refreshChrome() {
         sessionChanged()
-        sidebar.update(tabs.map { SidebarView.Row(title: $0.title, loaded: $0.isLoaded, icon: $0.icon) },
-                       selected: selected)
+        sidebar.update(sidebarItems, selected: selected)
         guard tabs.indices.contains(selected) else { return }
         let tab = tabs[selected]
         toolbar.update(url: tab.url, canBack: tab.webView?.canGoBack ?? false,

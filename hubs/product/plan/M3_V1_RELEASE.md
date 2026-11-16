@@ -28,7 +28,7 @@ Readback adds:
 
 Exit: the gate, R1-R38 PASS.
 
-## P7 — Tab folders (0.8.0, size L, status TODO)
+## P7 — Tab folders (0.8.0, size L, status DOING)
 
 Goal: collapsible groups in the sidebar, as in the headmate's reference screenshot.
 
@@ -50,6 +50,8 @@ Tests: every `TabTree` operation, parameterized; migration 1 to 2 with fixture f
 version 2 round trip; "delete folder keeps its tabs".
 Red first (P7-PREP-1, D24): stubs in `NhetrinhCore/Tabs/Lifecycle/Tree/`, 21 tests (58 cases) in
 `Tests/_NhetrinhCoreTests/Tabs/Lifecycle/Tree/`; the version 2 file shape is fixed by `SessionFixtures.swift`.
+P7-BUILD-1: `Session` stays the version 1 model, read only to migrate; `TreeSession` is version 2 (folding
+them would rewrite P1's session tests for no change in the file).
 
 Readback adds:
 - R39 New Folder, name "work": the row appears.

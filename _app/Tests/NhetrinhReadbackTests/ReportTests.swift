@@ -71,7 +71,7 @@ func homeFolderIsWrittenAsTilde(path: (text: String, written: String)) {
 @Test func headerSaysHowEachStepActs() {
     let text = Report.text([], app: URL(fileURLWithPath: "/nowhere/nhetrinh.app"))
     #expect(!text.contains("A step acts on the app through the Accessibility API"))
-    #expect(text.contains("R1, R3-R7 and R9-R38 act through the app's readback probe (`NHT_READBACK=1`, D23)"))
+    #expect(text.contains("R1, R3-R7 and R9-R43 act through the app's readback probe (`NHT_READBACK=1`, D23)"))
     #expect(text.contains("R2 reads the Dock through the Accessibility API") && text.contains("R8"))
 }
 

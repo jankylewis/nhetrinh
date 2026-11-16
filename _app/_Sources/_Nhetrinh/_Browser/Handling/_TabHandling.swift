@@ -4,12 +4,10 @@ import NhetrinhCore
 /// P2 tab handling (hubs/product/plan/M1_DAILY_DRIVER.md): reorder, next and previous tab, reopen a
 /// closed tab, a link in a background tab. The menu items target the window controller (AppMenu).
 extension BrowserWindowController: NSMenuItemValidation {
-    /// A dragged row and Tabs > Move Tab Up / Down: the selection follows its tab.
+    /// Tabs > Move Tab Up / Down: the selection follows its tab. A drag is `Folders.swift`'s (P7).
     func moveTab(from: Int, to: Int) {
         guard tabs.indices.contains(from), tabs.indices.contains(to), from != to else { return }
-        let follows = TabOrder.index(selected, afterMoveFrom: from, to: to, count: tabs.count)
-        tabs = TabOrder.move(tabs, from: from, to: to)
-        selected = follows
+        keepingSelection { tree.moveTab(fromFlat: from, toFlat: to) }  // P7: by the insert rule of the tree
         backgroundSlot = nil
         refreshChrome()
     }
@@ -30,8 +28,7 @@ extension BrowserWindowController: NSMenuItemValidation {
     @objc func reopenClosedTab(_ sender: Any?) {
         guard let closed = closedTabs.pop() else { return }
         let index = min(max(0, closed.index), tabs.count)
-        if index <= selected { selected += 1 }
-        tabs.insert(Tab(url: closed.url, title: closed.title), at: index)
+        keepingSelection { tree.insert(Tab(url: closed.url, title: closed.title), atFlat: index) }
         select(index)
     }
 
@@ -40,7 +37,7 @@ extension BrowserWindowController: NSMenuItemValidation {
     func openInBackground(_ url: URL) {
         guard Self.opensInBackground(url) else { return }
         let index = min(backgroundSlot ?? selected + 1, tabs.count)
-        tabs.insert(Tab(url: url, title: url.host ?? url.absoluteString), at: index)
+        keepingSelection { tree.insert(Tab(url: url, title: url.host ?? url.absoluteString), atFlat: index) }
         backgroundSlot = index + 1
         refreshChrome()
     }

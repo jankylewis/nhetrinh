@@ -17,16 +17,16 @@ extension BrowserWindowController {
 
     /// Restore the saved session, or one home tab. Turns saving on.
     func openSavedSession(in folder: URL, home: URL) {
-        let session = SessionStore.load(from: folder, home: home) { reason in
+        let session = TreeSessionStore.load(from: folder, home: home) { reason in
             Log.app.error("session: \(reason, privacy: .public)")
         }
         sessionFolder = folder
         restore(session)
     }
 
-    /// Show `session`: every tab as a row, only the selected one loaded.
-    func restore(_ session: Session) {
-        tabs = session.tabs.map { Tab(url: $0.url, title: $0.title) }
+    /// Show `session`: every tab as a row, in its folder (P7), only the selected one loaded.
+    func restore(_ session: TreeSession) {
+        tree = session.tree.compactMapTabs { Tab(url: $0.url, title: $0.title) }
         if tabs.isEmpty { tabs = [Tab(url: nil)] }
         sidebarWidth = session.sidebarWidth
         if let side = split.splitViewItems.first {
@@ -46,11 +46,12 @@ extension BrowserWindowController {
     }
 
     /// The session as the window shows it now.
-    var currentSession: Session {
+    var currentSession: TreeSession {
         let collapsed = split.splitViewItems.first?.isCollapsed ?? false
         if !collapsed, sidebar.frame.width >= 100 { sidebarWidth = Double(sidebar.frame.width) }
-        return Session.capture(tabs.map { (url: $0.url, title: $0.title) }, selected: selected,
-                               sidebarWidth: sidebarWidth, collapsed: collapsed)
+        return TreeSession.capture(tree, selected: selected, sidebarWidth: sidebarWidth, collapsed: collapsed) { tab in
+            tab.url.map { SessionTab(url: $0, title: tab.title) }
+        }
     }
 
     /// Save now (the timer, and at quit). A failure is logged; the last good file stays.
@@ -59,7 +60,7 @@ extension BrowserWindowController {
         saveTimer = nil
         guard let folder = sessionFolder else { return }
         do {
-            try SessionStore.save(currentSession, in: folder)
+            try TreeSessionStore.save(currentSession, in: folder)
         } catch {
             Log.app.error("session: save failed: \(error.localizedDescription, privacy: .public)")
         }

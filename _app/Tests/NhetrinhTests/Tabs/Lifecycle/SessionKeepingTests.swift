@@ -18,7 +18,7 @@ struct SessionKeepingTests {
     private func restored(_ session: Session) -> BrowserWindowController {
         _ = NSApplication.shared
         let browser = BrowserWindowController()
-        browser.restore(session)
+        browser.restore(TreeSession(migrating: session))  // P7: a version 1 session, migrated
         return browser
     }
 
@@ -34,7 +34,7 @@ struct SessionKeepingTests {
     func whatIsSavedIsWhatWasRestored(selected: Int) {
         let saved = session(selected: selected)
         let current = restored(saved).currentSession
-        #expect(current.tabs == saved.tabs && current.selectedIndex == selected)
+        #expect(current.tree.allTabs == saved.tabs && current.selectedIndex == selected)
     }
 
     @Test func noSaveIsScheduledWithoutASessionFolder() {

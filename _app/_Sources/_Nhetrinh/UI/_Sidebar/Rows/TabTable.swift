@@ -1,16 +1,18 @@
 import AppKit
 
-/// The sidebar's table: a middle click on a row closes it, and the row a menu was shown on is kept,
-/// so the menu's Close Tab closes that row and not the selected one (P2).
-final class TabTable: NSTableView {
+/// The sidebar's outline (P7; a table before): a middle click on a row closes it, and the row a menu
+/// was shown on is kept, so the menu acts on that row and not on the selected one (P2). Each row has
+/// its own menu: a tab's, or a folder's (`menuForRow`).
+final class TabTable: NSOutlineView {
     var onMiddleClick: ((Int) -> Void)?
+    var menuForRow: ((Int) -> NSMenu?)?
     /// The row the last menu was shown on; -1 when it was shown on no row.
     private(set) var menuRow = -1
 
     /// A right click (or ⌃-click) on a row: its menu. Off the rows: no menu.
     override func menu(for event: NSEvent) -> NSMenu? {
         menuRow = row(at: convert(event.locationInWindow, from: nil))
-        return menuRow >= 0 ? menu : nil
+        return menuRow >= 0 ? menuForRow?(menuRow) : nil
     }
 
     override func otherMouseDown(with event: NSEvent) {
