@@ -12,6 +12,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`IdleUnload.swift`); R11 PASS 22:09, red on P0 not run |
 | NT-UIX-001 | `after New Tab the sidebar has 1 rows, not 2` | FIXED | Nil-target menu item and no key window (app not active)? Browser items target the controller |
 | NT-UIX-002 | `the selected tab stays` | OBSERVED | Did a close of a row that is not selected select another tab? `close(at:)` selects only when the selected tab closes |
+| NT-UIX-003 | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
 | NT-ENV-003 | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |
@@ -24,6 +25,8 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-009 | `exited with unexpected signal code 5` | OBSERVED | Does a `@MainActor` test run `RunLoop.main`? It runs other tests inside; press the item at once |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | FIXED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
+| NT-PRF-003 | `anIconOfHugePixelSizeIsRefusedBeforeItIsDecoded` | OBSERVED | A small icon file of huge pixel size? `Favicons.fits` reads the size before any decode |
+| NT-PRF-004 | `aLargeDataHrefGivesNoIcon` | OBSERVED | A long `data:` icon href? It is a cache key: `FaviconURL` keeps 4 KB at most |
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |
 | NT-TG-002 | `screenshot shows other windows` | OPEN | Capture one window by id, never a screen region |
 | NT-TG-003 | `has no Accessibility permission`, `Accessibility reads are empty`, `its tree was not read` | OPEN | R1, R3-R7: `answers no readback probe`? Is the installed app built before D23? Install it. R2: which app does the reason name? Run as the granted app: `readback_app.sh run`; after a rebuild grant again (R-2); reads empty with the grant kept (19:51): re-grant, cause not proven |

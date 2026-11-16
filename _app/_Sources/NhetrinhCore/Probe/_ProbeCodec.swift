@@ -15,6 +15,10 @@ public enum ProbeRequest: Equatable, Sendable {
     case linkMenu(item: String)
     /// A toolbar button by its label ("Stop"), pressed (R18).
     case button(String)
+    /// A middle click on a sidebar row (R13).
+    case middleClick(row: Int)
+    /// A ⌘-click on the first link in the selected page (R17).
+    case commandClickLink
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -39,6 +43,8 @@ public enum ProbeCodec {
         case .rowMenu(let row, let item): return try line(["op": "rowMenu", "index": row, "text": item])
         case .linkMenu(let item): return try line(["op": "linkMenu", "text": item])
         case .button(let label): return try line(["op": "button", "text": label])
+        case .middleClick(let row): return try line(["op": "middleClick", "index": row])
+        case .commandClickLink: return try line(["op": "commandClickLink"])
         }
     }
 
@@ -62,6 +68,8 @@ public enum ProbeCodec {
             return .rowMenu(row: row, item: item)
         case ("linkMenu", .some(let item), _) where !item.isEmpty: return .linkMenu(item: item)
         case ("button", .some(let label), _) where !label.isEmpty: return .button(label)
+        case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
+        case ("commandClickLink", _, _): return .commandClickLink
         case ("menu", _, _):
             guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
             return .menu(path)

@@ -52,3 +52,13 @@ func dataHrefIsTheIconItself(href: String) {
 func nonHttpPageHasNoIcon(href: String?, page: String) {
     #expect(FaviconURL.resolve(href: href, page: url(page)) == nil)
 }
+
+/// P2-REVIEW (NT-PRF-004): the app keys its two icon caches (200 entries each) by this URL, so a
+/// `data:` href is kept whole as a key: 200 of 500 KB is 100 MB against the 2 MB favicon budget.
+/// A `data:` href longer than 4 KB (400 x 4 KB = 1.6 MB) gives no icon; one of 4 KB is the icon.
+@Test(arguments: [(4096, true), (4097, false), (65_536, false), (512_000, false)] as [(Int, Bool)])
+func aLargeDataHrefGivesNoIcon(length: Int, kept: Bool) {
+    let head = "data:image/png;base64,"
+    let href = head + String(repeating: "A", count: length - head.utf8.count)
+    #expect((FaviconURL.resolve(href: href, page: url(page)) != nil) == kept)
+}

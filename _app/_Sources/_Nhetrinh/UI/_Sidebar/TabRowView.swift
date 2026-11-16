@@ -56,6 +56,9 @@ final class TabRowView: NSTableCellView {
         close.isHidden = !isPointerInside
     }
 
+    /// Whether the row shows a site icon, not the globe of a row with none.
+    var showsSiteIcon: Bool { icon.image != nil && icon.image !== Self.noIcon }
+
     // MARK: - Hover
 
     private var isPointerInside: Bool {

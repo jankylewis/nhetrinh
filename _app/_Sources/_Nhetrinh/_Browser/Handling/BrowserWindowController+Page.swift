@@ -2,7 +2,7 @@ import AppKit
 import WebKit
 
 /// P2 page state in the chrome: reload becomes stop while a page loads, a thin progress line, the
-/// site icon in its row. And the readback probe's link menu (R17), shown as a right click shows it.
+/// site icon in its row. And the readback probe's link menu and ⌘-click (R17), sent as the window sends clicks.
 extension BrowserWindowController {
     /// The toolbar follows the selected tab's loading; only the toolbar, so progress costs no row redraw.
     func refreshLoading() {
@@ -28,22 +28,43 @@ extension BrowserWindowController {
     /// The probe's R17: a right click on the first link of the selected page, in this app only (no
     /// system event, D18); `item` is pressed once WebKit shows the menu. The answer comes before.
     func showLinkMenu(pressing item: String) -> String? {
+        clickFirstLink([.rightMouseDown, .rightMouseUp], flags: []) { $0.pressOnOpen = item }
+    }
+
+    /// The probe's R17: a ⌘-click on the first link of the selected page, as the window delivers one.
+    func commandClickFirstLink() -> String? {
+        clickFirstLink([.leftMouseDown, .leftMouseUp], flags: .command) { _ in }
+    }
+
+    /// Send `types` with `flags` to the centre of the page's first link; `prepare` runs first. Nil when
+    /// sent (the click comes after the answer), else why not.
+    private func clickFirstLink(_ types: [NSEvent.EventType], flags: NSEvent.ModifierFlags,
+                                prepare: @escaping (BrowserWebView) -> Void) -> String? {
         guard let webView = current as? BrowserWebView, let window else { return "no page is shown" }
         webView.evaluateJavaScript(Self.firstLinkCenter) { [weak webView] result, _ in
             guard let webView, let center = result as? [Double], center.count == 2 else {
-                return Log.app.error("probe: the page has no link to show a menu on")
+                return Log.app.error("probe: the page has no link to click")
             }
             let y = webView.isFlipped ? center[1] : webView.bounds.height - center[1]
             let point = webView.convert(NSPoint(x: center[0], y: y), to: nil)
-            webView.pressOnOpen = item
-            for type in [NSEvent.EventType.rightMouseDown, .rightMouseUp] {
-                guard let event = NSEvent.mouseEvent(with: type, location: point, modifierFlags: [],
+            prepare(webView)
+            for type in types {
+                guard let event = NSEvent.mouseEvent(with: type, location: point, modifierFlags: flags,
                                                      timestamp: ProcessInfo.processInfo.systemUptime,
                                                      windowNumber: window.windowNumber, context: nil,
                                                      eventNumber: 0, clickCount: 1, pressure: 1) else { continue }
-                type == .rightMouseDown ? webView.rightMouseDown(with: event) : webView.rightMouseUp(with: event)
+                Self.send(event, to: webView)
             }
         }
         return nil
+    }
+
+    private static func send(_ event: NSEvent, to view: NSView) {
+        switch event.type {
+        case .rightMouseDown: view.rightMouseDown(with: event)
+        case .rightMouseUp: view.rightMouseUp(with: event)
+        case .leftMouseDown: view.mouseDown(with: event)
+        default: view.mouseUp(with: event)
+        }
     }
 }

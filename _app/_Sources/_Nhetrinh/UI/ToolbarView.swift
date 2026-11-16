@@ -73,6 +73,10 @@ final class ToolbarView: NSView {
         progressLine.frame = NSRect(x: 0, y: 0, width: bounds.width * CGFloat(min(1, max(0.05, progress))), height: 2)
     }
 
+    /// Whether the progress line shows, and its width (the probe, R18, and the tests).
+    var progressShown: Bool { !progressLine.isHidden }
+    var progressWidth: CGFloat { progressLine.frame.width }
+
     /// Press a button by its label, as a click does (the readback probe, R18).
     func press(_ label: String) -> Bool {
         guard let button = [back, forward, reload].first(where: { $0.accessibilityLabel() == label }),

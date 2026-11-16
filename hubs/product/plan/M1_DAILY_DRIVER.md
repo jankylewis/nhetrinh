@@ -88,12 +88,12 @@ Tests: `ClosedTabs` (push, pop, cap); `TabOrder.move(from:to:)` index math; favi
 resolution (relative, absolute, missing).
 
 Readback adds:
-- R13 show a row's menu (`AXShowMenu`), press Close Tab: rows -1. Hover stays the user's way.
+- R13 right-click row 1 (`menu(for:)`), Close Tab: rows -1; middle-click row 1: rows -1. Hover: the user's way.
 - R14 select row 3, Tabs > Move Tab Up twice: it is row 1, and stays after a relaunch. Drag stays the user's way.
-- R15 File > Reopen Closed Tab: the row is back with the same URL.
-- R16 a site that has an icon shows it in its row.
-- R17 a local test page: show the link's menu (`AXShowMenu`), press Open Link in New Tab: rows +1,
-  the selected tab does not change. The link's menu out of reach: NOT READ BACK, never PASS.
-- R18 stop a slow local page: loading ends and the button is reload again.
+- R15 close row 2 of 3, File > Reopen Closed Tab: row 2 is back, same URL, selected.
+- R16 the row shows the `<link rel="icon">`, the globe when that icon is 404, else `/favicon.ico` (P2-FIX-1).
+- R17 a local test page: the link's menu > Open Link in New Tab, then ⌘-click the link: rows +1 each,
+  the selected tab does not change. The menu or the click out of reach: NOT READ BACK, never PASS.
+- R18 stop a slow local page: loading ends, the button is reload again, the progress line goes.
 
 Exit: the gate, R1-R18 PASS; favicons add 2 MB or less to the app process.
