@@ -67,20 +67,35 @@ enum PageSteps {
             + click
     }
 
-    /// A ⌘-click on the link: one more row, the page stays. No row and no navigation: the click did not
-    /// reach the page, NOT READ BACK. A navigation of the page itself: FAIL.
+    /// What the line says when the ⌘-click does not reach the page (ruling READBACK P2-2): the menu part
+    /// is R17's readback, the ⌘-click is covered by the unit test `commandClickOpensABackgroundTab` only.
+    static let commandClickUnitOnly = "Cmd-click: unit test only"
+
+    /// A ⌘-click on the link, sent in the app (the probe); 10 s for it to show, then `commandClickPart`.
     private static func commandClick(_ app: AppSession, url: String) throws -> String {
         try app.act(.commandClickLink, "⌘-click on the link")
         var state = try app.state()
-        let opened = waitUntil(10) {
+        waitUntil(10) {
             state = (try? app.state()) ?? state
-            return state.rows.count == 3 || state.address != url
+            return arrived(state, url: url)
         }
-        guard opened else { throw StepError.cannotDrive("the ⌘-click did not reach the page in 10 s: not read back") }
+        return try commandClickPart(state, url: url)
+    }
+
+    /// The ⌘-click part of R17 from the state after it: one more row and the page stays, said in the
+    /// line. Not arrived (2 rows, the same page): `commandClickUnitOnly`, never NOT READ BACK and never
+    /// PASS on its own. Arrived but wrong (the page navigated, or no new row): FAIL.
+    static func commandClickPart(_ state: ProbeState, url: String) throws -> String {
+        guard arrived(state, url: url) else { return commandClickUnitOnly }
         try expect(state.address == url && state.selected == 0,
                    "after the ⌘-click row \((state.selected ?? -1) + 1) shows \"\(state.address)\", not \(url)")
         try expect(state.rows.count == 3, "after the ⌘-click the sidebar has \(state.rows.count) rows, not 3")
         return "⌘-click on the link: 3 rows, row 1 still selected"
+    }
+
+    /// The ⌘-click reached the page: a third row, or the page itself moved.
+    private static func arrived(_ state: ProbeState, url: String) -> Bool {
+        state.rows.count != 2 || state.address != url
     }
 
     static func stopEndsLoading(_ app: AppSession) throws -> String {
