@@ -90,3 +90,27 @@ func aDownloadSoonAfterAClickIsClicked(ago: Double?, clicked: Bool) {
     let properties = try file.resourceValues(forKeys: [.quarantinePropertiesKey]).quarantineProperties
     #expect(properties?["LSQuarantineType"] as? String == "LSQuarantineTypeWebDownload")
 }
+
+/// P5-FIX-2, red first: Finder's "Where from" reads `com.apple.metadata:kMDItemWhereFroms`, not the
+/// quarantine (on this macOS the quarantine API keeps the type and the agent, never the URLs: the readback
+/// at 01:15 recorded them empty). The file's URL, then the page's, as Safari writes them; no user name or
+/// password; a page equal to the file's URL once.
+@Test(arguments: [
+    ("https://example.com/a.zip", "https://example.com/", ["https://example.com/a.zip", "https://example.com/"]),
+    ("http://127.0.0.1:8080/download/attachment", nil, ["http://127.0.0.1:8080/download/attachment"]),
+    ("https://user:secret@example.com/a.zip", "https://example.com/p",
+     ["https://example.com/a.zip", "https://example.com/p"]),
+    ("https://example.com/a.zip", "https://example.com/a.zip", ["https://example.com/a.zip"]),
+] as [(String, String?, [String])])
+func aDownloadSaysWhereItCameFrom(source: String, page: String?, expected: [String]) throws {
+    let file = FileManager.default.temporaryDirectory.appendingPathComponent("nhetrinh-where-\(UUID()).zip")
+    try Data("zip".utf8).write(to: file)
+    defer { try? FileManager.default.removeItem(at: file) }
+    try Quarantine.mark(file, source: URL(string: source), page: page.flatMap(URL.init(string:)))
+    let size = getxattr(file.path, Quarantine.whereFromsName, nil, 0, 0, 0)
+    try #require(size > 0, "no \(Quarantine.whereFromsName) on the file")
+    var bytes = [UInt8](repeating: 0, count: size)
+    _ = getxattr(file.path, Quarantine.whereFromsName, &bytes, size, 0, 0)
+    let urls = try PropertyListSerialization.propertyList(from: Data(bytes), format: nil) as? [String]
+    #expect(urls == expected)
+}
