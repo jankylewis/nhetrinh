@@ -103,5 +103,30 @@ class ReleaseNotesTests(unittest.TestCase):
             release_notes.notes("1.0.0", [], {})
 
 
+class ReviewP8Tests(unittest.TestCase):
+    """P8-REVIEW (REVIEW_P8.md), red on p8/release 41fc9df merged with p7/prep (e2bbc3f)."""
+
+    def test_task_ids_and_the_readback_are_not_in_the_notes(self):
+        rows = release_notes.parse_rows("\n".join([
+            "| NT-FEAT-036 | Downloads guarded (P5-FIX-1): written as `<name>.download` until complete "
+            "| x (P5-FIX-1) | 2026-11-17 | - |",
+            "| NT-FEAT-035 | Links from other apps open as tabs (a possible default browser; never made the "
+            "default by the app or the readback) (P5) | x | 2026-11-16 | - |"]))
+        text = release_notes.notes("1.0.0", rows, {"P5": "Downloads, app links"})
+        self.assertNotIn("P5-FIX-1", text)
+        self.assertNotIn("readback", text)
+
+    def test_a_feature_row_of_the_wrong_shape_is_an_error(self):
+        with self.assertRaises(ValueError):  # 4 cells: today the row is dropped without a word
+            release_notes.parse_rows("| NT-FEAT-099 | A feature with no date column | abc1234 | - |")
+
+    def test_the_real_notes_do_not_contradict_themselves(self):
+        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")
+        out = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "release_notes.py"), "1.0.0", "--root", root], capture_output=True, text=True)
+        self.assertEqual(out.returncode, 0, out.stderr)
+        self.assertNotIn("up to 3 download rows", out.stdout)  # since P5-FIX-1 every running one has a row
+
+
 if __name__ == "__main__":
     unittest.main()
