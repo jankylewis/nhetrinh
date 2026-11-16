@@ -15,7 +15,8 @@ enum Budget {
     /// lasts longer than any burst seen.
     static let risingCount = 4
 
-    /// One memory sample: the app process, and the app with every helper process.
+    /// One memory sample: the app process, and the app with every helper process. `app` is 0 when
+    /// the app process was not found (it quit or crashed while R8 read): such a sample is no reading.
     struct Sample {
         let app: Double
         let total: Double
@@ -31,8 +32,11 @@ enum Budget {
         let highestTotal: Double
         let count: Int
         let rises: Bool
+        /// Samples without the app process. Their zeros would pull the median down and pass (P0-REV-2).
+        let missingApp: Int
 
         init(_ samples: [Sample]) {
+            missingApp = samples.filter { $0.app <= 0 }.count
             app = median(samples.map(\.app))
             total = median(samples.map(\.total))
             highestApp = samples.map(\.app).max() ?? 0
@@ -51,9 +55,16 @@ enum Budget {
                    rises ? "yes" : "no")
         }
 
-        /// No sample is never a pass.
+        /// Why this is no reading (R8 says NOT READ BACK); nil when every sample has the app.
+        var noReading: String? {
+            if count == 0 { return "no memory sample was read" }
+            guard missingApp > 0 else { return nil }
+            return "the app process was missing in \(missingApp) of \(count) memory samples (it quit or crashed)"
+        }
+
+        /// No sample, or a sample without the app, is never a pass.
         var holds: Bool {
-            count > 0 && highestApp <= Budget.appMegabytes && total <= Budget.totalMegabytes && !rises
+            noReading == nil && highestApp <= Budget.appMegabytes && total <= Budget.totalMegabytes && !rises
         }
     }
 }

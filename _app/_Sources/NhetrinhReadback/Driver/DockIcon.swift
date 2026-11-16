@@ -38,10 +38,15 @@ enum DockIcon {
     static let ringPoints: CGFloat = 6
 
     /// The item grown by `ringPoints` on each side, clamped to the Dock's frame: where the item
-    /// touches the Dock's edge, the ring there is smaller. Nil when nothing is left inside the Dock.
+    /// touches the Dock's edge, the ring there is smaller. Rounded inward to whole points, because
+    /// `screencapture -R` takes whole points: rounding outward could pass the Dock's edge (P0-REV-2).
+    /// Nil when nothing is left inside the Dock.
     static func captureRect(around item: CGRect, dock: CGRect) -> CGRect? {
         let rect = item.insetBy(dx: -ringPoints, dy: -ringPoints).intersection(dock)
-        return rect.isNull || rect.width < 1 || rect.height < 1 ? nil : rect
+        guard !rect.isNull else { return nil }
+        let minX = rect.minX.rounded(.up), minY = rect.minY.rounded(.up)
+        let width = rect.maxX.rounded(.down) - minX, height = rect.maxY.rounded(.down) - minY
+        return width < 1 || height < 1 ? nil : CGRect(x: minX, y: minY, width: width, height: height)
     }
 
     /// Capture the item and its ring to a temporary PNG, read it, delete it. Returns the bitmap
@@ -52,7 +57,7 @@ enum DockIcon {
         }
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("nhetrinh-r2-\(UUID().uuidString).png")
         defer { try? FileManager.default.removeItem(at: file) }
-        let region = [frame.minX, frame.minY, frame.width, frame.height].map { String(Int($0.rounded())) }
+        let region = [frame.minX, frame.minY, frame.width, frame.height].map { String(Int($0)) }  // whole points
         let tool = Process()
         tool.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
         tool.arguments = ["-x", "-R", region.joined(separator: ","), file.path]

@@ -41,7 +41,8 @@ Read first, in this order:
 | The checker's own tests | `python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'` |
 | Unit tests | `nice -n 10 _app/scripts/test.sh` |
 | Build the app | `nice -n 10 _app/scripts/_build.sh` (output: `_app/build/nhetrinh.app`) |
-| Install (only when the brief says so) | `_app/scripts/install.sh` |
+| Install (only when the brief says so) | `_app/scripts/install/_install.sh` |
+| Readback as a granted app (only when the brief says so) | `_app/scripts/install/readback_app.sh run` (NT-TG-003) |
 | Readback (only when the brief says so) | `cd _app && swift run nhetrinh-readback` |
 
 ## Map
@@ -52,7 +53,7 @@ Read first, in this order:
 | `_app/_Sources/NhetrinhCore/` | pure logic, no AppKit: address parsing, profiles; unit tested |
 | `_app/_Sources/NhetrinhReadback/` | the readback tool: `_Steps/` (R1-R8), `Driver/` (Accessibility, processes, Dock) |
 | `_app/Tests/` | Swift Testing: `_NhetrinhCoreTests/` (`NhetrinhCore`), `NhetrinhReadbackTests/` (readback tool) |
-| `_app/scripts/` | `_build.sh`, `install.sh`, `test.sh`, `conventions/` (the checker), `VERSION` |
+| `_app/scripts/` | `_build.sh`, `install/` (app, readback app), `test.sh`, `conventions/` (the checker), `VERSION` |
 | `_app/assets/_icon/` | the app icon and the tools that made it |
 | `hubs/` | learnings (bugs, failures, lessons, tool gaps) and product (features, plan, rnd) |
 

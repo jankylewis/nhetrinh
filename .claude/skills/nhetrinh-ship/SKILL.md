@@ -20,7 +20,7 @@ The matemaster merges and ships (`CLAUDE.md`). A mate never pushes, merges or to
    - `python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'` is OK.
    - `nice -n 10 _app/scripts/test.sh` is all green.
    - `nice -n 10 _app/scripts/_build.sh` prints the bundle and its size.
-4. Commit, then `_app/scripts/install.sh`, then the full readback (`nhetrinh-readback`), so the
+4. Commit, then `_app/scripts/install/_install.sh`, then the full readback (`nhetrinh-readback`), so the
    readback reads an app built from a clean commit (no `+`).
 5. The readback verdict is `PASS (n of n)`. Commit `hubs/failures/evidence/readback/_LATEST.md`.
    FAIL, INCOMPLETE or NOT READ BACK does not ship.

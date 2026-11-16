@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Build and install nhetrinh.app into ~/Applications (quits a running copy first).
 set -euo pipefail
-cd "${0:A:h}"
+cd "${0:A:h}/.."
 ./_build.sh
 osascript -e 'quit app id "io.github.jankylewis.nhetrinh"' 2>/dev/null || true
 mkdir -p ~/Applications

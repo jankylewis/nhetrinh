@@ -20,7 +20,7 @@ only one app instance.
 
 ## Run it (only on the seat the brief names)
 
-1. `nice -n 10 _app/scripts/_build.sh`, then `_app/scripts/install.sh`.
+1. `nice -n 10 _app/scripts/_build.sh`, then `_app/scripts/install/_install.sh`.
    The readback reads the installed app, never `_app/build/`.
 2. From the repository root:
 

@@ -46,7 +46,7 @@ python3 _app/scripts/conventions/_check.py                               # conve
 python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'  # the checker's own tests
 _app/scripts/test.sh             # unit tests (not plain `swift test`: NT-GAT-001)
 _app/scripts/_build.sh           # -> _app/build/nhetrinh.app
-_app/scripts/install.sh          # -> ~/Applications/nhetrinh.app
+_app/scripts/install/_install.sh          # -> ~/Applications/nhetrinh.app
 cd _app && swift run nhetrinh-readback   # use the installed app as its end user
 ```
 

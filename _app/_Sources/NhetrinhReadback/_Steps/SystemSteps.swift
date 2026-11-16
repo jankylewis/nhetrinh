@@ -51,13 +51,14 @@ enum SystemSteps {
         try expect(started, "no page process after 15 s")
         Thread.sleep(forTimeInterval: 6)
         let (memory, helpers) = memorySamples(of: app.pid)
+        if let why = memory.noReading { throw StepError.cannotDrive("one simple tab (example.com): \(why)") }
         let cpu = Footprint.cpuPercent(of: app.pid, over: 5)
         let kilobytes = bundleKilobytes(app.appURL)
         let rest = String(format: "; idle CPU %.1f %% (max %.0f); bundle %d KB (max %d)",
                           cpu, Budget.idleCpuPercent, kilobytes, Budget.bundleKilobytes)
         let seen = memory.line(helpers: helpers) + rest
         let holds = memory.holds && cpu <= Budget.idleCpuPercent && kilobytes <= Budget.bundleKilobytes
-        try expect(memory.highestApp > 0 && holds, "one simple tab (example.com): \(seen)")
+        try expect(holds, "one simple tab (example.com): \(seen)")
         return "one simple tab (example.com), 6 s after load: \(seen)"
     }
 
@@ -68,7 +69,7 @@ enum SystemSteps {
         for index in 0..<Budget.sampleCount {
             if index > 0 { Thread.sleep(forTimeInterval: 1) }
             let processes = Footprint.processes(of: pid)
-            let app = processes.first { $0.pid == pid }?.megabytes ?? 0
+            let app = processes.first { $0.pid == pid }?.megabytes ?? 0  // 0: not found, no reading
             samples.append(Budget.Sample(app: app, total: processes.reduce(0) { $0 + $1.megabytes }))
             helpers = max(helpers, processes.count - 1)
         }

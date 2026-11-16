@@ -36,3 +36,12 @@ Mutation: no rise check, or the app on its median, each fails a case. Replayed o
 `NT_PRF_002_GPU_SAMPLES.jsonl` (every 9-sample window): 1 of 176 fails, the window from 1 s after
 launch in run 7 (5 of 9 samples in bursts); R8 samples only after the 6 s settle.
 Not proven: R8 with this code on the installed app (this seat may not start the app).
+
+## Review P0-REV-2: a sample without the app
+
+`memorySamples` writes app 0 when the app process is not found (it quit or crashed). Those zeros
+pulled the median down and passed. Now any sample without the app is no reading:
+`Budget.Reading.noReading` names it and R8 reports NOT READ BACK with that reason
+(`_app/_Sources/NhetrinhReadback/_Steps/Budget.swift`, `SystemSteps.swift`).
+Red first: commit 7181133, 2 issues in `memoryBudgetNeedsTheAppInEverySample`. Green after.
+Not proven: R8 with this code on the installed app.

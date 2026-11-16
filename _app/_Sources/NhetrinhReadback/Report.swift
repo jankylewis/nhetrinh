@@ -38,6 +38,9 @@ enum Report {
         return results.isEmpty || results.contains { $0.verdict == .notReadBack } ? 2 : 0
     }
 
+    /// The last line of a `--log` file: `open -W` returns 0 whatever the app's exit code.
+    static func exitLine(_ code: Int32) -> String { "exit: \(code)" }
+
     private static func plist(_ app: URL, _ key: String) -> String {
         let file = app.appendingPathComponent("Contents/Info.plist")
         let values = NSDictionary(contentsOf: file) as? [String: Any]

@@ -31,7 +31,7 @@ Run every command from the repository root. Read `CLAUDE.md` first: it holds the
    Never plain `swift test`: it sometimes loses the Swift Testing plugin (NT-GAT-001).
 6. Build, then install (the readback runs on the installed app, never on the build folder):
    `nice -n 10 _app/scripts/_build.sh` (output `_app/build/nhetrinh.app`), then
-   `_app/scripts/install.sh` (only on the seat the brief names; it quits a running copy).
+   `_app/scripts/install/_install.sh` (only on the seat the brief names; it quits a running copy).
 7. Readback: every step of this phase and of all earlier phases is PASS. See `nhetrinh-readback`.
 8. Lightness budget, measured inside the readback (step R8):
 

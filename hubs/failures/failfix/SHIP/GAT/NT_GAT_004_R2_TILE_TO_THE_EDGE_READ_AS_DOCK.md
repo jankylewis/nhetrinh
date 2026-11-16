@@ -42,3 +42,11 @@ fails `squareTileToTheEdge`, `squareTileAtDockEdge`, `lightTileLightCornersBelow
 `iconOnTileToTheEdge` cases and `noRingIsNeverAPass`.
 Not proven: R2 on the real Dock; that the ring holds only Dock colour (neighbour items, the
 running dot); that the Dock list's Accessibility frame holds only Dock pixels.
+
+## Review P0-REV-2: half-point Dock frame
+
+`DockIcon.capture` rounded x, y, width and height one by one for `screencapture -R`, so a Dock
+frame on a half point grew up to 1 pt past the Dock's edge. `DockIcon.captureRect` now rounds
+inward to whole points, inside the Dock frame; `capture` only converts it.
+Red first: commit 7181133, 2 issues in `ringIsWholePointsInsideTheDock`. Green after.
+Not proven: that the Dock's Accessibility frames are ever fractional on a real display.
