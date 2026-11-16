@@ -1,0 +1,9 @@
+# ENV
+
+Index of this folder; `_SCHEMA.md` has the rules.
+
+| Entry | What |
+|---|---|
+| `NT_ENV_001_BENCH_BURST_PEAKED_THE_MACHINE.md` | OBSERVED |
+| `NT_ENV_002_TERMINAL_LAUNCH_HIDES_WEBKIT_HELPERS.md` | FIXED |
+| `NT_ENV_003_RELAUNCH_BEFORE_HELPERS_EXIT.md` | FIXED |

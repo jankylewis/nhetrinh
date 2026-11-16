@@ -11,14 +11,26 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Build MVP A (WebKit)
-        run: rnd/a_webkit/build.sh
+      - name: Folder taxonomy (one `_` mark, max 5 entries)
+        run: python3 -I _app/scripts/check_tree.py
+      - name: Unit tests
+        working-directory: _app
+        run: swift test
+      - name: Build nhetrinh.app
+        run: _app/scripts/_build.sh
       - name: Check bundle
         run: |
-          plutil -lint rnd/a_webkit/build/nhetrinh-a.app/Contents/Info.plist
-          codesign --verify --strict rnd/a_webkit/build/nhetrinh-a.app
-          test -f rnd/a_webkit/build/nhetrinh-a.app/Contents/Resources/AppIcon.icns
-      - name: Build bench tool
-        run: clang -O2 -Wall -Werror -o rnd/bench/memsum rnd/bench/memsum.c
-      - name: Lint bench scripts
-        run: python3 -m py_compile rnd/bench/bench.py rnd/bench/summarize.py
+          APP=_app/build/nhetrinh.app
+          plutil -lint "$APP/Contents/Info.plist"
+          codesign --verify --strict "$APP"
+          test -f "$APP/Contents/Resources/AppIcon.icns"
+          test -f "$APP/Contents/Resources/AppIcon.png"
+      - name: Size budget (app <= 1 MB)
+        run: |
+          kb=$(du -sk _app/build/nhetrinh.app | cut -f1)
+          echo "nhetrinh.app: ${kb} KB"
+          test "$kb" -le 1024
+      - name: Bench tools compile
+        run: |
+          clang -O2 -Wall -Werror -o /tmp/memsum rnd/_bench/memsum.c
+          python3 -m py_compile rnd/_bench/_bench.py rnd/_bench/summarize.py

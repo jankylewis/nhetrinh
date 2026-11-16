@@ -3,51 +3,49 @@
 A very small macOS browser. Just browsing, a vertical tab sidebar, and the basics.
 Nothing else: no extensions, no sync, no accounts, no telemetry.
 
-> Status: R&D. Two MVPs are built and benchmarked against each other; the winner becomes nhetrinh v1.
+Engine: **WebKit** (built into macOS). Shell: **Swift + AppKit**. No third-party dependencies.
+Chosen by measurement against Chromium (CEF): see [`rnd/_bench/results/_RESULTS.md`](rnd/_bench/results/_RESULTS.md).
 
 ## Goals
 
-1. **Lightweight**: the smallest app and the lowest memory we can get.
-2. **Fast**: start instantly, render pages as fast as the engine allows.
-3. **Basic**: address bar, back / forward / reload, vertical tabs, shortcuts. New features only on request.
+1. **Lightweight**: smallest app, lowest memory. Budget: app process <= 40 MB, one simple tab <= 110 MB, app <= 1 MB.
+2. **Fast**: start instantly, render as fast as WebKit allows.
+3. **Basic**: new features only when asked for.
 
-## R&D: which stack?
+## Plan
 
-| | MVP A | MVP B |
-|---|---|---|
-| Engine | WebKit (built into macOS) | Chromium (CEF, bundled) |
-| Shell | Swift + AppKit | Objective-C++ + AppKit |
-| Code | [`rnd/a_webkit`](rnd/a_webkit) | [`rnd/b_cef`](rnd/b_cef) |
+Phases, gate, budget and decisions: [`hubs/product/plan/_PLAN.md`](hubs/product/plan/_PLAN.md).
 
-Both MVPs have the same features: a window with a vertical tab sidebar, address bar (URL or search),
-back / forward / reload, new / close / switch tab, popups open as tabs, lazy tabs (a tab's engine
-process starts only when you first open it), unloading of tabs idle for 10 minutes, and the same shortcuts
-(⌘T ⌘W ⌘L ⌘R ⌘[ ⌘] ⌘1-9 ⌘S).
+## Layout
 
-The benchmark ([`rnd/bench`](rnd/bench)) launches each app via LaunchServices like a Dock click,
-one app at a time, A/B alternating, and waits until all helper processes have exited
-before the next run. Memory = `phys_footprint` (Activity Monitor's "Memory") summed over the app
-**and every helper process** (WebKit XPC services, Chromium helpers).
+```
+_app/          the app (Swift Package Manager, Command Line Tools only, no Xcode)
+  _Sources/    _Nhetrinh (AppKit + WebKit UI), NhetrinhCore (pure logic, unit tested)
+  Tests/       Swift Testing
+  scripts/     _build.sh, install.sh, check_tree.py, VERSION
+  assets/      _icon (Hirono, pixel style)
+hubs/          learnings (bugs, failures, lessons, tool gaps) and product (features, plan); read _SCHEMA.md
+rnd/           the WebKit vs Chromium benchmark and its results
+```
 
-Results: [`rnd/bench/results/RESULTS.md`](rnd/bench/results/RESULTS.md).
+Every folder: exactly one entry starts with `_` (its most critical entry), and at most 5 entries.
+`_app/scripts/check_tree.py` checks both, locally and in CI.
 
 ## Build
 
-macOS 13+, Apple silicon, Command Line Tools (Xcode not required).
+macOS 13+, Apple silicon, Command Line Tools.
 
 ```sh
-rnd/a_webkit/build.sh          # -> rnd/a_webkit/build/nhetrinh-a.app
-rnd/b_cef/fetch_cef.sh         # one-time: pinned Chromium build (~135 MB download)
-rnd/b_cef/build.sh             # -> rnd/b_cef/build/nhetrinh-b.app
-clang -O2 -o rnd/bench/memsum rnd/bench/memsum.c
-python3 -I rnd/bench/bench.py  # ~40 min; windows open and close
-python3 -I rnd/bench/summarize.py
+cd _app && swift test            # unit tests
+_app/scripts/_build.sh           # -> _app/build/nhetrinh.app
+_app/scripts/install.sh          # -> ~/Applications/nhetrinh.app
 ```
+
+## Shortcuts
+
+⌘T new tab · ⌘W close tab · ⌘L address bar · ⌘R reload · ⌘[ ⌘] back / forward · ⌘1-9 switch tab · ⌘S toggle sidebar
 
 ## Icon
 
-Hirono (a Pop Mart character) in pixel style, no background: [`assets/icon`](assets/icon).
-`lift.swift` cuts the subject out of the photo (macOS Vision), `pixelate.swift` turns it into
-80x80 pixel art with hard edges, `make_icns.sh` builds the `.icns`.
-The app also sets its Dock icon at launch (`NSApp.applicationIconImage`), because macOS draws
-bundle icons on a tile, while a runtime icon is drawn as-is.
+Hirono (a Pop Mart character), pixel style, no background: [`_app/assets/_icon`](_app/assets/_icon).
+The app also sets its Dock icon at launch, because macOS draws bundle icons on a tile.
