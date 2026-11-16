@@ -32,5 +32,5 @@ jobs:
           test "$kb" -le 1024
       - name: Bench tools compile
         run: |
-          clang -O2 -Wall -Werror -o /tmp/memsum rnd/_bench/memsum.c
-          python3 -m py_compile rnd/_bench/_bench.py rnd/_bench/summarize.py
+          clang -O2 -Wall -Werror -o /tmp/memsum hubs/product/rnd/_bench/measure/_memsum.c
+          python3 -m py_compile hubs/product/rnd/_bench/_bench.py hubs/product/rnd/_bench/summarize.py

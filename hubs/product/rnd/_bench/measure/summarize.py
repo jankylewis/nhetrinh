@@ -1,4 +1,4 @@
-"""results/raw.jsonl -> results/_RESULTS.md (median per app per scenario)."""
+"""../results/raw.jsonl -> ../results/_RESULTS.md: the median per app and scenario (R&D run, A vs B)."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from collections import defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-RAW = HERE / "results" / "raw.jsonl"
-OUT = HERE / "results" / "_RESULTS.md"
+RAW = HERE.parent / "results" / "raw.jsonl"
+OUT = HERE.parent / "results" / "_RESULTS.md"
 
 ROWS = [  # (label, scenario, field, unit, better)
     ("Startup to first page (local)", "startup_local_page", "event_ms", "ms", "lower"),

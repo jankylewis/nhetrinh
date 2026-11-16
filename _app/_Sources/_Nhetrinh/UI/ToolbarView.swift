@@ -1,28 +1,25 @@
 import AppKit
 
-/// Back / forward / reload + address field.
-final class ToolbarView: NSView, NSTextFieldDelegate {
+/// Back, forward, reload and the address field.
+final class ToolbarView: NSView {
     var onBack: (() -> Void)?
     var onForward: (() -> Void)?
     var onReload: (() -> Void)?
     var onSubmit: ((String) -> Void)?
 
     let address = NSTextField()
-    private let back = ToolbarView.button("chevron.left")
-    private let forward = ToolbarView.button("chevron.right")
-    private let reload = ToolbarView.button("arrow.clockwise")
+    private lazy var back = makeButton("chevron.left", "Back", #selector(tapBack))
+    private lazy var forward = makeButton("chevron.right", "Forward", #selector(tapForward))
+    private lazy var reload = makeButton("arrow.clockwise", "Reload", #selector(tapReload))
 
     override init(frame: NSRect) {
         super.init(frame: frame)
-        back.target = self; back.action = #selector(tapBack)
-        forward.target = self; forward.action = #selector(tapForward)
-        reload.target = self; reload.action = #selector(tapReload)
         address.placeholderString = "Search or enter address"
         address.bezelStyle = .roundedBezel
         address.focusRingType = .none
-        address.delegate = self
         address.target = self
         address.action = #selector(submit)
+        address.setAccessibilityIdentifier("nhetrinh.address")
 
         let row = NSStackView(views: [back, forward, reload, address])
         row.spacing = 6
@@ -35,11 +32,12 @@ final class ToolbarView: NSView, NSTextFieldDelegate {
         ])
     }
 
-    required init?(coder: NSCoder) { fatalError("not used") }
+    required init?(coder: NSCoder) { return nil }
 
     func update(url: URL?, canBack: Bool, canForward: Bool) {
         back.isEnabled = canBack
         forward.isEnabled = canForward
+        // Never replace the text while the user is typing in the field.
         if window?.firstResponder != address.currentEditor() {
             address.stringValue = url?.absoluteString ?? ""
         }
@@ -50,11 +48,14 @@ final class ToolbarView: NSView, NSTextFieldDelegate {
     @objc private func tapReload() { onReload?() }
     @objc private func submit() { onSubmit?(address.stringValue) }
 
-    private static func button(_ symbol: String) -> NSButton {
-        let b = NSButton(image: NSImage(systemSymbolName: symbol, accessibilityDescription: symbol)!,
-                         target: nil, action: nil)
-        b.isBordered = false
-        b.widthAnchor.constraint(equalToConstant: 28).isActive = true
-        return b
+    /// A borderless symbol button; `label` is its accessibility name and its identifier suffix.
+    private func makeButton(_ symbol: String, _ label: String, _ action: Selector) -> NSButton {
+        let image = NSImage(systemSymbolName: symbol, accessibilityDescription: label) ?? NSImage()
+        let button = NSButton(image: image, target: self, action: action)
+        button.isBordered = false
+        button.setAccessibilityLabel(label)
+        button.setAccessibilityIdentifier("nhetrinh." + label.lowercased())
+        button.widthAnchor.constraint(equalToConstant: 28).isActive = true
+        return button
     }
 }

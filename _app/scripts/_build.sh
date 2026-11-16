@@ -3,6 +3,8 @@
 set -euo pipefail
 cd "${0:A:h}/.."
 VERSION=$(cat scripts/VERSION)
+# The commit this build comes from; "+" marks files changed since that commit (the readback reports it).
+COMMIT="$(git rev-parse --short HEAD)$(git diff --quiet HEAD -- . || echo +)"
 swift build -c release --arch arm64 --product Nhetrinh
 BIN=$(swift build -c release --arch arm64 --show-bin-path)
 APP=build/nhetrinh.app
@@ -24,6 +26,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>
+  <key>NHTCommit</key><string>$COMMIT</string>
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHighResolutionCapable</key><true/>

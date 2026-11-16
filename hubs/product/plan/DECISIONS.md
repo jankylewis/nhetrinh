@@ -8,7 +8,7 @@ row stays and is marked "replaced by".
 | Id | Decision | Decided by | Date |
 |---|---|---|---|
 | D1 | macOS only | headmate | 2026-11-16 |
-| D2 | Engine: WebKit (`WKWebView`). Measured against Chromium (CEF): about half the memory, about 1/15 of the idle CPU, same startup, 516 KB against 331 MB on disk (`rnd/_bench/results/_RESULTS.md`). The speed benchmarks were not run | measured; headmate chose to skip the speed runs | 2026-11-16 |
+| D2 | Engine: WebKit (`WKWebView`). Measured against Chromium (CEF): about half the memory, about 1/15 of the idle CPU, same startup, 516 KB against 331 MB on disk (`hubs/product/rnd/_bench/results/_RESULTS.md`). The speed benchmarks were not run | measured; headmate chose to skip the speed runs | 2026-11-16 |
 | D3 | Shell: Swift + AppKit. No SwiftUI. No third-party packages | agent proposal, headmate agreed | 2026-11-16 |
 | D4 | The vertical tab sidebar is the main navigation | headmate | 2026-11-16 |
 | D5 | Icon: Hirono, pixel style, no background, as large as the canvas allows | headmate | 2026-11-16 |

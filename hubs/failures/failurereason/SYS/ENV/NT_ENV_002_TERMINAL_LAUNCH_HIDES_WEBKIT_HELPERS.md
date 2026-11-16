@@ -5,8 +5,8 @@ family: ENV
 status: FIXED
 date: 2026-11-16
 signature: memsum procs=1 for a WebKit app
-source: rnd/_bench/memsum.c (`responsibility_get_pid_responsible_for_pid`)
-source: rnd/_bench/_bench.py `launch` (uses `open -n -F`)
+source: hubs/product/rnd/_bench/measure/_memsum.c (`responsibility_get_pid_responsible_for_pid`)
+source: hubs/product/rnd/_bench/_bench.py `launch` (uses `open -n -F`)
 links: fix=yes lesson=yes evidence=no toolgap=none
 
 ## Mechanism

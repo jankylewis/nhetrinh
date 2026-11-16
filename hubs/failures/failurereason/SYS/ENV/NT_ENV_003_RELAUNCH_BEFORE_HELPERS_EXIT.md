@@ -5,7 +5,7 @@ family: ENV
 status: FIXED
 date: 2026-11-16
 signature: first_load 8-10 s for one run, under 1 s for the next
-source: rnd/_bench/_bench.py `wait_clean`
+source: hubs/product/rnd/_bench/_bench.py `wait_clean`
 observed: the Chromium MVP took 8.3 s and 10.7 s to first load right after a kill, then 0.88 s once the old processes were gone
 links: fix=yes lesson=yes evidence=no toolgap=none
 

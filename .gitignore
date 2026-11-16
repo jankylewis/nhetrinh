@@ -2,7 +2,7 @@
 build/
 .build/
 *.app
-rnd/_bench/memsum
-rnd/_bench/results/events.jsonl
+hubs/product/rnd/_bench/measure/memsum
+hubs/product/rnd/_bench/results/events.jsonl
+__pycache__/
 .DS_Store
-rnd/_bench/results_run.log

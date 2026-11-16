@@ -5,7 +5,7 @@ family: ENV
 status: OBSERVED
 date: 2026-11-16
 signature: whole machine at ~80% CPU during the bench
-source: rnd/_bench/_bench.py scenario `tabs30` (`NHT_BENCH_LOADALL=1` with 30 URLs)
+source: hubs/product/rnd/_bench/_bench.py scenario `tabs30` (`NHT_BENCH_LOADALL=1` with 30 URLs)
 source: headmate report 2026-11-16 ("dont make my machine peak!", Activity Monitor screenshot)
 observed: ~17 WebKit content processes at ~55% CPU each, system ~80% user CPU
 links: fix=no lesson=yes evidence=yes toolgap=none

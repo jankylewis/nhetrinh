@@ -1,7 +1,7 @@
 import WebKit
 
-/// One tab. The web view is created lazily and dropped when the tab is unloaded;
-/// url + title survive so the sidebar row stays and reload is one click away.
+/// One tab. The web view is created on first use and dropped when the tab is unloaded.
+/// The URL and the title stay, so the sidebar row remains and one click loads the page again.
 final class Tab {
     var url: URL?
     var title: String
@@ -17,11 +17,11 @@ final class Tab {
     var isLoaded: Bool { webView != nil }
 
     func unload() {
-        guard let wv = webView else { return }
-        url = wv.url ?? url
+        guard let webView else { return }
+        url = webView.url ?? url
         observers.removeAll()
-        wv.stopLoading()
-        wv.removeFromSuperview()
-        webView = nil
+        webView.stopLoading()
+        webView.removeFromSuperview()
+        self.webView = nil
     }
 }

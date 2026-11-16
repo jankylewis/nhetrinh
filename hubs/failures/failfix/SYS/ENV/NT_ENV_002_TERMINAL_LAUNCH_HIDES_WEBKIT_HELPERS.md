@@ -4,7 +4,7 @@ id: NT-ENV-002
 family: ENV
 status: FIXED
 date: 2026-11-16
-source: rnd/_bench/_bench.py `launch`
+source: hubs/product/rnd/_bench/_bench.py `launch`
 links: fix=yes lesson=yes evidence=no toolgap=none
 
 ## Fix that holds

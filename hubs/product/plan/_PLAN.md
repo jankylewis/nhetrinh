@@ -11,7 +11,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 
 ## Where we are (2026-11-16)
 
-- Engine chosen by measurement: WebKit. Numbers: `rnd/_bench/results/_RESULTS.md`.
+- Engine chosen by measurement: WebKit. Numbers: `hubs/product/rnd/_bench/results/_RESULTS.md`.
 - On `master` (`b07f437`): the two R&D MVPs, the benchmark and the icon.
 - Features of the WebKit MVP, NT-FEAT-001 to 008: `../features/S01.md`.
 - Local, not committed: the `_app/` scaffold, `hubs/`, the folder checker.

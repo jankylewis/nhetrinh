@@ -4,7 +4,7 @@ A very small macOS browser. Just browsing, a vertical tab sidebar, and the basic
 Nothing else: no extensions, no sync, no accounts, no telemetry.
 
 Engine: **WebKit** (built into macOS). Shell: **Swift + AppKit**. No third-party dependencies.
-Chosen by measurement against Chromium (CEF): see [`rnd/_bench/results/_RESULTS.md`](rnd/_bench/results/_RESULTS.md).
+Chosen by measurement against Chromium (CEF): see [`hubs/product/rnd/_bench/results/_RESULTS.md`](hubs/product/rnd/_bench/results/_RESULTS.md).
 
 ## Goals
 
