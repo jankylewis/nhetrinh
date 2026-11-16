@@ -6,10 +6,11 @@
 Rows are grouped by phase, in phase order, with the phase's name from hubs/product/plan/_PLAN.md; the
 rows of the R&D app (no phase) come first as "The basics". A shelf whose header has a "Release note" column
 (| Id | Feature | Release note | Commit | Date | Closed bug |) gives the notes that column, written for users
-of the release; "-" leaves the row out (a tool row, or a row a later change superseded: its new row says
-how it works now). A shelf without that column falls back to the feature text, less its phase note, task
-ids, hub ids and a remark about the readback. A feature row of the wrong shape, an empty note, or a note
-with a hub id, a task id or the readback in it is an error: the build fails, never silent notes.
+of the release (a | in a cell is written \\|); "-" leaves the row out (a tool row, or a row a later change
+superseded: its new row says how it works now). A shelf without that column falls back to the feature text,
+less its phase note, task ids, hub ids and a remark about the readback. A feature row of the wrong shape, an
+empty note, or a note with a hub id, a task id, a decision id, a `code` name or the readback in it is an
+error: the build fails, never silent notes.
 """
 import argparse
 import glob
@@ -18,11 +19,12 @@ import re
 import sys
 
 ROW = re.compile(r"^\| (NT-FEAT-\d+) \| (.*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \|\s*$")
-NOTED_ROW = re.compile(r"^\| (NT-FEAT-\d+) \| (.*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \|\s*$")
+CELL = re.compile(r"(?<!\\)\|")
 NOTED_HEAD = re.compile(r"^\| Id \| Feature \| Release note \|")
 TASK = re.compile(r"\s*\(P\d+-[A-Z]+-\d+\)")
 TOOL_REMARK = re.compile(r"\s*\([^()]*readback[^()]*\)", re.IGNORECASE)
 INTERNAL = re.compile(r"(?i:readback)|NT-[A-Z]+-\d+|\bP\d+-[A-Z]+-\d+")
+NOT_FOR_USERS = re.compile(r"`[^`]*`|\bD\d+\b")
 PHASE = re.compile(r"\((P\d+)[-;)]")
 NOTE = re.compile(r"\s*\(P\d+[^()]*(\([^()]*\)[^()]*)*\)\s*$")
 REFS = re.compile(r",\s*(NT-[A-Z]+-\d+|D\d+|Q\d+)(?=[,)])")
@@ -32,24 +34,28 @@ PLAN_ROW = re.compile(r"^\| (P\d+) ([^|]+?) \| \d+\.\d+\.\d+ \|")
 
 def parse_rows(text):
     """Every feature row of a features shelf: id, note for users (None: not in the notes) and phase (None: R&D)."""
-    rows, shape = [], ROW
+    rows, has_notes = [], False
     for number, line in enumerate(text.splitlines(), 1):
-        if NOTED_HEAD.match(line):
-            shape = NOTED_ROW
+        has_notes = has_notes or bool(NOTED_HEAD.match(line))
         if not line.startswith("| NT-FEAT-"):
             continue
-        match = shape.match(line)
-        if not match:
-            raise ValueError(f"line {number}: a feature row of the wrong shape: {line}")
-        rows.append(noted(match) if shape is NOTED_ROW else fallback(match))
+        cells = [cell.strip() for cell in CELL.split(line.rstrip())]
+        match = ROW.match(line)
+        if (len(cells) != 8 or cells[-1]) if has_notes else not match:
+            raise ValueError(f"line {number}: a feature row of the wrong shape (a | in a cell is \\|): {line}")
+        rows.append(noted(cells[1:7]) if has_notes else fallback(match))
     return rows
 
 
-def noted(match):
-    ident, note, commit = match.group(1), match.group(3).strip(), match.group(4)
+def noted(cells):
+    """A row of a shelf with a Release note column: Id, Feature, Release note, Commit, Date, Closed bug."""
+    ident, feature, note, commit = cells[0], cells[1], cells[2].replace("\\|", "|"), cells[3]
     if not note:
         raise ValueError(f"{ident}: an empty release note (write - to leave the row out)")
-    found = PHASE.search(commit) or PHASE.search(match.group(2))
+    internal = NOT_FOR_USERS.search(note)
+    if internal:
+        raise ValueError(f"{ident}: the note says {internal.group(0)!r}, not for users")
+    found = PHASE.search(commit) or PHASE.search(feature)
     return {"id": ident, "text": None if note == "-" else note, "phase": found.group(1) if found else None}
 
 

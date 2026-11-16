@@ -1,5 +1,6 @@
 """Tests of release_notes.py (P8): the release notes are made from the product/features rows."""
 import os
+import pathlib
 import subprocess
 import sys
 import tempfile
@@ -25,6 +26,7 @@ PLAN = """| Phase | Version | Size | What | Status | Detail |
 | P3 Page basics | 0.4.0 | L | dialogs | DONE | `M2.md` |
 | P7 Tab folders | 0.8.0 | L | groups | DONE | `M3.md` |
 """
+HEAD = "| Id | Feature | Release note | Commit | Date | Closed bug |\n"
 
 
 class ReleaseNotesTests(unittest.TestCase):
@@ -61,58 +63,59 @@ class ReleaseNotesTests(unittest.TestCase):
         self.assertIn("- Window with a vertical tab sidebar (collapsible, ⌘S)\n", text)
         self.assertNotIn("Readback probe", text)
         self.assertNotIn("NT-", text.split("## Install")[0])
-
-    def test_notes_say_how_to_install_and_open(self):
-        text = release_notes.notes("1.0.0", release_notes.parse_rows(FEATURES), {})
-        self.assertIn("## Install", text)
+        self.assertIn("## Install", text)  # how to install and open
         self.assertIn("not notarized", text)
         self.assertIn("nhetrinh-1.0.0-arm64.zip", text)
 
-    def test_the_command_line_reads_the_repository(self):
+    def test_the_command_line_reads_the_repository_and_says_the_kind(self):
         root = tempfile.mkdtemp()
         features = os.path.join(root, "hubs", "product", "features")
         os.makedirs(features)
         os.makedirs(os.path.join(root, "hubs", "product", "plan"))
-        with open(os.path.join(features, "S01.md"), "w") as file:
-            file.write(FEATURES)
-        with open(os.path.join(root, "hubs", "product", "plan", "_PLAN.md"), "w") as file:
-            file.write(PLAN)
+        pathlib.Path(features, "S01.md").write_text(FEATURES, encoding="utf-8")
+        pathlib.Path(root, "hubs", "product", "plan", "_PLAN.md").write_text(PLAN, encoding="utf-8")
         out = subprocess.run([sys.executable, release_notes.__file__, "1.0.0", "--root", root],
                              capture_output=True, text=True, check=True).stdout
         self.assertIn("## Tab folders", out)
         self.assertIn("- A row with a | in its text\n", out)
-
-    def test_0x_is_a_prerelease_and_1_0_and_later_a_release(self):
-        cases = {"0.1.0": True, "0.8.0": True, "0.10.3": True, "1.0.0": False, "1.2.3": False, "2.0.0": False}
-        for version, expected in cases.items():
-            self.assertEqual(release_notes.prerelease(version), expected, version)
-
-    def test_a_version_that_is_not_x_y_z_is_an_error(self):
-        for version in ["", "v1.0.0", "1.0", "1.0.0-beta", "one.0.0"]:
-            with self.assertRaises(ValueError, msg=version):
-                release_notes.prerelease(version)
-
-    def test_the_command_line_says_the_kind(self):
         for version, kind in [("0.8.0", "prerelease"), ("1.0.0", "release")]:
             out = subprocess.run([sys.executable, release_notes.__file__, version, "--kind"],
                                  capture_output=True, text=True, check=True).stdout
             self.assertEqual(out, kind + "\n")
 
-    def test_no_feature_row_is_an_error(self):
-        with self.assertRaises(ValueError):
-            release_notes.notes("1.0.0", [], {})
+    def test_0x_is_a_prerelease_1_0_and_later_a_release_and_not_x_y_z_an_error(self):
+        cases = {"0.1.0": True, "0.8.0": True, "0.10.3": True, "1.0.0": False, "1.2.3": False, "2.0.0": False}
+        for version, expected in cases.items():
+            self.assertEqual(release_notes.prerelease(version), expected, version)
+        for version in ["", "v1.0.0", "1.0", "1.0.0-beta", "one.0.0"]:
+            with self.assertRaises(ValueError, msg=version):
+                release_notes.prerelease(version)
 
     def test_a_release_note_column_gives_the_notes_and_a_dash_leaves_a_row_out(self):
-        head = "| Id | Feature | Release note | Commit | Date | Closed bug |\n"
-        rows = release_notes.parse_rows(head + "| NT-FEAT-034 | Footer: up to 3 rows (P5) | - | x | d | - |\n"
+        rows = release_notes.parse_rows(HEAD + "| NT-FEAT-034 | Footer: up to 3 rows (P5) | - | x | d | - |\n"
                                         "| NT-FEAT-036 | `WKDownload` rows (P5-FIX-1) | Every download has a row "
                                         "| not committed (P5-FIX-1) | d | - |\n")
         self.assertEqual([(r["text"], r["phase"]) for r in rows], [(None, "P5"), ("Every download has a row", "P5")])
         for bad in ["| NT-FEAT-036 | A | x | d | - |", "| NT-FEAT-036 | A |  | x | d | - |"]:  # 5 cells, empty
             with self.assertRaises(ValueError, msg=bad):
-                release_notes.parse_rows(head + bad)
+                release_notes.parse_rows(HEAD + bad)
 
-    def test_a_note_with_a_hub_id_a_task_id_or_the_readback_is_an_error(self):
+    def test_a_pipe_in_a_note_is_written_escaped_and_a_bare_one_is_an_error(self):
+        rows = release_notes.parse_rows(HEAD + "| NT-FEAT-050 | A | Tabs \\| folders | x (P7) | d | - |")
+        self.assertEqual(rows[0]["text"], "Tabs | folders")
+        with self.assertRaises(ValueError):  # P8-FIX-2: the Feature cell took "A | Tabs", the note was cut
+            release_notes.parse_rows(HEAD + "| NT-FEAT-050 | A | Tabs | folders | x (P7) | d | - |")
+
+    def test_a_note_with_a_decision_id_or_a_code_name_is_an_error(self):
+        for note in ["Settings Hub (D19)", "Rows use `WKDownload`", "See D2"]:
+            with self.assertRaises(ValueError, msg=note):
+                release_notes.parse_rows(HEAD + f"| NT-FEAT-050 | A | {note} | x | d | - |")
+        self.assertEqual(release_notes.parse_rows(HEAD + "| NT-FEAT-050 | A | Dock icon, 3D | x | d | - |")[0]["text"],
+                         "Dock icon, 3D")
+
+    def test_no_row_or_a_note_with_a_hub_id_a_task_id_or_the_readback_is_an_error(self):
+        with self.assertRaises(ValueError):
+            release_notes.notes("1.0.0", [], {})
         for text in ["Closes NT-BUG-017", "Guarded (P5-FIX-1)", "Read back by the Readback tool"]:
             with self.assertRaises(ValueError, msg=text):
                 release_notes.notes("1.0.0", [{"id": "NT-FEAT-1", "text": text, "phase": None}], {})
