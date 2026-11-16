@@ -75,7 +75,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 
 | Id | Risk | Answer |
 |---|---|---|
-| R-1 | Accessibility permission is not granted, so the readback tool cannot drive the app | P0 asks once. Without it: weaker in-app checks, reported as such |
+| R-1 | Accessibility permission is not granted, so the readback tool cannot drive the app | P0 asks once. Without it: weaker in-app checks, reported as such. Since D23 only R2 needs it |
 | R-2 | macOS forgets permission grants when an ad-hoc signed app is rebuilt (seen 2026-11-16, NT-TG-003) | Sign with one stable local identity: `signing.sh` (written; not run, not proven) |
 | R-3 | WebKit limits: no find match count; some sites refuse non-Safari WebKit apps | Listed as known limits; the user agent already ends like Safari's |
 | R-4 | P7 (tab folders) is the largest phase | It can move after 1.0 without blocking it (`DECISIONS.md` Q2) |

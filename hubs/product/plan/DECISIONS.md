@@ -24,11 +24,12 @@ row stays and is marked "replaced by".
 | D15 | A1, A2, A3 below are accepted with the plan | headmate ("plan approved") | 2026-11-16 |
 | D16 | The briefing file is `CLAUDE.md` at the root (not `AGENTS.md` + `.claude/CLAUDE.md`): the fleet tool refuses to start a mate without it, the fleet is Claude-only, and the root has one free slot. Replaces the file names in A2 | agent, as owner | 2026-11-16 |
 | D17 | The work is done by a fleet: the agent is the matemaster (steers, reviews, runs the readback, ships) with 2 mates, each in its own worktree | headmate | 2026-11-16 |
-| D18 | The readback acts only through the Accessibility API (press, set value, confirm). It never moves the mouse or types keys, starts the app without taking the focus, and uses its own browsing profile | agent, as owner | 2026-11-16 |
+| D18 | The readback acts only through the Accessibility API (press, set value, confirm). It never moves the mouse or types keys, starts the app without taking the focus, and uses its own browsing profile. Narrowed by D23: only R2 still uses Accessibility | agent, as owner | 2026-11-16 |
 | D19 | Settings Hub: one small native window, ⌘, (nhetrinh > Settings Hub…), holding Appearance (System, Light, Dark; headmate request: dark and light theme), Search engine, Unload idle tabs after N minutes, Clear Website Data. Replaces "no settings window in v1". Planned, not built (D14): scheduled in P4 (`M2_REAL_SITES_WORK.md`); may move to P2 if the headmate asks | headmate | 2026-11-16 |
 | D20 | The bundle icon on a tile while the app is not running (pinned Dock item, Finder, Launchpad) is accepted, like the headmate's other apps: no Xcode, no Icon Composer. Closes the known limit of NT-BUG-002 | headmate | 2026-11-16 |
 | D21 | The fleet tool's onboarding row 8 (needs an ADO epic) is ignored for this personal project | headmate | 2026-11-16 |
 | D22 | P1 preparation may start before P0 closes: failing tests only, in `NhetrinhCore` only, no change to the app's behaviour. Narrows D14 for this one case | headmate | 2026-11-16 |
+| D23 | Readback probe (P0-PROBE-1, NT-TG-003), narrows D18: only when started with `NHT_READBACK=1`, nhetrinh opens a Unix socket in a 0700 folder of its own under the user's temporary folder (socket 0600, peers of the same user only, never TCP, never in a normal launch). It answers `state` (window title and shown, sidebar rows, selected row and width, address text, menu shortcuts) and `navigate`, `newTab`, `closeTab`, `select`, each through the user's path: the address field's action, the File menu item performed, a row selected in the sidebar table. The readback uses it for R1, R3-R7 with no Accessibility; R2 keeps Accessibility; R8 launches without it. Unset: no socket, no thread; the code costs 72 KB (bundle 520 to 592 KB, P0-PROBE-1). Not proven on the running app yet | agent | 2026-11-16 |
 
 ## Assumed, then accepted with the plan (D15)
 
@@ -38,7 +39,7 @@ Proposed by the agent; accepted as a group when the headmate approved the plan.
 |---|---|---|
 | A1 | Caps: `.md` 100 lines; `.swift` and other code 150 lines; function 30 lines; line 120 characters; 5 parameters | change the numbers in `_app/scripts/conventions/sizes.py` (read by `conventions/_check.py`); nothing else moves |
 | A2 | `rnd/` moves to `hubs/product/rnd/`, so `AGENTS.md` can sit at the root (5 root entries) | keep `rnd/` at the root and put the agent files only under `.claude/` |
-| A3 | The readback tool drives the app through macOS Accessibility; this needs one permission grant for the terminal | weaker checks from inside the app, reported as such (risk R-1) |
+| A3 | The readback tool drives the app through macOS Accessibility; this needs one permission grant for the terminal (since D23: R2 only) | weaker checks from inside the app, reported as such (risk R-1) |
 
 ## Open questions
 

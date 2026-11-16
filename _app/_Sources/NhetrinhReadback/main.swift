@@ -1,6 +1,8 @@
 import Foundation
 
 // nhetrinh-readback: use the installed app as its end user and say what happened, step by step.
+// R1, R3-R7 go through the app's readback probe (D23) and need no permission: they run from any
+// terminal. R2 reads the Dock: it needs Accessibility and Screen Recording (NT-TG-003).
 //
 //   swift run nhetrinh-readback                     every step, on ~/Applications/nhetrinh.app;
 //                                                   the verdict is kept in hubs/failures/evidence/readback/

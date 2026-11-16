@@ -12,11 +12,12 @@ only one app instance.
 ## What it does
 
 - Target `NhetrinhReadback`, product `nhetrinh-readback` (`_app/Package.swift`).
-- It starts the installed app `~/Applications/nhetrinh.app` and drives it through the macOS
-  Accessibility API only: press, set value, confirm. It never moves the mouse or types keys,
-  starts the app without taking the focus, and uses its own browsing profile (D18).
-- It needs the Accessibility permission for the terminal app (System Settings). Without it,
-  the steps that drive the app are NOT READ BACK (`_PLAN.md` risk R-1).
+- It starts the installed app `~/Applications/nhetrinh.app` without taking the focus, in its own
+  browsing profile (D18). R1, R3-R7 start it with `NHT_READBACK=1` and read and act through its
+  readback probe (D23, `_Steps/Probe.swift`): the menu item, the address field, the sidebar row.
+  They need no permission and run from any terminal. It never moves the mouse or types keys.
+- R2 reads the Dock through the Accessibility API and captures it: it needs Accessibility and
+  Screen Recording (run as `nhetrinh-readback.app`, NT-TG-003). Without them R2 is NOT READ BACK.
 
 ## Run it (only on the seat the brief names)
 
@@ -60,13 +61,13 @@ row shows that tab; R7 unopened tabs cost no page process; R8 the lightness budg
    - `try expect(condition, "what was seen")` throws `fail` with the evidence.
    - Throw `StepError.cannotDrive("why")` when the step cannot run.
    - Use `waitUntil(seconds) { ... }` to poll for a state.
-   - A step that reads the system (Dock, processes) calls `app.requireAccessibility()` first;
-     `AppSession` calls it itself in `window()` and `element(_:)`. A missing permission is
-     NOT READ BACK, never a FAIL and never a PASS.
+   - Read and act on the app through the probe: `app.state()`, `app.act(.newTab, "File > New Tab")`.
+     A new kind of read or action is a new `ProbeRequest` (Core codec test first). A step that reads
+     the Dock calls `app.requireAccessibility()` first. Not read is NOT READ BACK, never FAIL or PASS.
 3. Add `Step(id: "R<n>", name: "<what the user sees>", run: <function>)` to `BaseSteps.all`.
    `main.swift` runs only `BaseSteps.all`: a step list in a new file runs only after
    `main.swift` adds it to `steps`. `_Steps/` holds at most 5 entries, one `_` entry.
-4. Give every view the step reads an accessibility identifier (`nhetrinh.<name>`).
+4. The probe answers what the user sees (`BrowserWindowController+Probe.swift`), never model state.
 5. Machine rules: one app instance, at most 3 tabs loading, pages one after another.
    Capture only the app's own window, or the Dock item and a ring clamped to the Dock's own frame;
    never the screen. A capture goes to a temporary file, is read and deleted in the same step:

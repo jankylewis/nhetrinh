@@ -72,6 +72,17 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         updating = false
     }
 
+    /// The rows as the table shows them, and the selected row (-1: none). Read by the probe (D23).
+    var shownRows: [String] { Array(titles.prefix(table.numberOfRows)) }
+    var selectedRow: Int { table.selectedRow }
+
+    /// Select a row as a click does: the table reports the change, and `onSelect` shows that tab.
+    func selectAsClick(_ row: Int) -> Bool {
+        guard row >= 0, row < table.numberOfRows else { return false }
+        table.selectRowIndexes([row], byExtendingSelection: false)
+        return true
+    }
+
     // MARK: - Table
 
     func numberOfRows(in tableView: NSTableView) -> Int { titles.count }
