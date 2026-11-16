@@ -25,3 +25,4 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |
 | NT-TG-002 | `screenshot shows other windows` | OPEN | Capture one window by id, never a screen region |
 | NT-TG-003 | `has no Accessibility permission`, `Accessibility reads are empty`, `its tree was not read` | OPEN | R1, R3-R7: `answers no readback probe`? Is the installed app built before D23? Install it. R2: which app does the reason name? Run as the granted app: `readback_app.sh run`; after a rebuild grant again (R-2); reads empty with the grant kept (19:51): re-grant, cause not proven |
+| NT-TG-004 | `end: the app still runs`, a nhetrinh with `NHT_PROFILE=readback` after the run | OPEN | Read the report's `end:` line; `pgrep -fl 'Applications/nhetrinh.app'`; end only a `readback` profile instance, by pid |
