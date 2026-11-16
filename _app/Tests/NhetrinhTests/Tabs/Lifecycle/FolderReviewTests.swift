@@ -86,4 +86,14 @@ struct FolderReviewTests {
         #expect(browser.canMoveSelectedTab(up: up) == enabled)
         browser.tabs.forEach { $0.unload() }
     }
+
+    /// Ruling after P7-FIX-1: ⌃⇥ / ⌃⇧⇥ skip the tabs of a collapsed folder.
+    @Test(arguments: [(true, "r2"), (false, "r2")])
+    func controlTabSkipsACollapsedFolder(next: Bool, title: String) {
+        let browser = browser(["r0", "A*:a1", "r2"])
+        browser.select(0)
+        next ? browser.selectNextTab(nil) : browser.selectPreviousTab(nil)
+        #expect(browser.tabs[browser.selected].title == title)
+        browser.tabs.forEach { $0.unload() }
+    }
 }

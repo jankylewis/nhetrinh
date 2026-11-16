@@ -133,3 +133,14 @@ func aClosedTabFindsItsFolderOrItsPlace(spec: [String], path: TabPath, folder: S
 func closingSelectsTheNearestVisibleTab(spec: [String], removed: Int, expected: Int?) {
     #expect(names(spec).nearestVisible(afterRemoving: removed) == expected)
 }
+
+/// Ruling after P7-FIX-1: ⌃⇥ / ⌃⇧⇥ step through visible tabs only, round the ends; from a hidden tab to
+/// its visible neighbour; nil when no tab is visible. Red first on a stub.
+@Test(arguments: [
+    (["r0", "A*:a1", "r2"], 0, 1, 2), (["r0", "A*:a1", "r2"], 2, 1, 0), (["r0", "A*:a1", "r2"], 0, -1, 2),
+    (["r0", "A*:a1", "r2"], 1, 1, 2), (["r0", "A*:a1", "r2"], 1, -1, 0), (["r0", "A:a1", "r2"], 0, 1, 1),
+    (["A*:a1,a2", "r"], 2, 1, 2), (["A*:a1,a2"], 0, 1, nil),
+] as [([String], Int, Int, Int?)])
+func controlTabStepsThroughVisibleTabs(spec: [String], from: Int, step: Int, expected: Int?) {
+    #expect(names(spec).visibleStep(from: from, by: step) == expected)
+}

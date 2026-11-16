@@ -23,13 +23,13 @@ extension BrowserWindowController: NSMenuItemValidation {
     @objc func moveTabUp(_ sender: Any?) { moveSelectedTab(up: true) }
     @objc func moveTabDown(_ sender: Any?) { moveSelectedTab(up: false) }
 
-    /// ⌃⇥ and ⌃⇧⇥: the next and the previous tab, round the end.
+    /// ⌃⇥ and ⌃⇧⇥: the next and the previous visible tab, round the end; the tabs of a collapsed folder
+    /// are skipped (ruling after P7-FIX-1, `Tree.visibleStep`).
     @objc func selectNextTab(_ sender: Any?) { selectTab(by: 1) }
     @objc func selectPreviousTab(_ sender: Any?) { selectTab(by: -1) }
 
     private func selectTab(by step: Int) {
-        guard !tabs.isEmpty else { return }
-        select(((selected + step) % tabs.count + tabs.count) % tabs.count)
+        if let next = tree.visibleStep(from: selected, by: step), next != selected { select(next) }
     }
 
     /// File > Reopen Closed Tab: the tab closed last comes back where it was, selected and loaded.
@@ -61,7 +61,8 @@ extension BrowserWindowController: NSMenuItemValidation {
         case #selector(reopenClosedTab(_:)): return closedTabs.count > 0
         case #selector(moveTabUp(_:)): return canMoveSelectedTab(up: true)
         case #selector(moveTabDown(_:)): return canMoveSelectedTab(up: false)
-        case #selector(selectNextTab(_:)), #selector(selectPreviousTab(_:)): return tabs.count > 1
+        case #selector(selectNextTab(_:)), #selector(selectPreviousTab(_:)):
+            return tree.visibleStep(from: selected, by: 1).map { $0 != selected } ?? false
         case #selector(stopLoading(_:)): return current?.isLoading ?? false
         default: return true
         }

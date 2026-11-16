@@ -9,8 +9,8 @@ links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Change
 
-`close(at:)` selects `Tree.nearestVisible(afterRemoving:)`. ⌃⇥ / ⌃⇧⇥ still walk every tab, hidden ones too (not in the ruling).
+`close(at:)` selects `Tree.nearestVisible(afterRemoving:)`. ⌃⇥ / ⌃⇧⇥ (ruling after P7-FIX-1) step through visible tabs only, round the ends (`Tree.visibleStep`); from a hidden tab to its visible neighbour; the items are off when no other visible tab exists.
 
 ## Proof
 
-`closingTheSelectedTabSelectsAVisibleTab` red on e0b91ff, green; Core `closingSelectsTheNearestVisibleTab` red on a stub, green. Not read back.
+`closingTheSelectedTabSelectsAVisibleTab` red on e0b91ff, green; `controlTabSkipsACollapsedFolder` and Core `controlTabStepsThroughVisibleTabs` red on 9e6d1c4 (1 and 7 issues), green; Core `closingSelectsTheNearestVisibleTab` red on a stub, green. Not read back.

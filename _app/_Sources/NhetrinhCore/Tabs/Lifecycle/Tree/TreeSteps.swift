@@ -40,6 +40,15 @@ extension Tree {
         return count == 0 ? nil : min(max(0, index), count - 1)
     }
 
+    /// ⌃⇥ / ⌃⇧⇥: the flat index of the next (`by` 1) or previous (-1) visible tab from flat `from`, round
+    /// the ends; a tab in a collapsed folder is skipped, and a hidden `from` steps to its visible neighbour.
+    /// Nil when no tab is visible.
+    public func visibleStep(from: Int, by step: Int) -> Int? {
+        let shown = visibleFlatIndexes
+        guard let first = shown.first, let last = shown.last else { return nil }
+        return step > 0 ? shown.first { $0 > from } ?? first : shown.last { $0 < from } ?? last
+    }
+
     /// Move Tab Up / Down: one row within its container. At a folder's edge a tab steps out to the root,
     /// next to the folder; a root tab passes a folder whole and never enters it. Nil when it cannot move.
     @discardableResult
