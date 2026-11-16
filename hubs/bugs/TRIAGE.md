@@ -21,3 +21,4 @@ Grep the signature in the report or log.
 | NT-BUG-014 | `closingTheSelectedTabSelectsAVisibleTab` | OBSERVED | Is the chosen tab in a collapsed folder? `close(at:)` must use `Tree.nearestVisible` |
 | NT-BUG-015 | `foldersWithoutATabAreKept` | OBSERVED | A session of folders and no tab: `TreeSession.withHomeTab` keeps them |
 | NT-BUG-016 | `moveTabStepsOneRow` | OBSERVED | Did Move use the flat index? It must be `Tree.step` on the path |
+| NT-BUG-017 | `aCancelNeverRemovesTheNextDownloadsFile` | OBSERVED | A finished download gone after a cancel of the same name? The name is free only after WebKit confirms the cancel (NT-NAV-005) |

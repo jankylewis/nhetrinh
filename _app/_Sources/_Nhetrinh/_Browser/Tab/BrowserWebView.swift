@@ -15,6 +15,28 @@ final class BrowserWebView: WKWebView {
     private(set) var lastMenu: [String] = []
     /// The readback probe's item to press once the next context menu is shown (R17); nil for the user.
     var pressOnOpen: String?
+    /// The user's last click or key in the page: a download soon after is the user's (P5-FIX-1, F2).
+    private(set) var lastInput: Date?
+
+    override func mouseDown(with event: NSEvent) {
+        lastInput = Date()
+        super.mouseDown(with: event)
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        lastInput = Date()
+        super.rightMouseDown(with: event)
+    }
+
+    override func otherMouseDown(with event: NSEvent) {
+        lastInput = Date()
+        super.otherMouseDown(with: event)
+    }
+
+    override func keyDown(with event: NSEvent) {
+        lastInput = Date()
+        super.keyDown(with: event)
+    }
 
     override func willOpenMenu(_ menu: NSMenu, with event: NSEvent) {
         super.willOpenMenu(menu, with: event)
