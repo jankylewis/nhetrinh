@@ -63,8 +63,16 @@ extension BrowserWindowController {
     private func policyStates(playing: Set<ObjectIdentifier>) -> [UnloadPolicy.TabState] {
         tabs.map { tab in
             UnloadPolicy.TabState(lastActive: tab.lastActive, isLoaded: tab.isLoaded,
-                                  isPlaying: playing.contains(ObjectIdentifier(tab)))
+                                  isPlaying: playing.contains(ObjectIdentifier(tab)), isCapturing: capturing(tab))
         }
+    }
+}
+
+extension BrowserWindowController {
+    /// The page holds the camera or the microphone, on or muted: a call is not cut (F3 ruling).
+    func capturing(_ tab: Tab) -> Bool {
+        guard let webView = tab.webView else { return false }
+        return webView.cameraCaptureState != .none || webView.microphoneCaptureState != .none
     }
 }
 

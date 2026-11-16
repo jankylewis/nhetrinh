@@ -75,14 +75,28 @@ enum PressureSteps {
             return state.loaded == [true, false, true]
         }
         try expect(silentGone, "a warning past 1 min idle: loaded per row \(state.loaded), not [true, false, true]")
+        try freshBackgroundTab(app)
         try simulate(.critical, on: app)
-        Thread.sleep(forTimeInterval: 3)
-        state = try app.state()
-        try expect(state.loaded.first == true, "after a critical level the playing row 1 is unloaded")
+        let critical = waitUntil(10) {
+            state = (try? app.state()) ?? state
+            return state.loaded == [true, false, true, false]
+        }
+        try expect(critical, "a critical level: loaded per row \(state.loaded), not [true, false, true, false]: "
+            + "the fresh silent row 4 must go, the playing row 1 stay")
         let row = state.rows.first ?? ""
         try expect(row == TestPageContent.playingTitle, "the playing tab stays loaded but row 1 reads \"\(row)\"")
         return "row 1 playing, row 2 silent, row 3 selected, \(Int(pastTheWarningLimit)) s idle; a warning unloaded "
-            + "row 2 only; a critical level after it: row 1 still loaded and playing"
+            + "row 2 only; a critical level after it unloaded the fresh silent row 4: row 1 still loaded and playing"
+    }
+
+    /// F2 (P4P6-FIX-1): a control for the critical level, a silent background tab used seconds ago (row 4,
+    /// test page 3), which a warning keeps and only critical unloads; row 3 selected again.
+    private static func freshBackgroundTab(_ app: AppSession) throws {
+        try app.act(.newTab, "File > New Tab")
+        try LifecycleSteps.open(app, page: 3)
+        try app.act(.select(2), "select sidebar row 3")
+        try expect(waitUntil(10) { (try? app.state().loaded) == [true, false, true, true] },
+                   "row 4 opened, row 3 selected: loaded per row \((try? app.state().loaded) ?? [])")
     }
 
     /// R8's reading on 3 example sites, 2 of them unloaded by a critical level.

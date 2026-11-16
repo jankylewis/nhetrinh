@@ -4,7 +4,7 @@ import Foundation
 
 /// Which background tabs to unload. A pure function: the app asks WebKit if a tab plays
 /// (`requestMediaPlaybackState`) and passes the answer in; a playing tab is never unloaded (NT-TAB-001),
-/// at any memory pressure level.
+/// nor one holding the camera or the microphone (F3 ruling), at any memory pressure level.
 public enum UnloadPolicy {
     /// macOS's memory pressure level (P6), by the name the probe sends.
     public enum Pressure: String, Sendable {
@@ -19,11 +19,14 @@ public enum UnloadPolicy {
         public let lastActive: Date
         public let isLoaded: Bool
         public let isPlaying: Bool
+        /// The page holds the camera or the microphone (on or muted): kept like a playing tab (F3 ruling).
+        public let isCapturing: Bool
 
-        public init(lastActive: Date, isLoaded: Bool, isPlaying: Bool) {
+        public init(lastActive: Date, isLoaded: Bool, isPlaying: Bool, isCapturing: Bool = false) {
             self.lastActive = lastActive
             self.isLoaded = isLoaded
             self.isPlaying = isPlaying
+            self.isCapturing = isCapturing
         }
     }
 
@@ -36,7 +39,7 @@ public enum UnloadPolicy {
         }
     }
 
-    /// The indexes of the tabs to unload now, in ascending order: loaded, not selected, silent,
+    /// The indexes of the tabs to unload now, in ascending order: loaded, not selected, silent, not capturing,
     /// and idle for longer than the limit of `pressure` (exactly at the limit is not yet idle).
     public static func tabsToUnload(_ tabs: [TabState], selected: Int?, now: Date, idleLimit: TimeInterval,
                                     pressure: Pressure = .normal) -> [Int] {
@@ -44,7 +47,7 @@ public enum UnloadPolicy {
         return tabs.indices.filter { index in
             let tab = tabs[index]
             let idle = limit.map { now.timeIntervalSince(tab.lastActive) > $0 } ?? true
-            return index != selected && tab.isLoaded && !tab.isPlaying && idle
+            return index != selected && tab.isLoaded && !tab.isPlaying && !tab.isCapturing && idle
         }
     }
 }

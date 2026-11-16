@@ -46,20 +46,32 @@ public struct Prefs: Equatable, Sendable {
     public init() {}
 
     /// The prefs in `bytes`; nil when they are not a JSON object. A key of the wrong kind or out of
-    /// range keeps its default: one bad value never costs the others.
+    /// range keeps its default: one bad value never costs the others (F7). A JSON boolean is not a
+    /// number (F4); hosts are read lower case, as `Zoom.hostKey` gives them (F10).
     public static func decode(_ bytes: Data) -> Prefs? {
         guard let object = (try? JSONSerialization.jsonObject(with: bytes)) as? [String: Any] else { return nil }
-        if let zoom = object["zoom"], !(zoom is [String: Any]) { return nil }
         var prefs = Prefs()
-        for (host, level) in object["zoom"] as? [String: Any] ?? [:] {
-            guard let level = level as? Double else { continue }
-            prefs.zoom[host] = Zoom.clamp(level)
+        let zoom = object["zoom"] as? [String: Any] ?? [:]
+        for host in zoom.keys.sorted() {  // sorted: two spellings of one host give the same answer every time
+            guard let level = number(zoom[host]) else { continue }
+            prefs.zoom[host.lowercased()] = Zoom.clamp(level)
         }
         prefs.searchEngine = (object["searchEngine"] as? String).flatMap(SearchEngine.init(rawValue:)) ?? .google
         prefs.appearance = (object["appearance"] as? String).flatMap(Appearance.init(rawValue:)) ?? .system
-        if let minutes = object["idleUnloadMinutes"] as? Int, minutes >= 1 { prefs.idleUnloadMinutes = minutes }
+        if let minutes = number(object["idleUnloadMinutes"]).flatMap(Int.init(exactly:)), minutes >= 1 {
+            prefs.idleUnloadMinutes = minutes
+        }
         return prefs
     }
+
+    /// A JSON number; nil for anything else, a boolean too (JSONSerialization gives both as NSNumber).
+    static func number(_ value: Any?) -> Double? {
+        guard let number = value as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID() else { return nil }
+        return number.doubleValue
+    }
+
+    /// Clear All (F6 ruling): the per-site settings go (the zoom per host); the app-wide ones stay.
+    public mutating func forgetSites() { zoom = [:] }
 
     public func encoded() throws -> Data {
         let object: [String: Any] = ["zoom": zoom, "searchEngine": searchEngine.rawValue,

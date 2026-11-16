@@ -24,21 +24,24 @@ extension SettingsHub {
     }
 
     /// Clear Website Data…: a sheet asks first. Cancel is the default button; nothing is removed without a choice.
+    /// The buttons and what each removes: `ClearRange` (unit tested: R30 cannot tell them apart, F1).
     @objc func askToClear() {
         guard let window else { return }
         let alert = NSAlert()
         alert.messageText = "Clear website data?"
         alert.informativeText = "Cookies, caches and site storage are removed for every site."
-        alert.addButton(withTitle: "Cancel")
-        alert.addButton(withTitle: "Clear Last Hour")
-        alert.addButton(withTitle: "Clear All").hasDestructiveAction = true
+        for title in ClearRange.buttons { alert.addButton(withTitle: title) }
+        alert.buttons.last?.hasDestructiveAction = true
         alert.beginSheetModal(for: window) { [weak self] response in
-            switch response {
-            case .alertSecondButtonReturn: self?.removeData(since: Date().addingTimeInterval(-3600))
-            case .alertThirdButtonReturn: self?.removeData(since: .distantPast)
-            default: break
-            }
+            let first = NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
+            if let range = ClearRange(button: response.rawValue - first) { self?.clear(range) }
         }
+    }
+
+    /// One of the sheet's ranges: the website data since its date, and with Clear All the per-site settings.
+    func clear(_ range: ClearRange) {
+        removeData(since: range.since(now: Date()))
+        if range.forgetsSiteSettings { onChange? { $0.forgetSites() } }
     }
 
     private func removeData(since date: Date) {

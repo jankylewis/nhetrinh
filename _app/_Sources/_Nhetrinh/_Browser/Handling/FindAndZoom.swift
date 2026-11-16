@@ -45,11 +45,12 @@ extension BrowserWindowController {
 
     var currentZoom: Double { Double(current?.pageZoom ?? 1) }
 
-    /// The selected page at `level`, kept for its host (100 % keeps no entry).
+    /// The selected page at `level`, kept for its host (100 % keeps no entry); every loaded tab of that
+    /// host follows (F8, through `applyPrefs`). A page with no host is zoomed alone, not kept.
     private func setZoom(_ level: Double) {
         guard let webView = current else { return }
         webView.pageZoom = CGFloat(level)
-        if let key = webView.url.flatMap(Zoom.hostKey) {
+        if let key = (webView.url ?? tabs[selected].url).flatMap(Zoom.hostKey) {
             updatePrefs { $0.zoom[key] = abs(level - 1) < 0.001 ? nil : level }
         }
         toolbar.showZoom(Zoom.badge(level))
@@ -57,7 +58,19 @@ extension BrowserWindowController {
 
     /// A page of another host committed: its own kept level, or 100 %.
     func applySavedZoom(to webView: WKWebView) {
-        let level = webView.url.flatMap(Zoom.hostKey).flatMap { prefs.zoom[$0] } ?? 1
+        guard let key = webView.url.flatMap(Zoom.hostKey) else { return apply(1, to: webView) }
+        apply(prefs.zoom[key] ?? 1, to: webView)
+    }
+
+    /// Every loaded tab with a host at its host's kept level: after a zoom (F8) and after Clear All (F6).
+    func applyZoomToLoadedTabs() {
+        for tab in tabs {
+            guard let webView = tab.webView, let key = (webView.url ?? tab.url).flatMap(Zoom.hostKey) else { continue }
+            apply(prefs.zoom[key] ?? 1, to: webView)
+        }
+    }
+
+    private func apply(_ level: Double, to webView: WKWebView) {
         if abs(Double(webView.pageZoom) - level) > 0.001 { webView.pageZoom = CGFloat(level) }
         if webView === current { toolbar.showZoom(Zoom.badge(level)) }
     }
