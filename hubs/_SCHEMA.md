@@ -15,7 +15,7 @@ build the path, never search); ids and families are nhetrinh's own.
 | `failures/evidence/` | `_INDEX.md` rows (a file only past 3 paths) | PATHS to kept evidence, what to capture next time |
 | `lessons/lessonlearn/` | same path as failurereason | who believed what, what changed it, the rule left |
 | `lessons/toolgap/` | `NT_TG_<nnn>_<SLUG>.md` (shelved past 4) | missing or broken tool, workaround, status |
-| `product/features/` | `S<nn>.md` rows (40 a shelf) | what the app can do: feature, commit, date, the bug it closed |
+| `product/features/` | `S<nn>.md` rows (40 a shelf) | what the app can do: feature, release note, commit, date, the bug it closed |
 | `product/plan/` | `_PLAN.md` + one file per milestone | what comes next: phases, exit criteria, decisions |
 
 A bug is a symptom a user meets in the app (`NT-BUG-nnn`, global numbers).
@@ -76,4 +76,6 @@ cause: <NT-FAM-nnn>       (bugfacing only, when proven)
 4. Public repo: no secrets, tokens, e-mails, person names, work names or absolute
    personal paths. Name people by role (`headmate`).
 5. Ids are never reused. Check both TRIAGE files before giving a new id.
-6. Every feature gets its `product/features/` row in the same commit/PR that ships it.
+6. Every feature gets its `product/features/` row in the same commit/PR that ships it. Its Release
+   note is for users: what the app does now, no class, API, id or readback. A change to a shipped
+   feature edits the older rows' notes in the same change (`-`: left out of the notes, NT-BLD-003).

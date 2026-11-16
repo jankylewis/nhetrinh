@@ -16,6 +16,10 @@ on:
         type: boolean
         default: false
 
+# The token only reads, on a push and a pull request too (P8 review R4); release.yml's publish job alone writes.
+permissions:
+  contents: read
+
 jobs:
   macos:
     runs-on: macos-15
@@ -62,6 +66,7 @@ jobs:
           name: nhetrinh-app
           path: ${{ runner.temp }}/release/*.zip
           if-no-files-found: error
+          overwrite: true  # "Re-run all jobs" uploads again under the same name in the same run (P8 review R6)
           retention-days: 7
       - name: Readback tool compiles (not run in CI, it needs Accessibility)
         working-directory: _app

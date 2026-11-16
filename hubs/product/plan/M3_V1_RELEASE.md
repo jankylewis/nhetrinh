@@ -39,8 +39,7 @@ Build, Core:
   only: no folder inside a folder.
 - Operations: add folder, rename, move a tab (into, out of, inside), collapse, delete folder.
   Deleting a folder moves its tabs to the root. It never closes them.
-- Session schema version 2, with a migration from version 1 (flat list to root tabs).
-  The version 1 file is kept once as a backup.
+- Session schema version 2, with a migration from version 1 (flat list to root tabs); the version 1 file is kept once.
 
 Build, App:
 - The sidebar becomes an outline view. Drag a tab onto a folder; drag folders to reorder.
@@ -81,10 +80,11 @@ Build:
 - `release.yml`: on a tag `v*` run the checker, the tests and the build; zip the app; compute
   the SHA-256; make a GitHub Release. The notes are built from the `product/features` rows.
 - README: install, shortcuts, known limits, and how to open an app that is not notarized.
-- Apple silicon only (the smallest app). An Intel build only when asked.
-- Not notarized: there is no Apple Developer ID. The first open of a downloaded copy shows the
-  macOS warning. If the headmate gets an ID later, notarization is added as a new phase.
+- Apple silicon only; an Intel build only when asked. Not notarized (no Apple Developer ID): the first
+  open shows the macOS warning; notarization is a new phase if an ID comes.
 - Final lightness report: the budget table against the measured numbers and the R&D baseline.
+- P8-FIX-1 (review): notes from the Release note column (NT-BLD-003, 004); build.yml only reads; a tag not on master
+  is refused; upload `overwrite`. Notes: R44 passes only from the granted readback app (NT-TG-003); actions pinned by major tag, not SHA (low, open).
 
 Readback adds:
 - R44 download the zip from the Release page, check the SHA-256, unzip to a temporary folder,

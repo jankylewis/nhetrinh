@@ -17,7 +17,8 @@ R&D baseline it is measured against.
 | 3 tabs, 2 unloaded: app + helpers (R38) | 125 MB | — | 102.8 MB, 6 helpers | not measured |
 
 Sources: the budget, `plan/_PLAN.md` ("Lightness budget") and `plan/M3_V1_RELEASE.md` (P6's row);
-the R&D baseline, `_bench/results/_RESULTS.md` (WebKit, 5 runs; idle CPU 3 runs of 10 sites);
+the R&D baseline, `_bench/results/_RESULTS.md` (WebKit, 5 runs; idle CPU 3 runs of 10 sites), but its
+516 KB bundle from `plan/DECISIONS.md` D2 and `plan/_PLAN.md` (not in `_RESULTS.md`);
 the last measured, `hubs/failures/evidence/readback/_LATEST.md`, readback 00:34 on e0b5d3d (P7 merged
 with P5 and P6). That build has neither P5-FIX-1 (p5/review) nor P7-FIX-1: not the release build.
 
@@ -33,7 +34,8 @@ with P5 and P6). That build has neither P5-FIX-1 (p5/review) nor P7-FIX-1: not t
 
 From P2 to P7: +1.7 MB in the app process and +1.5 MB in all, for sessions, folders, favicons, dialogs,
 find, zoom, the Settings Hub, downloads and the memory guard. The bundle grew to 864 KB and came back to
-760 KB with `-Osize`. Every row is inside the budget; the smallest margin is the bundle (264 KB left).
+760 KB with `-Osize`. Every row is inside the budget; the smallest margin is the bundle (264 KB left on
+e0b5d3d; 812 KB on the P8 review's readback, 01:30 on e2bbc3f with P5-FIX-2: 212 KB left).
 
 ## How it is measured
 

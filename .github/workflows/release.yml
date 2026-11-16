@@ -35,7 +35,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag || github.ref }}
-      - name: The tag is v<VERSION> (_app/scripts/VERSION)
+          fetch-depth: 0  # origin/master, for the check below
+      - name: The tag is v<VERSION> (_app/scripts/VERSION), on a commit of master
         id: check
         env:
           TAG: ${{ inputs.tag || github.ref_name }}
@@ -46,6 +47,7 @@ jobs:
             exit 1
           fi
           [[ "$TAG" == "v$VERSION" ]] || { echo "::error::tag $TAG but _app/scripts/VERSION is $VERSION"; exit 1; }
+          git merge-base --is-ancestor HEAD origin/master || { echo "::error::tag $TAG is not on master"; exit 1; }
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 

@@ -102,6 +102,21 @@ class ReleaseNotesTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             release_notes.notes("1.0.0", [], {})
 
+    def test_a_release_note_column_gives_the_notes_and_a_dash_leaves_a_row_out(self):
+        head = "| Id | Feature | Release note | Commit | Date | Closed bug |\n"
+        rows = release_notes.parse_rows(head + "| NT-FEAT-034 | Footer: up to 3 rows (P5) | - | x | d | - |\n"
+                                        "| NT-FEAT-036 | `WKDownload` rows (P5-FIX-1) | Every download has a row "
+                                        "| not committed (P5-FIX-1) | d | - |\n")
+        self.assertEqual([(r["text"], r["phase"]) for r in rows], [(None, "P5"), ("Every download has a row", "P5")])
+        for bad in ["| NT-FEAT-036 | A | x | d | - |", "| NT-FEAT-036 | A |  | x | d | - |"]:  # 5 cells, empty
+            with self.assertRaises(ValueError, msg=bad):
+                release_notes.parse_rows(head + bad)
+
+    def test_a_note_with_a_hub_id_a_task_id_or_the_readback_is_an_error(self):
+        for text in ["Closes NT-BUG-017", "Guarded (P5-FIX-1)", "Read back by the Readback tool"]:
+            with self.assertRaises(ValueError, msg=text):
+                release_notes.notes("1.0.0", [{"id": "NT-FEAT-1", "text": text, "phase": None}], {})
+
 
 class ReviewP8Tests(unittest.TestCase):
     """P8-REVIEW (REVIEW_P8.md), red on p8/release 41fc9df merged with p7/prep (e2bbc3f)."""

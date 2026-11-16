@@ -32,8 +32,9 @@ Default web browser. nhetrinh never changes that setting itself.
 - **Tabs** come back after a quit. A tab not used for a while gives its memory back and reloads
   when you click it, with its history; a tab that plays sound is kept. When macOS is short of memory,
   nhetrinh unloads background tabs at once.
-- **Downloads** go to ~/Downloads; the sidebar footer shows them, with Cancel. A click on a finished
-  one shows it in Finder.
+- **Downloads** go to ~/Downloads; the sidebar footer shows every running one, with Cancel. A click
+  on a finished one shows it in Finder. A downloaded file says where it came from (Finder's Get Info,
+  "Where from"), and a page that starts a 6th download without a click asks you first.
 - **Pages** can ask (alerts, sign-in, camera, a link to another app): always in a sheet on the window.
 
 ## Shortcuts
