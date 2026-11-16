@@ -48,6 +48,8 @@ Build, App:
 
 Tests: every `TabTree` operation, parameterized; migration 1 to 2 with fixture files;
 version 2 round trip; "delete folder keeps its tabs".
+Red first (P7-PREP-1, D24): stubs in `NhetrinhCore/Tabs/Lifecycle/Tree/`, 21 tests (58 cases) in
+`Tests/_NhetrinhCoreTests/Tabs/Lifecycle/Tree/`; the version 2 file shape is fixed by `SessionFixtures.swift`.
 
 Readback adds:
 - R39 New Folder, name "work": the row appears.
