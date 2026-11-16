@@ -11,7 +11,7 @@ links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Fix that holds (P5-FIX-1, p5/review, not on master)
 
-`Quarantine.mark` on the finished partial file, before it gets its name: type web download, agent nhetrinh, the file's URL and its page.
+`Quarantine.mark` on the finished partial file, before it gets its name: type web download, agent nhetrinh, the file's URL and its page. macOS keeps the type and the agent but drops the two URLs; "Where from" is a second attribute since P5-FIX-2 (NT-NAV-013).
 
 ## Wrong fixes
 
