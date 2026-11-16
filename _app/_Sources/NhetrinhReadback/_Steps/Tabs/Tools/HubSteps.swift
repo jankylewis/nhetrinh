@@ -20,7 +20,23 @@ enum HubSteps {
             return seen.hasPrefix(wanted)
         }
         try expect(found, "after DuckDuckGo the address bar never held \(wanted); last \"\(seen)\"")
-        return "Settings Hub: Search engine DuckDuckGo; typed words: the address bar held \(wanted)"
+        try keptAfterRelaunch(app, wanted: wanted)
+        return "Settings Hub: Search engine DuckDuckGo; typed words: the address bar held \(wanted); "
+            + "after Quit and a launch the next search goes there too"
+    }
+
+    /// F12 (P4P6-FIX-1): the engine is kept: after Quit and a launch, words go to DuckDuckGo again.
+    private static func keptAfterRelaunch(_ app: AppSession, wanted: String) throws {
+        try app.act(.menu(["nhetrinh", "Quit nhetrinh"]), "nhetrinh > Quit nhetrinh")
+        try expect(app.waitForEnd(10), "nhetrinh > Quit nhetrinh: the app still runs after 10 s")
+        try app.launch(probe: true)
+        try app.act(.navigate("nhetrinh readback words"), "after the launch: the same words, Return")
+        var seen = ""
+        let kept = waitUntil(10, every: 0.05) {
+            seen = (try? app.addressText()) ?? seen
+            return seen.hasPrefix(wanted)
+        }
+        try expect(kept, "after Quit and a launch the search went to \"\(seen)\", not DuckDuckGo")
     }
 
     static func clearData(_ app: AppSession) throws -> String {

@@ -31,6 +31,7 @@ extension BrowserWindowController {
         if old?.appearance != prefs.appearance { NSApp.appearance = Self.appearance(prefs.appearance) }
         if old?.idleUnloadMinutes != prefs.idleUnloadMinutes, old != nil { startIdleUnloading() }
         if old == nil { startIdleUnloading() }
+        if let old, old.zoom != prefs.zoom { applyZoomToLoadedTabs() }
         hub?.show(prefs)
     }
 

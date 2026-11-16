@@ -33,7 +33,7 @@ func prefsRoundTrip(appearance: Appearance) throws {
     #expect(prefs.zoom.isEmpty)
 }
 
-@Test(arguments: ["{", "[]", "not json", "{\"zoom\": 3}"])
+@Test(arguments: ["{", "[]", "not json"])
 func corruptFileGivesDefaultsAndIsKept(text: String) throws {
     let dir = try folder()
     try Data(text.utf8).write(to: dir.appendingPathComponent(PrefsStore.fileName))
@@ -61,6 +61,7 @@ func missingKeysKeepTheirDefaults(json: String, expected: Prefs) throws {
 @Test(arguments: [
     "{\"appearance\": \"sepia\"}", "{\"appearance\": 3}", "{\"searchEngine\": \"altavista\"}",
     "{\"idleUnloadMinutes\": 0}", "{\"idleUnloadMinutes\": -4}", "{\"zoom\": {\"a.test\": \"big\"}}",
+    "{\"zoom\": 3}",
 ])
 func unknownValuesFallBack(json: String) throws {
     let prefs = try #require(Prefs.decode(Data(json.utf8)))

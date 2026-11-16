@@ -57,9 +57,18 @@ enum AppMenu {
             item("Stop", #selector(BrowserWindowController.stopLoading(_:)), ".", browser),
             .separator(),
             item("Zoom In", #selector(BrowserWindowController.zoomIn(_:)), "+", browser),
+            zoomInWithoutShift(browser),
             item("Zoom Out", #selector(BrowserWindowController.zoomOut(_:)), "-", browser),
             item("Actual Size", #selector(BrowserWindowController.actualSize(_:)), "0", browser),
         ])
+    }
+
+    /// ⌘= zooms in too: on most keyboards + needs Shift (F9). Hidden, its key still answers.
+    private static func zoomInWithoutShift(_ browser: BrowserWindowController) -> NSMenuItem {
+        let entry = item("Zoom In", #selector(BrowserWindowController.zoomIn(_:)), "=", browser)
+        entry.isHidden = true
+        entry.allowsKeyEquivalentWhenHidden = true
+        return entry
     }
 
     private static func tabsMenu(_ browser: BrowserWindowController) -> NSMenuItem {

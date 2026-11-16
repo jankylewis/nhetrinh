@@ -64,7 +64,7 @@ System; the search URL per engine through `AddressParser`.
 Readback adds:
 - R27 Edit > Find > Find…, set "Example": found; "zzzz": not found. Close button: the bar is gone.
 - R28 View > Zoom In twice: the badge shows 125 %. Relaunch: still 125 % on that host, 100 % on another.
-- R29 change the search engine: the next search goes to that engine's URL.
+- R29 change the search engine: the next search goes to that engine's URL, after a relaunch too.
 - R30 Clear Website Data: a cookie set by a local page is gone.
 - R30a nhetrinh > Settings Hub…, Appearance Dark: the window is dark and a local page that reads
   `prefers-color-scheme` shows dark. Relaunch: still dark. Appearance System: the system look again.

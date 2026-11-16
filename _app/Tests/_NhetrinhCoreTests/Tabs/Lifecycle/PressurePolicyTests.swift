@@ -67,3 +67,14 @@ func aWarningNeverWaitsLongerThanNormal(normal: TimeInterval, idle: TimeInterval
 func pressureLevelsByName(name: String, level: UnloadPolicy.Pressure) {
     #expect(UnloadPolicy.Pressure(rawValue: name) == level && level.rawValue == name)
 }
+
+/// F3 ruling (P4P6-FIX-1), red first: a tab holding the camera or the microphone is kept at every level,
+/// like a playing tab. The control (idle a day, silent, not capturing) goes at every level.
+@Test(arguments: [UnloadPolicy.Pressure.normal, .warning, .critical])
+func aCapturingTabIsKept(pressure: UnloadPolicy.Pressure) {
+    let control = UnloadPolicy.TabState(lastActive: now - 86_400, isLoaded: true, isPlaying: false)
+    let capturing = UnloadPolicy.TabState(lastActive: now - 86_400, isLoaded: true, isPlaying: false,
+                                          isCapturing: true)
+    #expect(UnloadPolicy.tabsToUnload([control, capturing], selected: nil, now: now, idleLimit: normal,
+                                      pressure: pressure) == [0])
+}

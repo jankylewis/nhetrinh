@@ -84,7 +84,7 @@ extension BrowserWindowController {
     /// Every item with a shortcut, by its path: "File > New Tab" -> "⌘T".
     private static func shortcuts(in menu: NSMenu, path: [String]) -> [String: String] {
         var found: [String: String] = [:]
-        for item in menu.items {
+        for item in menu.items where !item.isHidden {  // as the menu shows it: not ⌘= (F9)
             let here = path + [item.title]
             if let submenu = item.submenu {
                 found.merge(shortcuts(in: submenu, path: here)) { first, _ in first }
