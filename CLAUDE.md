@@ -21,7 +21,7 @@ Read first, in this order:
    Run tests only with `_app/scripts/test.sh` (plain `swift test` is flaky here: NT-GAT-001).
 4. **Readback is part of done.** `nhetrinh-readback` uses the installed app as its end user and
    gives a verdict per step. NOT READ BACK is never a pass. "Merged" and "tests green" are not a
-   readback. Only the matemaster runs it: it needs one app instance and the Accessibility permission.
+   readback. It runs on one seat at a time, the seat a brief names: there is only one app instance.
 5. **Lightness budget:** app process 40 MB, app + helpers 110 MB, bundle 1 MB, idle CPU 2 %.
    A change that breaks it stops until the cost is removed or the headmate accepts a new number.
 6. **Hubs in the same change.** Every bug, failure, lesson, tool gap and feature gets its entry
@@ -41,8 +41,8 @@ Read first, in this order:
 | The checker's own tests | `python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'` |
 | Unit tests | `nice -n 10 _app/scripts/test.sh` |
 | Build the app | `nice -n 10 _app/scripts/_build.sh` (output: `_app/build/nhetrinh.app`) |
-| Install (matemaster) | `_app/scripts/install.sh` |
-| Readback (matemaster) | `cd _app && swift run nhetrinh-readback` |
+| Install (only when the brief says so) | `_app/scripts/install.sh` |
+| Readback (only when the brief says so) | `cd _app && swift run nhetrinh-readback` |
 
 ## Map
 
@@ -68,7 +68,7 @@ The fleet is `nhetrinh`: matemaster `nhetrinh_mm`, mates `nhetrinh_1` and `nhetr
   `READY <task>`: the files changed, and the real last lines of the checker and of `test.sh`.
   `BLOCKED <task>`: the exact command and error. Two own attempts first, then report.
 - A mate never reports "works" for something it did not run. It says what it ran and what it saw.
-- The matemaster steers: it dispatches, reviews, runs the readback, ships. It does not do a
-  mate's work.
+- The matemaster steers: it dispatches, reviews the evidence, merges and ships. It does not do a
+  mate's work. A mate never reviews its own work as final: another seat reads it.
 - Other fleets, their seats and their folders are off limits. So is everything outside this
   repository.
