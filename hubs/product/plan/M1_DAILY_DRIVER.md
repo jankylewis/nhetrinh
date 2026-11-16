@@ -64,11 +64,11 @@ Tests: session round trip; corrupt JSON; unknown version; empty session gives a 
 100 tabs; the `UnloadPolicy` table (idle time x selected x playing).
 
 Readback adds:
-- R9 open 3 tabs, select the 2nd, ⌘Q, launch: the same 3 rows, the 2nd selected, 1 page process.
+- R9 open 3 tabs, select the 2nd, nhetrinh > Quit nhetrinh, launch: same 3 rows, 2nd selected, 1 page process.
 - R10 kill the app (signal 9), launch: the state of the last save is back.
 - R11 a background tab plays audio past the idle limit (limit set to 5 s for the run): it stays
   loaded. A silent tab in the same run is unloaded.
-- R12 click an unloaded tab: the same URL loads and ⌘[ goes back in its history.
+- R12 select an unloaded tab's row: the same URL loads and Tabs > Back goes back in its history.
 
 Exit: the gate, R1-R12 PASS.
 
@@ -79,8 +79,8 @@ Goal: the sidebar feels finished.
 Build:
 - Row: favicon (16 pt), title, close button on hover. Middle-click closes.
 - Drag a row to reorder. ⌃Tab and ⌃⇧Tab: next and previous tab.
-- ⌘⇧T reopens the last closed tab (Core `ClosedTabs`: the last 20, this run only).
-- ⌘-click a link: a new tab in the background.
+- File > Reopen Closed Tab (⌘⇧T) reopens the last closed tab (Core `ClosedTabs`: the last 20, this run only).
+- ⌘-click a link, or its context-menu item Open Link in New Tab: a new tab in the background.
 - Toolbar: reload becomes stop while a page loads; a thin progress line under the toolbar.
 - Favicons: the page's `<link rel="icon">`, else `/favicon.ico`; a memory cache of 200 icons at most.
 
@@ -90,9 +90,10 @@ resolution (relative, absolute, missing).
 Readback adds:
 - R13 hover a row: a close button appears; press it: rows -1.
 - R14 drag row 3 above row 1: the new order shows, and stays after a relaunch.
-- R15 ⌘⇧T: the row is back with the same URL.
+- R15 File > Reopen Closed Tab: the row is back with the same URL.
 - R16 a site that has an icon shows it in its row.
-- R17 ⌘-click a link on a local test page: rows +1, the selected tab does not change.
+- R17 a local test page: show the link's menu (`AXShowMenu`), press Open Link in New Tab: rows +1,
+  the selected tab does not change. The link's menu out of reach: NOT READ BACK, never PASS.
 - R18 stop a slow local page: loading ends and the button is reload again.
 
 Exit: the gate, R1-R18 PASS; favicons add 2 MB or less to the app process.
