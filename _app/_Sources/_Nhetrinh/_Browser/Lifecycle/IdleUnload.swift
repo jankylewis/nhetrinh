@@ -5,15 +5,19 @@ import WebKit
 /// unload WebKit is asked whether the tab plays media; a playing tab is kept (NT-TAB-001).
 extension BrowserWindowController {
     /// NHT_UNLOAD_AFTER_S=<seconds> shortens the limit: the readback sets 5 s for R11 and R12.
-    static let unloadAfter: TimeInterval = {
-        let seconds = ProcessInfo.processInfo.environment["NHT_UNLOAD_AFTER_S"].flatMap(TimeInterval.init)
-        return seconds.map { max(1, $0) } ?? 10 * 60
+    static let unloadOverride: TimeInterval? = {
+        ProcessInfo.processInfo.environment["NHT_UNLOAD_AFTER_S"].flatMap(TimeInterval.init).map { max(1, $0) }
     }()
 
-    /// Check a fifth of the limit apart: once a minute for 10 min, once a second for 5 s.
+    /// The limit: the override, else the Settings Hub's minutes (P4, `Prefs.idleUnloadMinutes`).
+    var unloadAfter: TimeInterval { Self.unloadOverride ?? TimeInterval(prefs.idleUnloadMinutes) * 60 }
+
+    /// Check a fifth of the limit apart: once a minute for 10 min, once a second for 5 s. Called
+    /// again when the limit changes: the old timer goes.
     func startIdleUnloading() {
+        unloadTimer?.invalidate()
         guard !Bench.loadAll else { return }
-        let every = min(60, max(1, Self.unloadAfter / 5))
+        let every = min(60, max(1, unloadAfter / 5))
         unloadTimer = Timer.scheduledTimer(withTimeInterval: every, repeats: true) { [weak self] _ in
             self?.unloadIdleTabs()
         }
@@ -22,7 +26,7 @@ extension BrowserWindowController {
     /// Ask WebKit about every tab idle long enough, then unload the ones the policy still names.
     func unloadIdleTabs(now: Date = Date()) {
         let idle = UnloadPolicy.tabsToUnload(policyStates(playing: []), selected: selected, now: now,
-                                             idleLimit: Self.unloadAfter).map { tabs[$0] }
+                                             idleLimit: unloadAfter).map { tabs[$0] }
         guard !idle.isEmpty else { return }
         let playing = PlayingTabs()
         let answers = DispatchGroup()
@@ -47,7 +51,7 @@ extension BrowserWindowController {
             Log.web.info("idle unload: a tab plays media; it stays loaded (NT-TAB-001)")
         }
         let indexes = UnloadPolicy.tabsToUnload(policyStates(playing: keep), selected: selected, now: Date(),
-                                                idleLimit: Self.unloadAfter)
+                                                idleLimit: unloadAfter)
         guard !indexes.isEmpty else { return }
         indexes.forEach { tabs[$0].unload() }
         refreshChrome()

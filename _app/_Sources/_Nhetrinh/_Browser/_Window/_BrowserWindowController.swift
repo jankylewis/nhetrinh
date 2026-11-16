@@ -25,6 +25,12 @@ final class BrowserWindowController: NSWindowController {
     var backgroundSlot: Int?
     /// P3 (`../Page/`): the sheets a page asks for, site permissions, links handed to other apps.
     let sheets = Sheets()
+    /// P4 (`../Handling/`, `UI/`): the settings (`prefs.json`, nil folder: not saved), the find bar, the Settings Hub.
+    var prefs = Prefs()
+    var prefsFolder: URL?
+    let findBar = FindBar()
+    var findBarHeight: NSLayoutConstraint?
+    var hub: SettingsHub?
 
     init() {
         let window = NSWindow(
@@ -65,7 +71,10 @@ final class BrowserWindowController: NSWindowController {
     private func makeMainView() -> NSView {
         let main = NSView()
         webContainer.setAccessibilityIdentifier("nhetrinh.web")
-        for view in [toolbar, webContainer] as [NSView] {
+        findBar.isHidden = true
+        let findHeight = findBar.heightAnchor.constraint(equalToConstant: 0)
+        findBarHeight = findHeight
+        for view in [toolbar, findBar, webContainer] as [NSView] {
             view.translatesAutoresizingMaskIntoConstraints = false
             main.addSubview(view)
         }
@@ -74,7 +83,11 @@ final class BrowserWindowController: NSWindowController {
             toolbar.leadingAnchor.constraint(equalTo: main.leadingAnchor),
             toolbar.trailingAnchor.constraint(equalTo: main.trailingAnchor),
             toolbar.heightAnchor.constraint(equalToConstant: 40),
-            webContainer.topAnchor.constraint(equalTo: toolbar.bottomAnchor),
+            findBar.topAnchor.constraint(equalTo: toolbar.bottomAnchor),
+            findBar.leadingAnchor.constraint(equalTo: main.leadingAnchor),
+            findBar.trailingAnchor.constraint(equalTo: main.trailingAnchor),
+            findHeight,
+            webContainer.topAnchor.constraint(equalTo: findBar.bottomAnchor),
             webContainer.leadingAnchor.constraint(equalTo: main.leadingAnchor),
             webContainer.trailingAnchor.constraint(equalTo: main.trailingAnchor),
             webContainer.bottomAnchor.constraint(equalTo: main.bottomAnchor),
@@ -92,6 +105,9 @@ final class BrowserWindowController: NSWindowController {
         toolbar.onReload = { [weak self] in self?.reload(nil) }
         toolbar.onStop = { [weak self] in self?.stopLoading(nil) }
         toolbar.onSubmit = { [weak self] text in self?.navigate(text) }
+        toolbar.onZoomBadge = { [weak self] in self?.actualSize(nil) }
+        findBar.onFind = { [weak self] text, backwards in self?.find(text, backwards: backwards) }
+        findBar.onClose = { [weak self] in self?.closeFind() }
     }
 
     // MARK: - Chrome
@@ -109,6 +125,7 @@ final class BrowserWindowController: NSWindowController {
         toolbar.update(url: tab.url, canBack: tab.webView?.canGoBack ?? false,
                        canForward: tab.webView?.canGoForward ?? false)
         refreshLoading()
+        toolbar.showZoom(Zoom.badge(Double(tab.webView?.pageZoom ?? 1)))
         window?.title = tab.title
     }
 }

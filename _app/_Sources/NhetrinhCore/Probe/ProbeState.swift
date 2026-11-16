@@ -37,6 +37,13 @@ public struct ProbeState: Equatable, Sendable {
     public var fullscreen = false
     /// Whether the app is the active app, with the focus (D25: R26a, R26b say whether they took it).
     public var active = false
+    /// P4: the find bar shown and its last answer ("found", "not found"; "" none), the zoom badge
+    /// ("" at 100 %), the window's look ("dark", "light"), whether the Settings Hub window is shown.
+    public var findShown = false
+    public var findResult = ""
+    public var zoomBadge = ""
+    public var appearance = ""
+    public var hubShown = false
 
     public init() {}
 }
@@ -49,7 +56,8 @@ extension ProbeState {
                                      "loading": loading, "reloadButton": reloadButton, "webMenu": webMenu,
                                      "sheet": sheet, "sheetKind": sheetKind, "sheetButtons": sheetButtons,
                                      "sheetsShown": sheetsShown, "handedOff": handedOff, "fullscreen": fullscreen,
-                                     "active": active]
+                                     "active": active, "findShown": findShown, "findResult": findResult,
+                                     "zoomBadge": zoomBadge, "appearance": appearance, "hubShown": hubShown]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -76,5 +84,10 @@ extension ProbeState {
         handedOff = object["handedOff"] as? Int ?? 0
         fullscreen = object["fullscreen"] as? Bool ?? false
         active = object["active"] as? Bool ?? false
+        findShown = object["findShown"] as? Bool ?? false
+        findResult = object["findResult"] as? String ?? ""
+        zoomBadge = object["zoomBadge"] as? String ?? ""
+        appearance = object["appearance"] as? String ?? ""
+        hubShown = object["hubShown"] as? Bool ?? false
     }
 }

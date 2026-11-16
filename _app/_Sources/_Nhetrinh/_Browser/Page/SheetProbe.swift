@@ -5,12 +5,34 @@ import WebKit
 /// The readback probe's P3 answers (D23): the window's sheet read as it shows, its button pressed and
 /// its field typed in as a user does, and a left click on an element of the page, sent to this app only.
 extension BrowserWindowController {
+    /// The browser window's sheet, else the Settings Hub's (P4: Clear Website Data…).
+    var shownSheet: NSWindow? { window?.attachedSheet ?? hub?.window?.attachedSheet }
+
+    /// P4: the find bar, the zoom badge, the window's look, the Settings Hub.
+    private func readTools(into state: inout ProbeState) {
+        state.findShown = !findBar.isHidden
+        state.findResult = findBar.result
+        state.zoomBadge = toolbar.zoomText
+        let look = window?.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua])
+        state.appearance = look == .darkAqua ? "dark" : "light"
+        state.hubShown = hub?.window?.isVisible ?? false
+    }
+
+    /// The probe's `find`: typed into the shown bar, then Return.
+    func typeInFindBar(_ text: String) -> ProbeResponse {
+        guard !findBar.isHidden else { return .failed("the find bar is not shown") }
+        findBar.field.stringValue = text
+        let sent = findBar.field.sendAction(findBar.field.action, to: findBar.field.target)
+        return sent ? .done : .failed("the find bar's field did not submit")
+    }
+
     func readSheet(into state: inout ProbeState) {
         state.sheetsShown = sheets.shown
         state.handedOff = sheets.handedOff
         state.fullscreen = NSApp.windows.contains { $0.isVisible && $0.styleMask.contains(.fullScreen) }
         state.active = NSApp.isActive
-        guard let sheet = window?.attachedSheet else { return }
+        readTools(into: &state)
+        guard let sheet = shownSheet else { return }
         state.sheetKind = sheet === sheets.openPanel ? "open" : sheets.printing ? "print" : "alert"
         let views = Self.views(in: sheet.contentView)
         state.sheet = views.compactMap { $0 as? NSTextField }.filter { !$0.isEditable && !$0.stringValue.isEmpty }
@@ -21,7 +43,7 @@ extension BrowserWindowController {
 
     /// The open panel is the system's: only its Cancel is pressed, through the panel itself.
     func pressSheetButton(_ label: String) -> ProbeResponse {
-        guard let sheet = window?.attachedSheet else { return .failed("no sheet is shown") }
+        guard let sheet = shownSheet else { return .failed("no sheet is shown") }
         if let panel = sheets.openPanel, sheet === panel {
             guard label == "Cancel" else { return .failed("the open panel is the system's: only Cancel is pressed") }
             DispatchQueue.main.async { panel.cancel(nil) }
@@ -36,7 +58,7 @@ extension BrowserWindowController {
     }
 
     func typeInSheet(field index: Int, _ text: String) -> ProbeResponse {
-        guard let sheet = window?.attachedSheet else { return .failed("no sheet is shown") }
+        guard let sheet = shownSheet else { return .failed("no sheet is shown") }
         let fields = Self.views(in: sheet.contentView).compactMap { $0 as? NSTextField }.filter(\.isEditable)
         guard fields.indices.contains(index) else { return .failed("the sheet has \(fields.count) field(s)") }
         fields[index].stringValue = text

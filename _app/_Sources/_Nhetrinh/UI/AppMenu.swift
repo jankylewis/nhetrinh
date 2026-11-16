@@ -7,12 +7,17 @@ import AppKit
 enum AppMenu {
     static func build(browser: BrowserWindowController) -> NSMenu {
         let main = NSMenu()
-        [appMenu(), fileMenu(browser), editMenu(), viewMenu(browser), tabsMenu(browser)].forEach(main.addItem)
+        [appMenu(browser), fileMenu(browser), editMenu(browser), viewMenu(browser), tabsMenu(browser)]
+            .forEach(main.addItem)
         return main
     }
 
-    private static func appMenu() -> NSMenuItem {
-        submenu("nhetrinh", [item("Quit nhetrinh", #selector(NSApplication.terminate(_:)), "q")])
+    private static func appMenu(_ browser: BrowserWindowController) -> NSMenuItem {
+        submenu("nhetrinh", [
+            item("Settings Hub…", #selector(BrowserWindowController.showSettingsHub(_:)), ",", browser),
+            .separator(),
+            item("Quit nhetrinh", #selector(NSApplication.terminate(_:)), "q"),
+        ])
     }
 
     private static func fileMenu(_ browser: BrowserWindowController) -> NSMenuItem {
@@ -26,7 +31,8 @@ enum AppMenu {
         ])
     }
 
-    private static func editMenu() -> NSMenuItem {
+    /// Find targets the browser (the bar is the browser's); the text items keep a nil target.
+    private static func editMenu(_ browser: BrowserWindowController) -> NSMenuItem {
         submenu("Edit", [
             item("Undo", Selector(("undo:")), "z"),
             item("Redo", Selector(("redo:")), "Z"),
@@ -35,6 +41,12 @@ enum AppMenu {
             item("Copy", #selector(NSText.copy(_:)), "c"),
             item("Paste", #selector(NSText.paste(_:)), "v"),
             item("Select All", #selector(NSText.selectAll(_:)), "a"),
+            .separator(),
+            submenu("Find", [
+                item("Find…", #selector(BrowserWindowController.showFind(_:)), "f", browser),
+                item("Find Next", #selector(BrowserWindowController.findNext(_:)), "g", browser),
+                item("Find Previous", #selector(BrowserWindowController.findPrevious(_:)), "G", browser),
+            ]),
         ])
     }
 
@@ -43,6 +55,10 @@ enum AppMenu {
             item("Toggle Sidebar", #selector(BrowserWindowController.toggleTabSidebar(_:)), "s", browser),
             item("Reload", #selector(BrowserWindowController.reload(_:)), "r", browser),
             item("Stop", #selector(BrowserWindowController.stopLoading(_:)), ".", browser),
+            .separator(),
+            item("Zoom In", #selector(BrowserWindowController.zoomIn(_:)), "+", browser),
+            item("Zoom Out", #selector(BrowserWindowController.zoomOut(_:)), "-", browser),
+            item("Actual Size", #selector(BrowserWindowController.actualSize(_:)), "0", browser),
         ])
     }
 

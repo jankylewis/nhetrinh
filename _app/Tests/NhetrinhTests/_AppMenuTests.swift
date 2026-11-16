@@ -13,6 +13,8 @@ struct AppMenuTests {
         ["Tabs", "Back"], ["Tabs", "Forward"], ["Tabs", "Tab 1"], ["Tabs", "Tab 9"],
         ["File", "Reopen Closed Tab"], ["View", "Stop"], ["Tabs", "Select Next Tab"], ["Tabs", "Select Previous Tab"],
         ["Tabs", "Move Tab Up"], ["Tabs", "Move Tab Down"], ["File", "Print…"],
+        ["Edit", "Find", "Find…"], ["Edit", "Find", "Find Next"], ["Edit", "Find", "Find Previous"],
+        ["View", "Zoom In"], ["View", "Zoom Out"], ["View", "Actual Size"], ["nhetrinh", "Settings Hub…"],
     ]
 
     @Test(arguments: browserItems)
@@ -31,7 +33,9 @@ struct AppMenuTests {
         (["File", "New Tab"], "t"), (["File", "Close Tab"], "w"), (["File", "Open Location"], "l"),
         (["View", "Toggle Sidebar"], "s"), (["View", "Reload"], "r"), (["Tabs", "Back"], "["),
         (["Tabs", "Forward"], "]"), (["Tabs", "Tab 1"], "1"), (["Tabs", "Tab 9"], "9"),
-        (["File", "Print…"], "p"),
+        (["File", "Print…"], "p"), (["Edit", "Find", "Find…"], "f"), (["Edit", "Find", "Find Next"], "g"),
+        (["View", "Zoom In"], "+"), (["View", "Zoom Out"], "-"), (["View", "Actual Size"], "0"),
+        (["nhetrinh", "Settings Hub…"], ","),
     ])
     func browserItemKeepsItsShortcut(path: [String], key: String) throws {
         let menu = AppMenu.build(browser: BrowserWindowController())
@@ -43,6 +47,7 @@ struct AppMenuTests {
     @Test(arguments: [
         ("File > Reopen Closed Tab", "⇧⌘T"), ("View > Stop", "⌘."),
         ("Tabs > Select Next Tab", "⌃⇥"), ("Tabs > Select Previous Tab", "⌃⇧⇥"),
+        ("Edit > Find > Find Previous", "⇧⌘G"),
     ])
     func p2ShortcutReadsLikeTheMenu(path: String, shortcut: String) {
         _ = NSApplication.shared

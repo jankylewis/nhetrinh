@@ -23,11 +23,16 @@ extension BrowserWindowController {
             return sidebar.pressRowMenu(row, item: item) ? .done : .failed("row \(row) has no menu item \(item)")
         case .linkMenu(let item): return showLinkMenu(pressing: item).map { .failed($0) } ?? .done
         case .button(let label):
-            return toolbar.press(label) ? .done : .failed("the toolbar has no button \(label)")
+            let pressed = toolbar.press(label) || findBar.press(label) || hub?.press(label) == true
+            return pressed ? .done : .failed("no shown button \(label) in the toolbar, find bar or Settings Hub")
         case .click(let selector): return clickInPage(selector)
         case .sheetButton(let label): return pressSheetButton(label)
         case .sheetField(let index, let text): return typeInSheet(field: index, text)
         case .front: return comeToFront()
+        case .find(let text): return typeInFindBar(text)
+        case .setting(let name, let value):
+            guard let hub, hub.window?.isVisible == true else { return .failed("the Settings Hub is not shown") }
+            return hub.set(name, to: value) ? .done : .failed("the Settings Hub has no \(name) \(value)")
         }
     }
 

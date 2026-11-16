@@ -40,7 +40,7 @@ Readback adds:
 
 Exit: the gate, R1-R26 PASS. Risk R-2 (permission grants after a rebuild) is checked here.
 
-## P4 — Find, zoom, small tools (0.5.0, size M, status TODO)
+## P4 — Find, zoom, small tools (0.5.0, size M, status WIP: P4-BUILD-1, not read back)
 
 Goal: find text, zoom per site, and one place for the few settings.
 

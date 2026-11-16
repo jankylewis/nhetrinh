@@ -24,6 +24,11 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     state.handedOff = 1
     state.fullscreen = true
     state.active = true
+    state.findShown = true
+    state.findResult = "not found"
+    state.zoomBadge = "125 %"
+    state.appearance = "dark"
+    state.hubShown = true
     return state
 }
 
@@ -45,6 +50,9 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .sheetField(index: 1, text: "secret \"x\""),
     .sheetField(index: 0, text: ""),
     .front,
+    .find("Example"),
+    .find(""),
+    .setting(name: "Search engine", value: "DuckDuckGo"),
 ])
 func requestRoundTrips(request: ProbeRequest) throws {
     let line = try ProbeCodec.encode(request)
@@ -71,7 +79,9 @@ func responseRoundTrips(response: ProbeResponse) throws {
                   "{\"op\":\"linkMenu\"}", "{\"op\":\"button\"}", "{\"op\":\"button\",\"text\":\"\"}",
                   "{\"op\":\"click\"}", "{\"op\":\"click\",\"text\":\"\"}", "{\"op\":\"sheetButton\"}",
                   "{\"op\":\"sheetField\",\"text\":\"x\"}", "{\"op\":\"sheetField\",\"index\":-1,\"text\":\"x\"}",
-                  "{\"op\":\"sheetField\",\"index\":0}"])
+                  "{\"op\":\"sheetField\",\"index\":0}", "{\"op\":\"find\"}", "{\"op\":\"setting\"}",
+                  "{\"op\":\"setting\",\"name\":\"Appearance\"}", "{\"op\":\"setting\",\"text\":\"Dark\"}",
+                  "{\"op\":\"setting\",\"name\":\"\",\"text\":\"Dark\"}"])
 func malformedRequestThrows(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
 }
