@@ -15,6 +15,7 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     state.shortcuts = ["File > New Tab": "⌘T", "File > Close Tab": "⌘W"]
     state.icons = rows.map { $0 == "B" }
     state.loading = true
+    state.progressShown = true
     state.reloadButton = "Stop"
     state.webMenu = ["Open Link in New Tab", "Copy Link"]
     state.sheet = "Allow 127.0.0.1 to use your microphone?"
@@ -45,6 +46,9 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .sheetField(index: 1, text: "secret \"x\""),
     .sheetField(index: 0, text: ""),
     .front,
+    .middleClick(row: 0),
+    .middleClick(row: 3),
+    .commandClickLink,
 ])
 func requestRoundTrips(request: ProbeRequest) throws {
     let line = try ProbeCodec.encode(request)
@@ -71,7 +75,8 @@ func responseRoundTrips(response: ProbeResponse) throws {
                   "{\"op\":\"linkMenu\"}", "{\"op\":\"button\"}", "{\"op\":\"button\",\"text\":\"\"}",
                   "{\"op\":\"click\"}", "{\"op\":\"click\",\"text\":\"\"}", "{\"op\":\"sheetButton\"}",
                   "{\"op\":\"sheetField\",\"text\":\"x\"}", "{\"op\":\"sheetField\",\"index\":-1,\"text\":\"x\"}",
-                  "{\"op\":\"sheetField\",\"index\":0}"])
+                  "{\"op\":\"sheetField\",\"index\":0}",
+                  "{\"op\":\"middleClick\"}", "{\"op\":\"middleClick\",\"index\":-1}"])
 func malformedRequestThrows(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
 }

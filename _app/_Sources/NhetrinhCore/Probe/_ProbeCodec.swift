@@ -23,6 +23,10 @@ public enum ProbeRequest: Equatable, Sendable {
     case sheetField(index: Int, text: String)
     /// Bring nhetrinh to the front and take the focus: only R26a and R26b, only with `--allow-focus` (D25).
     case front
+    /// A middle click on a sidebar row (R13).
+    case middleClick(row: Int)
+    /// A ⌘-click on the first link in the selected page (R17).
+    case commandClickLink
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -51,6 +55,8 @@ public enum ProbeCodec {
         case .sheetButton(let label): return try line(["op": "sheetButton", "text": label])
         case .sheetField(let index, let text): return try line(["op": "sheetField", "index": index, "text": text])
         case .front: return try line(["op": "front"])
+        case .middleClick(let row): return try line(["op": "middleClick", "index": row])
+        case .commandClickLink: return try line(["op": "commandClickLink"])
         }
     }
 
@@ -79,6 +85,8 @@ public enum ProbeCodec {
         case ("sheetButton", .some(let label), _) where !label.isEmpty: return .sheetButton(label)
         case ("sheetField", .some(let text), .some(let index)) where index >= 0:
             return .sheetField(index: index, text: text)
+        case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
+        case ("commandClickLink", _, _): return .commandClickLink
         case ("menu", _, _):
             guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
             return .menu(path)

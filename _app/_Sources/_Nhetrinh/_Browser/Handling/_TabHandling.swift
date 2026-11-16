@@ -38,11 +38,15 @@ extension BrowserWindowController: NSMenuItemValidation {
     /// A link for a background tab: after the selected tab (and after the ones opened from it since),
     /// not loaded until it is selected. The selected tab does not change.
     func openInBackground(_ url: URL) {
+        guard Self.opensInBackground(url) else { return }
         let index = min(backgroundSlot ?? selected + 1, tabs.count)
         tabs.insert(Tab(url: url, title: url.host ?? url.absoluteString), at: index)
         backgroundSlot = index + 1
         refreshChrome()
     }
+
+    /// A `javascript:` link runs in its own page, never in a new tab: no tab is made, none is saved.
+    static func opensInBackground(_ url: URL) -> Bool { url.scheme?.lowercased() != "javascript" }
 
     func validateMenuItem(_ item: NSMenuItem) -> Bool {
         switch item.action {

@@ -76,15 +76,18 @@ func requestHeadIsRead(head: String, path: String, range: String?) {
 // R16-R18 pages (P2).
 
 @Test(arguments: [("/icon", TestPageContent.iconTitle, "rel=\"icon\" href=\"/icon.png\""),
-                  ("/links", TestPageContent.linksTitle, "<a href=\"/page/5\">")])
+                  ("/links", TestPageContent.linksTitle, "<a href=\"/page/5\">"),
+                  ("/noicon", TestPageContent.noIconTitle, "rel=\"icon\" href=\"/missing.png\"")])
 func p2PagesCarryWhatTheStepNeeds(path: String, title: String, part: String) {
     let body = String(decoding: TestPageContent.reply(path: path).body, as: UTF8.self)
     #expect(body.contains("<title>\(title)</title>") && body.contains(part))
 }
 
-/// A real PNG, so the app's icon decoder accepts it.
-@Test func iconIsAPng() {
-    let reply = TestPageContent.reply(path: "/icon.png")
+/// A real PNG, so the app's icon decoder accepts it; /favicon.ico is the origin's icon, /missing.png none.
+@Test(arguments: ["/icon.png", "/favicon.ico"])
+func iconIsAPng(path: String) {
+    let reply = TestPageContent.reply(path: path)
+    #expect(TestPageContent.reply(path: "/missing.png").status == "404 Not Found")
     #expect(reply.type == "image/png" && reply.body.prefix(8) == Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]))
 }
 

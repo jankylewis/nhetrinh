@@ -96,6 +96,7 @@ extension BrowserWindowController {
         tab.unload()
         if let url = tab.url { closedTabs.push(ClosedTab(url: url, title: tab.title, index: index)) }
         tabs.remove(at: index)
+        if let slot = backgroundSlot, index < slot { backgroundSlot = slot - 1 }  // NT-UIX-003
         if tabs.isEmpty {
             window?.close()
             return

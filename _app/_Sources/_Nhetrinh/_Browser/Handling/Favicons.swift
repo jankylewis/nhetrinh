@@ -1,4 +1,5 @@
 import AppKit
+import ImageIO
 import NhetrinhCore
 import WebKit
 
@@ -7,6 +8,8 @@ import WebKit
 final class Favicons {
     static let capacity = 200
     static let pixels = 32
+    /// An icon wider or taller than this is refused before it is decoded (NT-PRF-003).
+    static let largestSide = 2048
     /// The page's icon link, as written in the page (relative or not); null when it has none.
     static let findLink = """
         (() => { const l = [...document.querySelectorAll('link[rel]')]
@@ -55,8 +58,9 @@ final class Favicons {
     }
 
     /// The icon drawn into 32 x 32 pixels, shown at 16 pt: the decoded original is not kept.
+    /// Drawing decodes the whole image first, so a small file of huge pixel size is refused (NT-PRF-003).
     static func small(_ data: Data) -> NSImage? {
-        guard let source = NSImage(data: data), source.isValid,
+        guard fits(data), let source = NSImage(data: data), source.isValid,
               let bitmap = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: pixels, pixelsHigh: pixels,
                                             bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
                                             colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
@@ -68,5 +72,18 @@ final class Favicons {
         let image = NSImage(size: NSSize(width: 16, height: 16))
         image.addRepresentation(bitmap)
         return image
+    }
+
+    /// Every image in `data` (an .ico holds several) is `largestSide` or less on a side, read from its
+    /// header. A bitmap whose size cannot be read is refused; data ImageIO does not know (SVG) is drawn
+    /// as a vector by `NSImage`.
+    static func fits(_ data: Data) -> Bool {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return true }
+        return (0..<CGImageSourceGetCount(source)).allSatisfy { index in
+            let properties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [CFString: Any]
+            guard let width = properties?[kCGImagePropertyPixelWidth] as? Int,
+                  let height = properties?[kCGImagePropertyPixelHeight] as? Int else { return false }
+            return width <= largestSide && height <= largestSide
+        }
     }
 }

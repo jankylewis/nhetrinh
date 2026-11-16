@@ -28,6 +28,9 @@ extension BrowserWindowController {
         case .sheetButton(let label): return pressSheetButton(label)
         case .sheetField(let index, let text): return typeInSheet(field: index, text)
         case .front: return comeToFront()
+        case .middleClick(let row):
+            return sidebar.middleClick(row) ? .done : .failed("the sidebar has no row \(row)")
+        case .commandClickLink: return commandClickFirstLink().map { .failed($0) } ?? .done
         }
     }
 
@@ -43,8 +46,9 @@ extension BrowserWindowController {
         state.sidebarWidth = sidebarShown ? Double(sidebar.frame.width) : 0
         state.addressShown = toolbar.address.window != nil && !toolbar.address.isHiddenOrHasHiddenAncestor
         state.shortcuts = menu.map { Self.shortcuts(in: $0, path: []) } ?? [:]
-        state.icons = Array(tabs.map { $0.icon != nil }.prefix(state.rows.count))
+        state.icons = sidebar.shownIcons
         state.loading = current?.isLoading ?? false
+        state.progressShown = toolbar.progressShown
         state.reloadButton = toolbar.reloadLabel
         state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
         readSheet(into: &state)
