@@ -28,6 +28,15 @@ public enum DownloadNamer {
         return unlink(path) == 0
     }
 
+    /// The extension of a download not yet complete (F1, F6): `a.pdf.download` until it is `a.pdf`.
+    public static let partialExtension = ".download"
+
+    public static func partial(_ name: String) -> String { name + partialExtension }
+
+    /// One key for every spelling ~/Downloads (APFS, by default) takes for the same file: case and Unicode
+    /// normalization ignored (F8).
+    public static func key(_ name: String) -> String { name.precomposedStringWithCanonicalMapping.lowercased() }
+
     /// Clash `number` of `suggested` (0: the name itself), cut to `maxBytes`.
     public static func candidate(_ suggested: String, number: Int) -> String {
         var (base, ext) = split(suggested)
@@ -45,13 +54,14 @@ public enum DownloadNamer {
         return (String(name[..<dot]), String(name[dot...]))
     }
 
-    /// The site's name without folders, `:` and control characters; a name of only dots or spaces
-    /// gives `fallback`. A dot file keeps its dot (it has no extension).
+    /// The site's name without folders, `:`, control characters and line breaks (F4: U+2028, U+2029 too);
+    /// leading dots go (F10: no hidden file in ~/Downloads). A name of only dots or spaces gives `fallback`.
     public static func clean(_ suggested: String) -> String {
         let last = suggested.split(separator: "/").last.map(String.init) ?? ""
-        let kept = last.unicodeScalars.filter { !CharacterSet.controlCharacters.contains($0) }
+        let dropped = CharacterSet.controlCharacters.union(.newlines)
+        let kept = last.unicodeScalars.filter { !dropped.contains($0) }
         let name = String(String.UnicodeScalarView(kept)).replacingOccurrences(of: ":", with: "-")
-            .trimmingCharacters(in: .whitespaces)
-        return name.allSatisfy { $0 == "." || $0 == " " } ? fallback : name
+        let visible = name.drop { $0 == "." || $0 == " " }.trimmingCharacters(in: .whitespaces)
+        return visible.isEmpty ? fallback : visible
     }
 }

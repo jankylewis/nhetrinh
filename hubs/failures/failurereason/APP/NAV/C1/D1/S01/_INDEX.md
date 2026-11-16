@@ -1,0 +1,10 @@
+# S01
+
+Index of this folder; `_SCHEMA.md` has the rules.
+
+| Entry | What |
+|---|---|
+| `NT_NAV_001_QUERY_VALUE_NOT_ESCAPED.md` | FIXED |
+| `NT_NAV_002_JAVASCRIPT_TAKEN_FOR_ANOTHER_APP.md` | OBSERVED |
+| `NT_NAV_003_CAMERA_ANSWER_KEPT_PER_HOST.md` | OBSERVED |
+| `NT_NAV_004_LINK_TO_ANOTHER_APP_ASKS_WITHOUT_A_CLICK.md` | OBSERVED, ruling pending |
