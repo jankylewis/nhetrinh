@@ -30,6 +30,14 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     state.zoomBadge = "125 %"
     state.appearance = "dark"
     state.hubShown = true
+    return withDownloads(state)
+}
+
+private func withDownloads(_ shown: ProbeState) -> ProbeState {
+    var state = shown
+    state.downloads = ["a.pdf", "a (1).pdf"]
+    state.downloadStates = ["42 %", "failed: no space"]
+    state.revealed = ["a.pdf"]
     return state
 }
 
@@ -57,6 +65,8 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .middleClick(row: 0),
     .middleClick(row: 3),
     .commandClickLink,
+    .download(row: 0, item: "Cancel"),
+    .download(row: 2, item: "Show in Finder"),
 ])
 func requestRoundTrips(request: ProbeRequest) throws {
     let line = try ProbeCodec.encode(request)
@@ -86,7 +96,10 @@ func responseRoundTrips(response: ProbeResponse) throws {
                   "{\"op\":\"sheetField\",\"index\":0}", "{\"op\":\"find\"}", "{\"op\":\"setting\"}",
                   "{\"op\":\"setting\",\"name\":\"Appearance\"}", "{\"op\":\"setting\",\"text\":\"Dark\"}",
                   "{\"op\":\"setting\",\"name\":\"\",\"text\":\"Dark\"}",
-                  "{\"op\":\"middleClick\"}", "{\"op\":\"middleClick\",\"index\":-1}"])
+                  "{\"op\":\"middleClick\"}", "{\"op\":\"middleClick\",\"index\":-1}",
+                  "{\"op\":\"download\",\"index\":0}",
+                  "{\"op\":\"download\",\"text\":\"Cancel\"}", "{\"op\":\"download\",\"index\":-1,\"text\":\"Cancel\"}",
+                  "{\"op\":\"download\",\"index\":0,\"text\":\"\"}"])
 func malformedRequestThrows(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
 }

@@ -9,11 +9,7 @@ extension BrowserWindowController {
     func probeAnswer(_ request: ProbeRequest, menu: NSMenu? = NSApp.mainMenu) -> ProbeResponse {
         switch request {
         case .state: return .state(probeState(menu: menu))
-        case .navigate(let text):
-            let field = toolbar.address
-            field.stringValue = text
-            let sent = field.sendAction(field.action, to: field.target)
-            return sent ? .done : .failed("the address field did not submit")
+        case .navigate(let text): return submitAddress(text)
         case .newTab: return Self.perform(["File", "New Tab"], in: menu)
         case .closeTab: return Self.perform(["File", "Close Tab"], in: menu)
         case .select(let row):
@@ -34,7 +30,16 @@ extension BrowserWindowController {
         case .middleClick(let row):
             return sidebar.middleClick(row) ? .done : .failed("the sidebar has no row \(row)")
         case .commandClickLink: return commandClickFirstLink().map { .failed($0) } ?? .done
+        case .download(let row, let item): return pressDownload(row: row, item: item)
         }
+    }
+
+    /// The address typed into the field and submitted, as Return does.
+    private func submitAddress(_ text: String) -> ProbeResponse {
+        let field = toolbar.address
+        field.stringValue = text
+        let sent = field.sendAction(field.action, to: field.target)
+        return sent ? .done : .failed("the address field did not submit")
     }
 
     func probeState(menu: NSMenu?) -> ProbeState {
@@ -55,6 +60,7 @@ extension BrowserWindowController {
         state.reloadButton = toolbar.reloadLabel
         state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
         readSheet(into: &state)
+        readDownloads(into: &state)
         return state
     }
 

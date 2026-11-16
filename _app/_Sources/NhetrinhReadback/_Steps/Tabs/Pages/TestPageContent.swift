@@ -1,6 +1,6 @@
 import Foundation
 
-/// What the readback's local test server answers (R9-R30a): never a site on the Internet.
+/// What the readback's local test server answers (R9-R35): never a site on the Internet.
 ///   /page/<n>      a page titled "nhetrinh test <n>"
 ///   /play          a page that plays /silence.wav in a loop; its title says when it plays
 ///   /silence.wav   2 s of silence (digital zero: nothing is heard on the shared machine)
@@ -9,7 +9,7 @@ import Foundation
 ///   /noicon        a page whose `<link rel="icon">` is /missing.png, which answers 404: no icon (R16)
 ///   /links         a page with one link, to /page/5 (R17)
 ///   /slow          a page that answers after 30 s, so it is still loading when R18 presses Stop
-///   P3 pages (R19-R26b): `BasicPages`; P4 pages (R27-R30a): `ToolPages`
+///   P3 pages (R19-R26b): `BasicPages`; P4 pages (R27-R30a): `ToolPages`; P5 (R31-R35): `DownloadPages`
 enum TestPageContent {
     struct Reply: Equatable {
         var status = "200 OK"
@@ -18,6 +18,8 @@ enum TestPageContent {
         var body = Data()
         /// Seconds the server waits before it answers.
         var delay: TimeInterval = 0
+        /// P5: seconds between two 64 KB parts of the body (0: all at once), a slow download (R33).
+        var pace: TimeInterval = 0
     }
 
     static let waitingTitle = "audio test: waiting"
@@ -35,6 +37,7 @@ enum TestPageContent {
     static func reply(path: String, range: String? = nil, authorization: String? = nil) -> Reply {
         if let basic = BasicPages.reply(path: path, authorization: authorization) { return basic }
         if let tool = ToolPages.reply(path: path) { return tool }
+        if let download = DownloadPages.reply(path: path) { return download }
         if path.hasPrefix("/page/"), let page = Int(path.dropFirst(6)) {
             return html("<title>\(title(page: page))</title><p>nhetrinh readback test page \(page)</p>")
         }

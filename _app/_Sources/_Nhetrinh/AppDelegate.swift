@@ -5,6 +5,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browser: BrowserWindowController?
     /// Exists only when started with `NHT_READBACK=1` (D23); a normal launch makes no socket.
     private(set) var probe: ProbeServer?
+    /// Links from other apps that came before the window (a launch by a link): opened after the session (P5).
+    private var incoming: [URL] = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setDockIcon()
@@ -13,7 +15,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.mainMenu = AppMenu.build(browser: browser)
         browser.showWindow(nil)
         browser.openInitialTabs()
+        browser.openIncoming(incoming)
+        incoming = []
         startProbe(if: ProcessInfo.processInfo.environment, browser)
+    }
+
+    /// A link another app hands to nhetrinh (P5): a new tab. macOS brings the app forward itself.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        guard let browser else { return incoming.append(contentsOf: urls) }
+        browser.openIncoming(urls)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }

@@ -58,3 +58,47 @@ struct ToolsProbeTests {
         #expect(!browser.probeState(menu: menu).findShown)
     }
 }
+
+/// P5: WebKit and AppKit find the download and link handlers by their Objective-C selectors; a method
+/// whose Swift name misses the selector is never called, and nothing else would tell. The probe's
+/// `download` refuses a row the footer does not show; a link from another app opens only for the web.
+@MainActor
+struct OutsideProbeTests {
+    @Test(arguments: ["webView:decidePolicyForNavigationResponse:decisionHandler:",
+                      "webView:navigationAction:didBecomeDownload:", "webView:navigationResponse:didBecomeDownload:",
+                      "webView:decidePolicyForNavigationAction:decisionHandler:"])
+    func webKitFindsTheDownloadHandlers(selector: String) {
+        _ = NSApplication.shared
+        #expect(BrowserWindowController().responds(to: NSSelectorFromString(selector)))
+    }
+
+    @Test(arguments: ["download:decideDestinationUsingResponse:suggestedFilename:completionHandler:",
+                      "downloadDidFinish:", "download:didFailWithError:resumeData:"])
+    func webKitFindsTheDownloadDelegate(selector: String) {
+        #expect(Downloads(folder: nil).responds(to: NSSelectorFromString(selector)))
+    }
+
+    @Test func appKitFindsTheLinkHandler() {
+        #expect(AppDelegate().responds(to: NSSelectorFromString("application:openURLs:")))
+    }
+
+    @Test(arguments: [("Cancel", 0), ("Show in Finder", 2)])
+    func downloadRowNotShownFails(item: String, row: Int) {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        #expect(browser.probeAnswer(.download(row: row, item: item), menu: nil)
+                == .failed("the footer has no download row \(row)"))
+        #expect(browser.probeState(menu: nil).downloads == [])
+        #expect(browser.sidebar.downloads.isHidden)
+    }
+
+    @Test(arguments: [("mailto:a@example.com", 0), ("file:///tmp/a.html", 0), ("HTTP://127.0.0.1:9/a", 1)])
+    func linkFromAnotherAppOpensOnlyForTheWeb(link: String, added: Int) throws {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        browser.openIncoming([try #require(URL(string: link))])
+        #expect(browser.tabs.count == added)
+        #expect(browser.selected == added - 1)
+        browser.tabs.first?.unload()
+    }
+}

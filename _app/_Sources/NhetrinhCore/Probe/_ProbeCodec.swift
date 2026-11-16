@@ -34,6 +34,9 @@ public enum ProbeRequest: Equatable, Sendable {
     case middleClick(row: Int)
     /// A ⌘-click on the first link in the selected page (R17).
     case commandClickLink
+    /// The download row `row` (0 top) in the sidebar footer: "Cancel" pressed, or the row clicked
+    /// ("Show in Finder") (P5).
+    case download(row: Int, item: String)
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -67,6 +70,7 @@ public enum ProbeCodec {
         case .setting(let name, let value): return try line(["op": "setting", "name": name, "text": value])
         case .middleClick(let row): return try line(["op": "middleClick", "index": row])
         case .commandClickLink: return try line(["op": "commandClickLink"])
+        case .download(let row, let item): return try line(["op": "download", "index": row, "text": item])
         }
     }
 
@@ -92,8 +96,8 @@ public enum ProbeCodec {
             guard let name = object["name"] as? String, !name.isEmpty else { throw Failure.malformed(line) }
             return .setting(name: name, value: value)
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
-        case ("rowMenu", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
-            return .rowMenu(row: row, item: item)
+        case (let op, .some(let item), .some(let row)) where ["rowMenu", "download"].contains(op) && row >= 0
+            && !item.isEmpty: return op == "download" ? .download(row: row, item: item) : .rowMenu(row: row, item: item)
         case ("linkMenu", .some(let item), _) where !item.isEmpty: return .linkMenu(item: item)
         case ("button", .some(let label), _) where !label.isEmpty: return .button(label)
         case ("click", .some(let selector), _) where !selector.isEmpty: return .click(selector)
