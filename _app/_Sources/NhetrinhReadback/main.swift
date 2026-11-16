@@ -49,8 +49,9 @@ let session = AppSession(appURL: options.app)
 session.keepCapture = options.keepCapture
 let steps = allSteps.filter { options.steps.isEmpty || options.steps.contains($0.id) }
 let results = Runner.run(steps, in: session)
-session.quit()
-let text = Report.text(results, app: options.app)
+let ending = session.quit()
+FileHandle.standardError.write(Data((ending.line + "\n").utf8))
+let text = Report.text(results, app: options.app, ending: ending)
 print(text)
 do {
     if let kept { try Report.write(text, to: kept) }

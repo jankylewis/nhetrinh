@@ -48,18 +48,19 @@ final class AppSession {
         probing = probe
     }
 
-    /// Quit like the user does (terminate request); force it only if the app does not answer.
-    func quit() {
-        guard isRunning else { return }
-        let app = NSRunningApplication(processIdentifier: pid)
-        app?.terminate()
-        if !waitUntil(5, { !self.isRunning }) {
-            app?.forceTerminate()
-            waitUntil(3) { !self.isRunning }
-        }
+    /// Quit like the user does (terminate request) and wait for the exit; past 5 s, end only the
+    /// instance this readback launched, by its pid (NT-TG-004). Returns how it ended, for the report.
+    @discardableResult
+    func quit() -> QuitOutcome {
+        let target = pid
+        let outcome = Ending.end(target, isRunning: { self.isRunning }, askToQuit: {
+            NSRunningApplication(processIdentifier: target)?.terminate()
+        }, kill: { _ = kill($0, SIGKILL) }, wait: { waitUntil($0, $1) })
+        guard outcome != .notRunning else { return outcome }
         pid = 0
         probing = false
         Thread.sleep(forTimeInterval: 2)  // let WebKit's helper processes exit as well
+        return outcome
     }
 
     /// The app ended by itself (its own Quit, or a kill): wait up to `timeout`, then forget it.
@@ -100,5 +101,35 @@ enum Grant {
 
     static func noScreenRecording(bundlePath: String = Bundle.main.bundlePath) -> String {
         grantee(bundlePath: bundlePath) + " has no Screen Recording permission (System Settings, Privacy & Security)"
+    }
+}
+
+/// How the readback's own app instance ended at a quit (NT-TG-004: one outlived its run).
+enum QuitOutcome: Equatable {
+    case notRunning
+    case quit
+    case killed(pid_t)
+    case survived(pid_t)
+
+    var line: String {
+        switch self {
+        case .notRunning: return "end: the app was not running"
+        case .quit: return "end: the app quit when asked"
+        case .killed(let pid): return "end: the app did not quit within 5 s; the readback ended its own instance "
+            + "(pid \(pid), signal 9)"
+        case .survived(let pid): return "end: the app still runs after quit and signal 9 (pid \(pid))"
+        }
+    }
+}
+
+/// Ask to quit, wait 5 s; past that, signal 9 to `pid` only (the instance the readback launched).
+enum Ending {
+    static func end(_ pid: pid_t, isRunning: @escaping () -> Bool, askToQuit: () -> Void, kill: (pid_t) -> Void,
+                    wait: (TimeInterval, () -> Bool) -> Bool) -> QuitOutcome {
+        guard pid > 0, isRunning() else { return .notRunning }
+        askToQuit()
+        if wait(5, { !isRunning() }) { return .quit }
+        kill(pid)
+        return wait(3, { !isRunning() }) ? .killed(pid) : .survived(pid)
     }
 }

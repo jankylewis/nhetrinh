@@ -3,7 +3,8 @@ import Foundation
 /// The readback's verdict as text: printed, and kept as evidence in
 /// hubs/failures/evidence/readback/_LATEST.md after a full run on the installed app.
 enum Report {
-    static func text(_ results: [StepResult], app: URL) -> String {
+    /// `ending`: how the run's own app instance ended (NT-TG-004); nil says nothing about it.
+    static func text(_ results: [StepResult], app: URL, ending: QuitOutcome? = nil) -> String {
         let failed = results.filter { $0.verdict == .fail }.count
         let skipped = results.filter { $0.verdict == .notReadBack }.count
         let passed = results.count - failed - skipped
@@ -19,11 +20,15 @@ enum Report {
             "app: \(tilde(app.path)), version \(plist(app, "CFBundleShortVersionString")), "
                 + "built from commit \(plist(app, "NHTCommit"))",
             "verdict: \(verdict)", "",
-            "A step acts on the app through the Accessibility API, as a user would, and says what it saw.",
+            "Each step acts on the app as a user would and says what it saw. "
+                + "R1, R3-R7 and R9-R18 act through the app's readback probe (`NHT_READBACK=1`, D23), "
+                + "along the user's own paths;",
+            "R2 reads the Dock through the Accessibility API; R8 measures a normal launch, without the probe.",
             "NOT READ BACK means the step could not run. It is never counted as passed.", "",
             "| Step | Verdict | What the readback did and saw |", "|---|---|---|",
         ]
         lines += results.map { "| \($0.id) \($0.name) | \($0.verdict.rawValue) | \(tilde($0.detail)) |" }
+        if let ending { lines += ["", ending.line] }
         return lines.joined(separator: "\n") + "\n"
     }
 

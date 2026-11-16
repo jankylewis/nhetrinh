@@ -66,6 +66,15 @@ func homeFolderIsWrittenAsTilde(path: (text: String, written: String)) {
     #expect(Report.tilde(path.text, home: "/Users/someone") == path.written)
 }
 
+/// D23 (P0-PROBE-FIX gap 4): only R2 uses Accessibility; the header must not say every step does.
+/// P1-FIX-1: it names every probe step, R9-R12 included; P2 adds R13-R18.
+@Test func headerSaysHowEachStepActs() {
+    let text = Report.text([], app: URL(fileURLWithPath: "/nowhere/nhetrinh.app"))
+    #expect(!text.contains("A step acts on the app through the Accessibility API"))
+    #expect(text.contains("R1, R3-R7 and R9-R18 act through the app's readback probe (`NHT_READBACK=1`, D23)"))
+    #expect(text.contains("R2 reads the Dock through the Accessibility API") && text.contains("R8"))
+}
+
 @Test func reportHasNoHomePath() {
     let home = FileManager.default.homeDirectoryForCurrentUser.path
     let result = StepResult(id: "R2", name: "dock", verdict: .pass, detail: "saved \(home)/capture.png")

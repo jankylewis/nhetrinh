@@ -34,5 +34,6 @@ for good. WebKit's answer is read at each check instead.
 
 Red first: the 14 `UnloadPolicyTests` cases failed on the stub (P1-PREP-1); green after the fix
 (`_app/scripts/test.sh`, P1-BUILD-1).
-Not proven: R11 on the installed app (the app seat was held by another seat); that R11 fails on
-P0's code; that `requestMediaPlaybackState` says `.playing` for a background tab's silent loop.
+Readback 2026-11-16 22:09, installed build cb22afe: R11 PASS (the silent background tab was
+unloaded; the playing one stayed loaded and playing 10 s past that), R12 PASS. Not kept as a file
+(`--steps` run). Not proven: that R11 fails on P0's code (it needs a P0 rebuild with a 5 s limit).

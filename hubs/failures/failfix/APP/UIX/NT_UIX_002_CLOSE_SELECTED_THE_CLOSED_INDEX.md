@@ -23,4 +23,4 @@ moves the first responder and the idle clock of a tab the user did not touch.
 
 Red first: failed on the old `close(at:)` in the first P2 test run; green with the fix; red again
 under a mutation that restores the old path (P2-BUILD-1).
-Not proven: R13 on the installed app.
+Read back: R13 PASS 22:34 (`hubs/failures/evidence/readback/_LATEST.md`, build eac0ce9+). Not on master.

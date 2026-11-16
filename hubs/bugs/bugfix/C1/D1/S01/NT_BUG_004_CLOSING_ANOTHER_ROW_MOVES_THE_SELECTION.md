@@ -19,4 +19,4 @@ one shifts the selection index by one; the selected tab and its page stay
 Red first: the test (rows 1, 2, 3 closed through the row's menu, row 3 selected) failed on the old
 `close(at:)` in the first P2 test run; green with the fix. Checked again by a mutation that restores
 the old path: red (P2-BUILD-1, test.sh).
-Not proven: R13 on the installed app (not read back yet). Not on master.
+Read back: R13 PASS 22:34, `row 1's menu > Close Tab: 2 rows [...], the selected tab kept` (`_LATEST.md`, build eac0ce9+). Not on master.

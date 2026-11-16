@@ -19,4 +19,4 @@ Expected: row 1 closes; the tab of row 3 stays selected (now row 2).
 Actual (master 7176264, from the code): the tab now in row 1 (the old row 2) is selected and loads.
 P2 adds three more ways to close a row that is not selected (close button, middle click, R13).
 
-Not proven on the installed app (not read back; the app seat was not given).
+Old behaviour not run on the installed app (from the code). The fix read back: R13 PASS 22:34 (`_LATEST.md`).
