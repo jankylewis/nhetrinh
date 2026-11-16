@@ -14,12 +14,12 @@ Build:
    tree per rule.
 2. Fix today's violations: split `_BrowserWindowController.swift` (209 lines) into `_Window/`
    (controller and its extensions) and `Tab/`; split `_bench.py` (186 lines).
-3. Harness: `AGENTS.md` at the root, `.claude/CLAUDE.md`, and skills `nhetrinh-develop`,
-   `nhetrinh-readback`, `nhetrinh-hubs`, `nhetrinh-ship` (each 100 lines or less).
+3. Harness: `CLAUDE.md` at the root (D16), and skills `nhetrinh-develop`, `nhetrinh-readback`,
+   `nhetrinh-hubs`, `nhetrinh-ship` under `.claude/skills/` (each 100 lines or less).
    `rnd/` moves to `hubs/product/rnd/` to free the root slot (`DECISIONS.md` A2).
 4. Readback tool: target `NhetrinhReadback`, run with `swift run nhetrinh-readback`. It starts
    the installed app the way the Dock does and drives it through the macOS Accessibility API:
-   real clicks and real keys. The views get accessibility identifiers. It writes a verdict file
+   press, set value, confirm; no mouse or key events (D18). The views get accessibility identifiers. It writes a verdict file
    (one PASS / FAIL line per step) and its path goes to `hubs/failures/evidence/_INDEX.md`.
 5. Safe benchmark: `_bench.py` loads tabs one at a time, 10 at most. The 30-tab scenario is removed.
 6. Code hygiene from the conventions: `os.Logger` on every failure path, no force unwraps.

@@ -22,6 +22,9 @@ row stays and is marked "replaced by".
 | D13 | Version per phase: 0.1.0 (P0) to 0.8.0 (P7), then 1.0.0 (P8) | agent, as owner | 2026-11-16 |
 | D14 | The plan (P0 to P8) is approved. The harness comes first: P0 is finished before any feature work | headmate | 2026-11-16 |
 | D15 | A1, A2, A3 below are accepted with the plan | headmate ("plan approved") | 2026-11-16 |
+| D16 | The briefing file is `CLAUDE.md` at the root (not `AGENTS.md` + `.claude/CLAUDE.md`): the fleet tool refuses to start a mate without it, the fleet is Claude-only, and the root has one free slot. Replaces the file names in A2 | agent, as owner | 2026-11-16 |
+| D17 | The work is done by a fleet: the agent is the matemaster (steers, reviews, runs the readback, ships) with 2 mates, each in its own worktree | headmate | 2026-11-16 |
+| D18 | The readback acts only through the Accessibility API (press, set value, confirm). It never moves the mouse or types keys, starts the app without taking the focus, and uses its own browsing profile | agent, as owner | 2026-11-16 |
 
 ## Assumed, then accepted with the plan (D15)
 
