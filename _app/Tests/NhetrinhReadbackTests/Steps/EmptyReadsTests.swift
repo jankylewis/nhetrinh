@@ -77,3 +77,32 @@ func missingElement(_ missing: MissingCase) {
         return why.hasPrefix("no running Dock item") && !why.contains("re-grant")
     }
 }
+
+struct WindowCase: CustomTestStringConvertible {
+    let roles: [String]
+    let pick: Int?
+    let notReadBack: Bool
+    var testDescription: String { "AXWindows read as \(roles)" }
+}
+
+/// NT-GAT-008, 20:07: the first element `AXWindows` gave held [AXApplication, AXMenuBar]. The old
+/// `window()` took `windows.first` whatever its role; these cases fail against that rule.
+@Test("only an element with the role AXWindow is the app's window", arguments: [
+    WindowCase(roles: [], pick: nil, notReadBack: false),
+    WindowCase(roles: ["AXWindow"], pick: 0, notReadBack: false),
+    WindowCase(roles: ["AXApplication", "AXWindow"], pick: 1, notReadBack: false),
+    WindowCase(roles: ["AXApplication"], pick: nil, notReadBack: true),
+    WindowCase(roles: [""], pick: nil, notReadBack: true),
+])
+func windowIsPickedByRole(_ read: WindowCase) {
+    do {
+        #expect(try WindowRole.pick(read.roles) == read.pick)
+        #expect(!read.notReadBack)
+    } catch StepError.cannotDrive(let why) {
+        #expect(read.notReadBack)
+        #expect(why.contains("none has the role AXWindow"))
+        #expect(why.contains(read.roles[0].isEmpty ? "[(empty)]" : "[\(read.roles[0])]"))
+    } catch {
+        Issue.record("unexpected error \(error)")
+    }
+}

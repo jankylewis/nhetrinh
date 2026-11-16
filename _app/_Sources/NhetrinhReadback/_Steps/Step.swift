@@ -106,3 +106,19 @@ struct WindowRead {
         return "window \"\(title)\", \(children) children, first roles [\(roles)], read error \(error)"
     }
 }
+
+/// NT-GAT-008, readback 20:07: the first element `AXWindows` gave had the children [AXApplication,
+/// AXMenuBar], not a window. A step acts only on an element whose role is AXWindow.
+enum WindowRole {
+    static let window = "AXWindow"
+
+    /// The index of the first window among the roles `AXWindows` read; nil when nothing was read
+    /// yet. Elements read but none a window: NOT READ BACK, naming the roles, never FAIL of the app.
+    static func pick(_ roles: [String]) throws -> Int? {
+        guard !roles.isEmpty else { return nil }
+        if let index = roles.firstIndex(of: window) { return index }
+        let seen = roles.map { $0.isEmpty ? "(empty)" : $0 }.joined(separator: ", ")
+        throw StepError.cannotDrive("the app's windows read as [\(seen)], none has the role \(window): "
+            + "the Accessibility tree read is not the app's window")
+    }
+}

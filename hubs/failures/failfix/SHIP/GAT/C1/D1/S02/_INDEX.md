@@ -7,3 +7,4 @@ Index of this folder; `_SCHEMA.md` has the rules.
 | `NT_GAT_005_R2_MEASURED_A_PINNED_COPY.md` | the launched app's item only: running, of its bundle |
 | `NT_GAT_006_R6_HELD_A_ROW_ACROSS_A_RELOAD.md` | rows read fresh before each act, one retry |
 | `NT_GAT_007_R2_SCORED_PAST_THE_ICON_ON_A_SIDE_DOCK.md` | the icon's square only; background per line along the Dock |
+| `NT_GAT_008_WINDOW_READ_WAS_NOT_A_WINDOW.md` | only an element with the role AXWindow; else NOT READ BACK with the roles |

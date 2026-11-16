@@ -68,15 +68,16 @@ final class AppSession {
         return AXNode.application(pid: pid)
     }
 
+    /// The app's window: the first element `AXWindows` gives whose role is AXWindow (NT-GAT-008).
     func window() throws -> AXNode {
         let app = try root()
-        var found: AXNode?
+        var windows: [AXNode] = []
         waitUntil(10) {
-            found = app.windows.first
-            return found != nil
+            windows = app.windows
+            return (try? WindowRole.pick(windows.map(\.role))) != nil
         }
-        guard let found else { throw StepError.fail("no window after 10 s") }
-        return found
+        guard let index = try WindowRole.pick(windows.map(\.role)) else { throw StepError.fail("no window after 10 s") }
+        return windows[index]
     }
 
     /// A window holding none of the app's identifiers was not read: NOT READ BACK (`EmptyReads`, NT-TG-003).

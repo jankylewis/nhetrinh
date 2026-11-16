@@ -78,3 +78,4 @@ BACK `none of the app's identifiers (nhetrinh.*) is in the window, its tree was 
 "<title>", <n> children, first roles [...], read error <AXError>)` (`WindowRead` in `_Steps/Step.swift`,
 tests `missingElement`, `notReadTreeSaysWhatWasRead`; red under the old rule, checked by mutation).
 Not proven on the app (no rebuild, no run since).
+At 20:07 the "window" read was not a window (children AXApplication, AXMenuBar): NT-GAT-008.
