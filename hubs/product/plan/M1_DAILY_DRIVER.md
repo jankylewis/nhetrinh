@@ -25,14 +25,14 @@ Build:
 6. Code hygiene from the conventions: `os.Logger` on every failure path, no force unwraps.
 
 Readback steps (the base set, run again in every later phase):
-- R1 the window opens with the sidebar and the address bar.
-- R2 the Dock icon has no tile. Only the Dock item's own rectangle is captured.
-- R3 type `example.com`, Return: the title is "Example Domain".
-- R4 type `rock & roll`, Return: the URL holds `q=rock%20%26%20roll`.
-- R5 ⌘T, then ⌘W: sidebar rows +1, then -1.
-- R6 click another sidebar row: the page changes.
-- R7 start with 3 tabs: 1 page process runs.
-- R8 the lightness budget.
+- R1 the window opens: a sidebar 100 pt wide or more, with 1 row or more, and the address bar.
+- R2 the Dock icon has no tile. Only the Dock item's own rectangle is captured, then matched to the icon.
+- R3 set the address bar to `example.com`, confirm: title "Example Domain", bar `https://example.com/`.
+- R4 set the address bar to `rock & roll`, confirm: the bar holds `q=rock%20%26%20roll`.
+- R5 press File > New Tab (shortcut ⌘T), then File > Close Tab (shortcut ⌘W): rows +1, then -1.
+- R6 two tabs (example.com, example.org): select the row above, then the last row: the bar follows.
+- R7 launch with 3 tabs (seeded by the launch environment until P1): 3 rows, 1 page process.
+- R8 one simple tab (example.com), 6 s after load: app, app + helpers, idle CPU, bundle within budget.
 
 Exit: checker 0 violations; `_app/scripts/test.sh` green; R1-R8 PASS on `~/Applications/nhetrinh.app`;
 CI green; NT-BUG-001, NT-BUG-002, NT-ENV-001, NT-BLD-002 are FIXED with proof; NT-TG-001 and
