@@ -13,8 +13,9 @@ let package = Package(
         // The app: AppKit window, vertical tab sidebar, WKWebView tabs.
         .executableTarget(name: "Nhetrinh", dependencies: ["NhetrinhCore"], path: "_Sources/_Nhetrinh",
                           linkerSettings: [.linkedFramework("AppKit"), .linkedFramework("WebKit")]),
-        // The readback tool: uses the installed app as its end user (Accessibility API).
-        .executableTarget(name: "NhetrinhReadback", path: "_Sources/NhetrinhReadback",
+        // The readback tool: uses the installed app as its end user. R1, R3-R7 through the app's
+        // readback probe (D23, no Accessibility); R2 reads the Dock through the Accessibility API.
+        .executableTarget(name: "NhetrinhReadback", dependencies: ["NhetrinhCore"], path: "_Sources/NhetrinhReadback",
                           linkerSettings: [.linkedFramework("AppKit"), .linkedFramework("ApplicationServices")]),
         // Pure logic, no AppKit/WebKit: address parsing, session model. Unit tested.
         .target(name: "NhetrinhCore", path: "_Sources/NhetrinhCore"),

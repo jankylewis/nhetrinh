@@ -18,8 +18,8 @@ Build:
    `nhetrinh-hubs`, `nhetrinh-ship` under `.claude/skills/` (each 100 lines or less).
    `rnd/` moves to `hubs/product/rnd/` to free the root slot (`DECISIONS.md` A2).
 4. Readback tool: target `NhetrinhReadback`, run with `swift run nhetrinh-readback`. It starts
-   the installed app the way the Dock does and drives it through the macOS Accessibility API:
-   press, set value, confirm; no mouse or key events (D18). The views get accessibility identifiers. It writes a verdict file
+   the installed app the way the Dock does and drives it through its readback probe (D23; R2
+   reads the Dock through Accessibility); no mouse or key events (D18). The views get accessibility identifiers. It writes a verdict file
    (one PASS / FAIL line per step) and its path goes to `hubs/failures/evidence/_INDEX.md`.
 5. Safe benchmark: `_bench.py` loads tabs one at a time, 10 at most. The 30-tab scenario is removed.
 6. Code hygiene from the conventions: `os.Logger` on every failure path, no force unwraps.
@@ -38,9 +38,9 @@ Exit: checker 0 violations; `_app/scripts/test.sh` green; R1-R8 PASS on `~/Appli
 CI green; NT-BUG-001, NT-BUG-002, NT-ENV-001, NT-BLD-002 are FIXED with proof; NT-TG-001 and
 NT-TG-002 are closed by the tool.
 
-Needs from the headmate: Accessibility permission for the terminal, one time.
+Needs from the headmate: Accessibility for `nhetrinh-readback.app`, for R2 only (D23).
 
-## P1 — Tab lifecycle: session restore and safe unload (0.2.0, size M, status TODO)
+## P1 — Tab lifecycle: session restore and safe unload (0.2.0, size M, status DOING)
 
 Goal: quit and open again without losing tabs. An idle tab is never unloaded while it plays.
 

@@ -1,4 +1,5 @@
 import AppKit
+import NhetrinhCore
 
 /// One running instance of the app under readback. It is started through LaunchServices, like
 /// a Dock click, without taking the focus, and in the profile "readback", so the user's own
@@ -6,9 +7,13 @@ import AppKit
 final class AppSession {
     static let installed = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("Applications/nhetrinh.app")
+    /// The app runs in this profile (NHT_PROFILE): its own cookies, cache and saved session.
+    static let profile = "readback"
 
     let appURL: URL
     private(set) var pid: pid_t = 0
+    /// Whether the running instance was started with the probe on.
+    private(set) var probing = false
     /// R2 keeps its capture here (`--keep-capture`); nil: the capture is deleted at once.
     var keepCapture: URL?
 
@@ -20,13 +25,16 @@ final class AppSession {
         if !isRunning { try launch() }
     }
 
-    /// Start a fresh instance (the old one is quit first). `env` is added to the launch environment.
-    func launch(env: [String: String] = [:]) throws {
+    /// Start a fresh instance (the old one is quit first). `env` is added to the launch environment;
+    /// `probe` adds `NHT_READBACK=1`, so the app answers the readback probe (D23). R8 never asks
+    /// for it: the budget is measured on a normal launch.
+    func launch(env: [String: String] = [:], probe: Bool = false) throws {
         quit()
         let config = NSWorkspace.OpenConfiguration()
         config.createsNewApplicationInstance = true
         config.activates = false
-        config.environment = ["NHT_PROFILE": "readback"].merging(env) { _, new in new }
+        let base = ["NHT_PROFILE": Self.profile].merging(probe ? [ProbePath.variable: "1"] : [:]) { _, new in new }
+        config.environment = base.merging(env) { _, new in new }
         let done = DispatchSemaphore(value: 0)
         var failure: Error?
         NSWorkspace.shared.openApplication(at: appURL, configuration: config) { app, error in
@@ -37,83 +45,44 @@ final class AppSession {
         done.wait()
         if let failure { throw StepError.cannotDrive("launch failed: \(failure.localizedDescription)") }
         guard isRunning else { throw StepError.cannotDrive("the app did not start") }
+        probing = probe
     }
 
-    /// Quit like the user does (terminate request); force it only if the app does not answer.
-    func quit() {
-        guard isRunning else { return }
-        let app = NSRunningApplication(processIdentifier: pid)
-        app?.terminate()
-        if !waitUntil(5, { !self.isRunning }) {
-            app?.forceTerminate()
-            waitUntil(3) { !self.isRunning }
-        }
+    /// Quit like the user does (terminate request) and wait for the exit; past 5 s, end only the
+    /// instance this readback launched, by its pid (NT-TG-004). Returns how it ended, for the report.
+    @discardableResult
+    func quit() -> QuitOutcome {
+        let target = pid
+        let outcome = Ending.end(target, isRunning: { self.isRunning }, askToQuit: {
+            NSRunningApplication(processIdentifier: target)?.terminate()
+        }, kill: { _ = kill($0, SIGKILL) }, wait: { waitUntil($0, $1) })
+        guard outcome != .notRunning else { return outcome }
         pid = 0
+        probing = false
         Thread.sleep(forTimeInterval: 2)  // let WebKit's helper processes exit as well
+        return outcome
     }
 
-    // MARK: - What the user sees
+    /// The app ended by itself (its own Quit, or a kill): wait up to `timeout`, then forget it.
+    func waitForEnd(_ timeout: TimeInterval) -> Bool {
+        guard waitUntil(timeout, { !self.isRunning }) else { return false }
+        pid = 0
+        probing = false
+        Thread.sleep(forTimeInterval: 2)  // let WebKit's helper processes exit as well
+        return true
+    }
 
-    /// Every step that reads or acts on the interface calls this first: without the permission
-    /// the step is NOT READ BACK; it must never look like a failure of the app, or like a pass.
+    /// Signal 9, as a crash or a power cut does: the app saves nothing more.
+    func killNow() {
+        if isRunning { kill(pid, SIGKILL) }
+    }
+
+    /// A step that reads the system through Accessibility (R2, the Dock) calls this first: without
+    /// the permission it is NOT READ BACK; never a failure of the app, never a pass.
     func requireAccessibility() throws {
         guard AXNode.isTrusted else {
             throw StepError.cannotDrive(Grant.noAccessibility())
         }
-    }
-
-    private func root() throws -> AXNode {
-        try requireAccessibility()
-        try ensureRunning()
-        return AXNode.application(pid: pid)
-    }
-
-    /// The app's window: the first element `AXWindows` gives whose role is AXWindow (NT-GAT-008).
-    func window() throws -> AXNode {
-        let app = try root()
-        var windows: [AXNode] = []
-        waitUntil(10) {
-            windows = app.windows
-            return (try? WindowRole.pick(windows.map(\.role))) != nil
-        }
-        guard let index = try WindowRole.pick(windows.map(\.role)) else { throw StepError.fail("no window after 10 s") }
-        return windows[index]
-    }
-
-    /// A window holding none of the app's identifiers was not read: NOT READ BACK (`EmptyReads`, NT-TG-003).
-    func element(_ id: String) throws -> AXNode {
-        let window = try window()
-        guard let found = window.find(id: id) else { throw EmptyReads.missing(id, in: WindowRead(window)) }
-        return found
-    }
-
-    func menuItem(_ path: [String]) throws -> AXNode {
-        guard let item = try root().menuItem(path) else {
-            throw StepError.fail("no menu item \(path.joined(separator: " > "))")
-        }
-        return item
-    }
-
-    func rowCount() throws -> Int { try element("nhetrinh.sidebar").rows.count }
-    func addressText() throws -> String { try element("nhetrinh.address").value }
-
-    /// Select the sidebar row `fromEnd` places above the last, as a click does. The rows are read
-    /// fresh right before acting and again for the one retry, never kept (NT-GAT-006).
-    func selectRow(fromEnd offset: Int) throws {
-        try Fresh.retryingOnce {
-            let rows = try element("nhetrinh.sidebar").rows
-            guard let index = Fresh.rowIndex(fromEnd: offset, count: rows.count) else {
-                throw StepError.fail("the sidebar has \(rows.count) row(s); \(offset + 1) are needed")
-            }
-            try rows[index].set(kAXSelectedAttribute, to: kCFBooleanTrue)
-        }
-    }
-
-    /// Put `text` in the address field and confirm it, as Return does.
-    func navigate(_ text: String) throws {
-        let field = try element("nhetrinh.address")
-        try field.set(kAXValueAttribute, to: text as CFString)
-        try field.confirm()
     }
 }
 
@@ -132,5 +101,35 @@ enum Grant {
 
     static func noScreenRecording(bundlePath: String = Bundle.main.bundlePath) -> String {
         grantee(bundlePath: bundlePath) + " has no Screen Recording permission (System Settings, Privacy & Security)"
+    }
+}
+
+/// How the readback's own app instance ended at a quit (NT-TG-004: one outlived its run).
+enum QuitOutcome: Equatable {
+    case notRunning
+    case quit
+    case killed(pid_t)
+    case survived(pid_t)
+
+    var line: String {
+        switch self {
+        case .notRunning: return "end: the app was not running"
+        case .quit: return "end: the app quit when asked"
+        case .killed(let pid): return "end: the app did not quit within 5 s; the readback ended its own instance "
+            + "(pid \(pid), signal 9)"
+        case .survived(let pid): return "end: the app still runs after quit and signal 9 (pid \(pid))"
+        }
+    }
+}
+
+/// Ask to quit, wait 5 s; past that, signal 9 to `pid` only (the instance the readback launched).
+enum Ending {
+    static func end(_ pid: pid_t, isRunning: @escaping () -> Bool, askToQuit: () -> Void, kill: (pid_t) -> Void,
+                    wait: (TimeInterval, () -> Bool) -> Bool) -> QuitOutcome {
+        guard pid > 0, isRunning() else { return .notRunning }
+        askToQuit()
+        if wait(5, { !isRunning() }) { return .quit }
+        kill(pid)
+        return wait(3, { !isRunning() }) ? .killed(pid) : .survived(pid)
     }
 }

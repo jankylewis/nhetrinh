@@ -34,4 +34,4 @@ Not proven: what the strip shows (wallpaper through the Dock's edge, or the Dock
 
 Run the 5f2592e `IconMatch.measure` on the kept capture with the item in pixels
 (x 7.2 y 10 w 60.8 h 44): 0.762, 0.84. The fixtures `bareLeft` and `bareBottom` in
-`Steps/DockAxisTests.swift` fail with that version of `measure` (red run of P0-FIX-4).
+`_Dock/DockAxisTests.swift` fail with that version of `measure` (red run of P0-FIX-4).

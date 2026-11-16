@@ -1,6 +1,8 @@
 import Foundation
 
 // nhetrinh-readback: use the installed app as its end user and say what happened, step by step.
+// R1, R3-R7 and R9-R12 go through the app's readback probe (D23) and need no permission: they run from any
+// terminal. R2 reads the Dock: it needs Accessibility and Screen Recording (NT-TG-003).
 //
 //   swift run nhetrinh-readback                     every step, on ~/Applications/nhetrinh.app;
 //                                                   the verdict is kept in hubs/failures/evidence/readback/
@@ -27,9 +29,10 @@ if let log = Options.logPath(CommandLine.arguments) {
     dup2(handle.fileDescriptor, STDERR_FILENO)
     setvbuf(stdout, nil, _IOLBF, 0)
 }
+let allSteps = BaseSteps.all + LifecycleSteps.all
 let options: Options
 do {
-    options = try Options(CommandLine.arguments, known: Set(BaseSteps.all.map(\.id)))
+    options = try Options(CommandLine.arguments, known: Set(allSteps.map(\.id)))
 } catch {
     let message = (error as? UsageError)?.message ?? "\(error)"
     FileHandle.standardError.write(Data("usage error: \(message)\n\(Options.usage)\n".utf8))
@@ -39,13 +42,16 @@ guard FileManager.default.fileExists(atPath: options.app.path) else {
     print("no app at \(Report.tilde(options.app.path)); run _app/scripts/install/_install.sh first")
     finish(2)
 }
+// Every run starts without a saved session of the readback profile (P1), so R1 sees one home tab.
+LifecycleSteps.forgetSession()
 let kept = options.keepsEvidence ? options.evidence ?? evidenceFolder() : nil
 let session = AppSession(appURL: options.app)
 session.keepCapture = options.keepCapture
-let steps = BaseSteps.all.filter { options.steps.isEmpty || options.steps.contains($0.id) }
+let steps = allSteps.filter { options.steps.isEmpty || options.steps.contains($0.id) }
 let results = Runner.run(steps, in: session)
-session.quit()
-let text = Report.text(results, app: options.app)
+let ending = session.quit()
+FileHandle.standardError.write(Data((ending.line + "\n").utf8))
+let text = Report.text(results, app: options.app, ending: ending)
 print(text)
 do {
     if let kept { try Report.write(text, to: kept) }

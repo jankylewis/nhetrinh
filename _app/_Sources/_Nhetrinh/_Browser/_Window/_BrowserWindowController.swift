@@ -1,11 +1,12 @@
 import AppKit
+import NhetrinhCore
 import WebKit
 
 /// The one browser window: vertical tab sidebar | toolbar + web view.
-/// Tab lifecycle, menu actions and WebKit delegates are in the `BrowserWindowController+…` files.
+/// Tab lifecycle, menu actions and WebKit delegates are in the `BrowserWindowController+…` files;
+/// session restore and idle unload are in `../Lifecycle/`.
 final class BrowserWindowController: NSWindowController {
     static let homeURL = URL(string: "https://www.google.com")
-    static let unloadAfter: TimeInterval = 10 * 60
 
     var tabs: [Tab] = []
     var selected = -1
@@ -13,7 +14,11 @@ final class BrowserWindowController: NSWindowController {
     let toolbar = ToolbarView()
     let webContainer = NSView()
     let split = NSSplitViewController()
-    private var unloadTimer: Timer?
+    var unloadTimer: Timer?
+    /// Session restore (`../Lifecycle/`): the pending save, where it goes (nil: off), the last sidebar width.
+    var saveTimer: Timer?
+    var sessionFolder: URL?
+    var sidebarWidth = Session.defaultSidebarWidth
 
     init() {
         let window = NSWindow(
@@ -81,20 +86,14 @@ final class BrowserWindowController: NSWindowController {
         toolbar.onSubmit = { [weak self] text in self?.navigate(text) }
     }
 
-    /// Once a minute, unload background tabs that were not used for `unloadAfter`.
-    private func startIdleUnloading() {
-        guard !Bench.loadAll else { return }
-        unloadTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            self?.unloadIdleTabs()
-        }
-    }
-
     // MARK: - Chrome
 
     var current: WKWebView? { tabs.indices.contains(selected) ? tabs[selected].webView : nil }
 
-    /// Bring the sidebar, the toolbar and the window title in line with the tabs.
+    /// Bring the sidebar, the toolbar and the window title in line with the tabs. Every tab change
+    /// passes here, so this is also where the session save is scheduled.
     func refreshChrome() {
+        sessionChanged()
         sidebar.update(titles: tabs.map(\.title), loaded: tabs.map(\.isLoaded), selected: selected)
         guard tabs.indices.contains(selected) else { return }
         let tab = tabs[selected]

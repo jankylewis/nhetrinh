@@ -33,8 +33,7 @@ rebuild changes the ad-hoc signature and macOS then drops the Accessibility and 
 grants (risk R-2, seen 2026-11-16 19:09, brief P0-SIGN-1).
 A step without a grant is NOT READ BACK and names the app that lacks it: `nhetrinh-readback.app`
 when run as that app, `the terminal app` otherwise (`Grant` in `Driver/AppSession.swift`, tests
-`granteeIsTheAppThatRuns`, `missingGrantNamesTheGranteeAndNoPath`).
-Not proven: a full run through the app (not launched yet; waits for the grant).
+`granteeIsTheAppThatRuns`, `missingGrantNamesTheGranteeAndNoPath`). A full run through the app: proven at 21:24 (below).
 
 ## Wanted: one stable local signing identity (written, not run)
 
@@ -66,7 +65,7 @@ the installed readback app is signed with it (`Authority=nhetrinh local signing`
 
 A window with no child or 0 Dock items read is a refused read: the step is NOT READ BACK
 `Accessibility reads are empty: re-grant nhetrinh-readback.app (…, read error <AXError>)`, never
-FAIL (`EmptyReads` in `_Steps/Step.swift`; tests in `Steps/EmptyReadsTests.swift`). R7 now reads
+FAIL (`EmptyReads` in `_Steps/Step.swift`; tests in `_Dock/EmptyReadsTests.swift`). R7 now reads
 the row count once more after the wait instead of reporting -1. The read error of the window's
 children is in the reason, so the next empty run says why.
 At 20:01 the window had children but no `nhetrinh.*` identifier, so R1, R3-R7 still said FAIL.
@@ -82,6 +81,20 @@ At 20:07 the "window" read was not a window (children AXApplication, AXMenuBar):
 
 ## Master 0f99aee: stays OPEN
 
-After the headmate toggled Accessibility for the readback app (21:23:41), the installed app (source
-hash `6563a6e1db6acadb`, equal to master's readback sources) ran in full: `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8).
-So a full run through the app is now proven. Why reads were empty with the grant kept stays not proven.
+After the headmate toggled Accessibility for the readback app (21:23:41), the installed app (source hash `6563a6e1db6acadb`, equal to master's readback sources) ran in full: `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8). So a full run through the app is now proven. Why reads were empty with the grant kept stays not proven.
+
+## Remedy: the readback probe (P0-PROBE-1, D23; run on the app in P0-REV-PROBE)
+
+source: brief P0-PROBE-1 (2026-11-16): the fleet waited 75 min for re-grants after rebuilds
+R1, R3-R7 no longer use Accessibility. The readback starts nhetrinh with `NHT_READBACK=1`; only then the app opens a Unix
+socket in a 0700 folder of its own (`ProbeServer`, `NhetrinhCore/Probe/`) and answers state and actions through the user's
+own paths (`BrowserWindowController+Probe.swift`). So these steps need no grant and run from any terminal; a rebuild of the
+readback app touches only R2. Checked by tests, not by a run: socket round trip, folder 0700 and socket 0600, a malformed
+line answered `failed` with the server still up (`ProbeSocketTests`); the menu item, the address field and a sidebar click
+(`ProbeAnswerTests`); refused action FAIL, unreachable probe NOT READ BACK (`ProbeReplyTests`). Each was red under a
+mutation (P0-PROBE-1 state file). The AX window reads (`WindowRole`, `EmptyReads.missing`, `Fresh` retry; NT-GAT-006,
+NT-GAT-008) are removed with their tests. Run on the app (P0-REV-PROBE, 2026-11-16 21:50, commit d56bf81, terminal,
+no grant): R1, R3-R7 PASS 6 of 6, R8 PASS, exit 0; a normal launch made no `nhetrinh-probe-*` folder (`lsof -U`: no probe
+socket). Fixed in P0-PROBE-FIX: 1 s per `read` became 1 s for the whole line (`ProbeDeadlineTests`); the gate is tested
+(`AppDelegateProbeTests`); report header. Not proven: the refusal of another user's peer (`getpeereid`, no test, needs a
+second user); that R2 still reads the Dock when run as `nhetrinh-readback.app` (unchanged code, not re-run).

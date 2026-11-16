@@ -24,7 +24,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | Phase | Version | Size | What the headmate gets | Status | Detail |
 |---|---|---|---|---|---|
 | P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | DONE (readback 8/8, 2026-11-16 21:24, `hubs/failures/evidence/readback/_LATEST.md`) | `M1_DAILY_DRIVER.md` |
-| P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | TODO | `M1_DAILY_DRIVER.md` |
+| P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | DOING (readback 22:13: R1, R3-R12 PASS in `_LATEST.md`, R2 PASS from the readback app; PR to come) | `M1_DAILY_DRIVER.md` |
 | P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | TODO | `M1_DAILY_DRIVER.md` |
 | P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
 | P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
@@ -75,7 +75,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 
 | Id | Risk | Answer |
 |---|---|---|
-| R-1 | Accessibility permission is not granted, so the readback tool cannot drive the app | P0 asks once. Without it: weaker in-app checks, reported as such |
+| R-1 | Accessibility permission is not granted, so the readback tool cannot drive the app | P0 asks once. Without it: weaker in-app checks, reported as such. Since D23 only R2 needs it |
 | R-2 | macOS forgets permission grants when an ad-hoc signed app is rebuilt (seen 2026-11-16, NT-TG-003) | Sign with one stable local identity: `signing.sh` (written; not run, not proven) |
 | R-3 | WebKit limits: no find match count; some sites refuse non-Safari WebKit apps | Listed as known limits; the user agent already ends like Safari's |
 | R-4 | P7 (tab folders) is the largest phase | It can move after 1.0 without blocking it (`DECISIONS.md` Q2) |

@@ -5,7 +5,7 @@ family: GAT
 status: FIXED
 date: 2026-11-16
 signature: R2 FAIL: the Dock item does not show the bare icon: silhouette agreement 90 %, icon at 82 % of the Dock item
-source: _app/_Sources/NhetrinhReadback/_Steps/SystemSteps.swift `dockIconHasNoTile` (commit 0d00e08: `items.last`)
+source: _app/_Sources/NhetrinhReadback/_Steps/System/_SystemSteps.swift `dockIconHasNoTile` (commit 0d00e08: `items.last`)
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift `items(title:)` (commit 0d00e08: filter by title only)
 source: hubs/failures/evidence/readback/_LATEST.md (run P0-RUN-1, 2026-11-16 18:57, app commit 0d00e08)
 observed: `defaults read com.apple.dock persistent-apps` lists two items titled nhetrinh: the installed app, then a copy in an agent's temporary folder; the copy was not running

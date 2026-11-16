@@ -39,17 +39,16 @@ enum SystemSteps {
     }
 
     static func unopenedTabsCostNothing(_ app: AppSession) throws -> String {
-        try app.requireAccessibility()
         let urls = "https://example.com,https://example.org,https://example.net"
-        try app.launch(env: [seedKey: urls])
+        try app.launch(env: [seedKey: urls], probe: true)
         let three = waitUntil(10) { (try? app.rowCount()) == 3 }
-        let rows = three ? 3 : try app.rowCount()  // a refused read is NOT READ BACK, never -1 rows
+        let rows = three ? 3 : try app.rowCount()  // an unreachable probe is NOT READ BACK, never -1 rows
         try expect(rows == 3, "started with 3 tabs; the sidebar has \(rows) row(s)")
         waitUntil(15) { !Footprint.pageProcesses(of: app.pid).isEmpty }
         Thread.sleep(forTimeInterval: 4)
         let pages = Footprint.pageProcesses(of: app.pid).count
         try expect(pages == 1, "3 tabs, 1 selected: \(pages) page process(es) run, 1 is expected")
-        return "started with 3 tabs (seeded by the launch environment; real restore comes with P1): "
+        return "started with 3 tabs (seeded by the launch environment; a restored session is R9): "
             + "3 rows, 1 page process"
     }
 
