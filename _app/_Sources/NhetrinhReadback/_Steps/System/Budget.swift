@@ -6,6 +6,9 @@ enum Budget {
     static let totalMegabytes = 110.0
     static let bundleKilobytes = 1024
     static let idleCpuPercent = 2.0
+    /// R38 (P6): 3 tabs opened and 2 of them unloaded cost the one-tab budget + this, for the app
+    /// and for the app with its helpers.
+    static let pressureExtra = 15.0
 
     /// R8 reads this many memory samples, 1 s apart, after the page has settled. A GPU burst
     /// lasts at most 3 s (NT-PRF-002), so it covers at most 3 of 9 and cannot move the median.
@@ -34,8 +37,14 @@ enum Budget {
         let rises: Bool
         /// Samples without the app process. Their zeros would pull the median down and pass (P0-REV-2).
         let missingApp: Int
+        /// The budgets judged: the one-tab budget, + `extra` for R38's 3 tabs with 2 unloaded (P6).
+        let appLimit: Double
+        let totalLimit: Double
 
-        init(_ samples: [Sample]) {
+        init(_ samples: [Sample], extra: Double = 0) {
+            appLimit = Budget.appMegabytes + extra
+            let totalLimit = Budget.totalMegabytes + extra
+            self.totalLimit = totalLimit
             missingApp = samples.filter { $0.app <= 0 }.count
             app = median(samples.map(\.app))
             total = median(samples.map(\.total))
@@ -43,15 +52,15 @@ enum Budget {
             highestTotal = samples.map(\.total).max() ?? 0
             count = samples.count
             let last = samples.suffix(Budget.risingCount)
-            rises = last.count == Budget.risingCount && last.allSatisfy { $0.total > Budget.totalMegabytes }
+            rises = last.count == Budget.risingCount && last.allSatisfy { $0.total > totalLimit }
         }
 
-        /// The R8 line: what is judged, on which samples, against which budget.
+        /// The R8 (and R38) line: what is judged, on which samples, against which budget.
         func line(helpers: Int) -> String {
             String(format: "app judged on the highest of %d samples 1 s apart: %.1f MB (max %.0f); "
                    + "app + %d helpers judged on the median of %d: %.1f MB (max %.0f), highest %.1f MB; "
-                   + "last %d samples all over %.0f MB: %@", count, highestApp, Budget.appMegabytes, helpers, count,
-                   total, Budget.totalMegabytes, highestTotal, Budget.risingCount, Budget.totalMegabytes,
+                   + "last %d samples all over %.0f MB: %@", count, highestApp, appLimit, helpers, count,
+                   total, totalLimit, highestTotal, Budget.risingCount, totalLimit,
                    rises ? "yes" : "no")
         }
 
@@ -64,7 +73,7 @@ enum Budget {
 
         /// No sample, or a sample without the app, is never a pass.
         var holds: Bool {
-            noReading == nil && highestApp <= Budget.appMegabytes && total <= Budget.totalMegabytes && !rises
+            noReading == nil && highestApp <= appLimit && total <= totalLimit && !rises
         }
     }
 }

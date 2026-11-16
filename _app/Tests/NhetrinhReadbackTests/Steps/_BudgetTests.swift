@@ -107,3 +107,13 @@ let missingAppCases = [
 func memoryBudgetNeedsTheAppInEverySample(run: SamplesCase) {
     #expect(Budget.Reading(run.samples).holds == run.holds)
 }
+
+/// P6, R38: 3 tabs opened, 2 unloaded, cost the one-tab budget + 15 MB (app 55, app + helpers 125).
+@Test(arguments: [
+    (Budget.Sample(app: 54, total: 124), 15.0, true), (Budget.Sample(app: 56, total: 100), 15.0, false),
+    (Budget.Sample(app: 35, total: 126), 15.0, false), (Budget.Sample(app: 54, total: 124), 0.0, false),
+])
+func theBudgetTakesAnAllowance(sample: Budget.Sample, extra: Double, holds: Bool) {
+    let reading = Budget.Reading(Array(repeating: sample, count: Budget.sampleCount), extra: extra)
+    #expect(reading.holds == holds && Budget.pressureExtra == 15)
+}

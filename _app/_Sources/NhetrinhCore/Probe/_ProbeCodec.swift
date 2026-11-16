@@ -23,6 +23,9 @@ public enum ProbeRequest: Equatable, Sendable {
     case sheetField(index: Int, text: String)
     /// Bring nhetrinh to the front and take the focus: only R26a and R26b, only with `--allow-focus` (D25).
     case front
+    /// Simulate macOS memory pressure at this level (P6). Readback only: the probe exists only with
+    /// NHT_READBACK=1; real system pressure is never made.
+    case pressure(UnloadPolicy.Pressure)
     /// The find bar's field: `text` typed, then Return, as a user searches (P4, R27).
     case find(String)
     /// The Settings Hub's control `name` set to `value` as a user picks it ("Search engine", "DuckDuckGo") (P4).
@@ -59,6 +62,7 @@ public enum ProbeCodec {
         case .sheetButton(let label): return try line(["op": "sheetButton", "text": label])
         case .sheetField(let index, let text): return try line(["op": "sheetField", "index": index, "text": text])
         case .front: return try line(["op": "front"])
+        case .pressure(let level): return try line(["op": "pressure", "text": level.rawValue])
         case .find(let text): return try line(["op": "find", "text": text])
         case .setting(let name, let value): return try line(["op": "setting", "name": name, "text": value])
         case .middleClick(let row): return try line(["op": "middleClick", "index": row])
@@ -82,6 +86,7 @@ public enum ProbeCodec {
         case ("newTab", _, _): return .newTab
         case ("closeTab", _, _): return .closeTab
         case ("front", _, _): return .front
+        case ("pressure", let text, _): return .pressure(try level(text, of: line))
         case ("find", .some(let text), _): return .find(text)
         case ("setting", .some(let value), _):
             guard let name = object["name"] as? String, !name.isEmpty else { throw Failure.malformed(line) }
@@ -112,6 +117,12 @@ public enum ProbeCodec {
         case ("failed", _, .some(let reason)): return .failed(reason)
         default: throw Failure.malformed(line)
         }
+    }
+
+    /// A pressure level by its name (P6); an unknown or missing one is malformed, never guessed.
+    private static func level(_ name: String?, of line: String) throws -> UnloadPolicy.Pressure {
+        guard let level = name.flatMap(UnloadPolicy.Pressure.init) else { throw Failure.malformed(line) }
+        return level
     }
 
     private static func line(_ object: [String: Any]) throws -> String {

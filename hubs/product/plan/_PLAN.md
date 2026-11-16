@@ -29,7 +29,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
 | P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
 | P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | TODO | `M2_REAL_SITES_WORK.md` |
-| P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | TODO | `M3_V1_RELEASE.md` |
+| P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DOING (P6-BUILD-1 on p6/memory: built, tests green, not read back) | `M3_V1_RELEASE.md` |
 | P7 Tab folders | 0.8.0 | L | collapsible tab groups in the sidebar | TODO | `M3_V1_RELEASE.md` |
 | P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | TODO | `M3_V1_RELEASE.md` |
 
@@ -60,6 +60,7 @@ A step the readback cannot drive is reported as "not read back". It is never cou
 | App + all helper processes, one simple tab | 110 MB | 95.7 MB |
 | `nhetrinh.app` on disk | 1 MB | 516 KB |
 | Idle CPU, tabs open, nothing playing | 2 % | 1.3 % (10 sites) |
+| 3 tabs opened, 2 unloaded (P6, R38): app, and app + helpers | one-tab budget + 15 MB (55 MB, 125 MB) | not measured yet |
 
 A phase that breaks a budget stops. It ships only after the cost is removed, or the headmate
 accepts a new number (recorded in `DECISIONS.md`).
@@ -83,6 +84,8 @@ accepts a new number (recorded in `DECISIONS.md`).
 | R-6 | P2: the link's menu is WebKit's own; the probe opens it with an in-app right click. The probe's in-app ⌘-click did not reach the page (23:00) | R17 says NOT READ BACK when no menu is seen; at 22:34 the menu opened and R17 PASS. ⌘-click: unit test `commandClickOpensABackgroundTab` only (ruling READBACK P2-2); a ⌘-click that does not arrive is said in R17's line, never NOT READ BACK; one that arrives wrong is a FAIL. Why it did not arrive: not proven |
 | R-7 | P2: favicons fetch in the app process (URLSession) and keep images | 32 px each, 200 at most (800 KB); R8 22:34: app 30.5 MB with example.com's icon request (the P2 cost alone not measured) |
 | R-8 | P2: ⌃⇥ / ⌃⇧⇥ may be taken by the web view before the menu; hover and drag are not read back (D18) | Tested on the menu items only; reported as not read back |
+| R-9 | P6: WebKit may keep the page process of an unloaded tab (a process cache), so R36 sees more than 1 | R36 counts the page processes before and after; a cache is not proven or ruled out until R36 runs |
+| R-10 | P6: a warning takes tabs idle past 1 min, so R36 and R37 wait 63 s each | Accepted: a warning sent at once proves nothing; R36 sends one at once too and expects no unload |
 
 ## Not in v1 (only when the headmate asks)
 

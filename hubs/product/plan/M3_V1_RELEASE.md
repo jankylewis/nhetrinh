@@ -3,7 +3,7 @@
 After M3 nhetrinh stays light under memory pressure, has tab folders, and has a released
 build that anyone can download. The gate is in `_PLAN.md`.
 
-## P6 — Memory guard (0.7.0, size S, status TODO)
+## P6 — Memory guard (0.7.0, size S, status DOING)
 
 Goal: when macOS is short of memory, nhetrinh gives memory back at once.
 

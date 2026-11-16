@@ -29,6 +29,7 @@ extension BrowserWindowController {
         case .sheetButton(let label): return pressSheetButton(label)
         case .sheetField(let index, let text): return typeInSheet(field: index, text)
         case .front: return comeToFront()
+        case .pressure(let level): return simulatePressure(level)
         case .find, .setting: return toolAnswer(request)
         case .middleClick(let row):
             return sidebar.middleClick(row) ? .done : .failed("the sidebar has no row \(row)")

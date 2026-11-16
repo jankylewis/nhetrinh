@@ -32,6 +32,7 @@ if let log = Options.logPath(CommandLine.arguments) {
     setvbuf(stdout, nil, _IOLBF, 0)
 }
 let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicSteps.all + ToolSteps.all
+    + PressureSteps.all  // P6: R36-R38
 let options: Options
 do {
     options = try Options(CommandLine.arguments, known: Set(allSteps.map(\.id)))

@@ -17,7 +17,7 @@ final class Favicons {
         """
     private static let largest = 512 * 1024
 
-    private var cache = IconCache<URL, NSImage>(capacity: capacity)
+    var cache = IconCache<URL, NSImage>(capacity: capacity)
     private var missing = IconCache<URL, Bool>(capacity: capacity)
     private var waiting: [URL: [(NSImage?) -> Void]] = [:]
     private lazy var session: URLSession = {
@@ -26,6 +26,15 @@ final class Favicons {
         config.timeoutIntervalForRequest = 10
         return URLSession(configuration: config)
     }()
+
+    /// Icons and known misses kept now.
+    var count: Int { cache.count + missing.count }
+
+    /// P6, critical memory pressure: every kept icon and miss goes; a fetch under way still answers.
+    func empty() {
+        cache = IconCache(capacity: Self.capacity)
+        missing = IconCache(capacity: Self.capacity)
+    }
 
     /// The icon of the page `webView` shows; `done` runs on the main queue (nil: the site has none).
     func icon(of webView: WKWebView, done: @escaping (NSImage?) -> Void) {

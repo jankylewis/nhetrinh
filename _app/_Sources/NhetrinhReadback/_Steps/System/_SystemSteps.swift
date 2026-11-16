@@ -72,8 +72,9 @@ enum SystemSteps {
         return "one simple tab (example.com), 6 s after load: \(seen)"
     }
 
-    /// `Budget.sampleCount` samples, 1 s apart, and the most helper processes seen in one sample.
-    private static func memorySamples(of pid: pid_t) -> (Budget.Reading, Int) {
+    /// `Budget.sampleCount` samples, 1 s apart, and the most helper processes seen in one sample;
+    /// judged against the budget + `extra` (R38, P6).
+    static func memorySamples(of pid: pid_t, extra: Double = 0) -> (Budget.Reading, Int) {
         var samples: [Budget.Sample] = []
         var helpers = 0
         for index in 0..<Budget.sampleCount {
@@ -83,7 +84,7 @@ enum SystemSteps {
             samples.append(Budget.Sample(app: app, total: processes.reduce(0) { $0 + $1.megabytes }))
             helpers = max(helpers, processes.count - 1)
         }
-        return (Budget.Reading(samples), helpers)
+        return (Budget.Reading(samples, extra: extra), helpers)
     }
 
     /// Size on disk (allocated blocks), the number `du -sk` prints.
