@@ -33,3 +33,16 @@ func toolPageCarriesWhatTheStepReads(path: String, part: String) {
 @Test func clearTitleIsTheHubsButton() {
     #expect(SettingsTitles.clear == "Clear Website Data…")
 }
+
+/// R30a (ruling after the 23:20 run): Light must read light; System must equal macOS's own look and,
+/// when macOS is dark, differ from Light. A window stuck on Light can never pass for System.
+@Test(arguments: [
+    ("light", "dark", "dark", nil), ("light", "light", "light", nil),
+    ("light", "light", "dark", "System: the window is light, macOS is dark"),
+    ("light", "dark", "light", "System: the window is dark, macOS is light"),
+    ("dark", "dark", "dark", "Light: the window is dark"),
+    ("", "dark", "dark", "Light: the window is "),
+] as [(String, String, String, String?)])
+func appearanceCheckTellsSystemFromLight(light: String, system: String, macOS: String, failure: String?) {
+    #expect(HubSteps.appearanceFailure(light: light, system: system, macOS: macOS) == failure)
+}

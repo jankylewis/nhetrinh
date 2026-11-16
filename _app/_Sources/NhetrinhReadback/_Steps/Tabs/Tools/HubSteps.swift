@@ -54,14 +54,34 @@ enum HubSteps {
             "after the relaunch the window is \($0.appearance), the page \"\($0.title)\""
         })
         try openHub(app)
-        try app.act(.setting(name: "Appearance", value: "System"), "Settings Hub: Appearance System")
-        let system = systemIsDark() ? "dark" : "light"
-        let page = ToolPages.schemeTitle(dark: system == "dark")
-        _ = try ToolSteps.until(app, { $0.appearance == system && $0.title == page }, else: {
-            "System (macOS is \(system)): the window is \($0.appearance), the page \"\($0.title)\""
-        })
+        let light = try choose(app, "Light", page: ToolPages.schemeTitle(dark: false))
+        let macOS = systemIsDark() ? "dark" : "light"
+        let system = try choose(app, "System", page: ToolPages.schemeTitle(dark: macOS == "dark"))
+        if let failure = appearanceFailure(light: light.appearance, system: system.appearance, macOS: macOS) {
+            throw StepError.fail(failure)
+        }
         return "Appearance Dark: window dark, the page read dark; after Quit and a launch: still dark; "
-            + "System: the window and the page follow macOS (\(system))"
+            + "Light: the window and the page light; System: both follow macOS (\(macOS))"
+    }
+
+    /// Choose `value` in the hub; the state once the page reads `page` (or 10 s, then the last state).
+    private static func choose(_ app: AppSession, _ value: String, page: String) throws -> ProbeState {
+        try app.act(.setting(name: "Appearance", value: value), "Settings Hub: Appearance \(value)")
+        var state = try app.state()
+        waitUntil(10) {
+            state = (try? app.state()) ?? state
+            return state.title == page
+        }
+        try expect(state.title == page, "Appearance \(value): the page reads \"\(state.title)\", not \"\(page)\"")
+        return state
+    }
+
+    /// Why R30a fails, or nil: Light reads light; System equals macOS's look (so differs from Light when
+    /// macOS is dark).
+    static func appearanceFailure(light: String, system: String, macOS: String) -> String? {
+        if light != "light" { return "Light: the window is \(light)" }
+        if system != macOS { return "System: the window is \(system), macOS is \(macOS)" }
+        return nil
     }
 
     /// macOS's own look, as the readback's process reads it.
