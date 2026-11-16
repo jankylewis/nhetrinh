@@ -22,4 +22,5 @@ OBSERVED. The headmate's two other apps use the same call (`setApplicationIconIm
 both binaries) and show no tile.
 
 Not fixed: when the app is not running, macOS draws the bundle `.icns` on a tile (see the
-bugfacing entry, "Known limit"; headmate ruling pending).
+bugfacing entry, "Known limit"); accepted by the headmate, not to be fixed
+(`hubs/product/plan/DECISIONS.md` D20).

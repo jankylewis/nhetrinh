@@ -85,3 +85,17 @@ func ringNeverLeavesTheDock(item: CGRect) {
     #expect(!IconMatch.measure(capture: drawn, icon: icon, item: CGRect(x: 0, y: 0, width: 128, height: 128))
         .showsBareIcon)
 }
+
+/// P0-REV-2 gap. `DockIcon.capture` rounds x, y, width and height one by one before it hands them
+/// to `screencapture -R`, so a Dock frame on a half point grows by up to 1 pt past the Dock's edge.
+/// The rect must already be whole points, inside the Dock, so the rounding changes nothing.
+/// Not proven: that the Dock's Accessibility frames are ever fractional on a real display.
+@Test(arguments: [CGRect(x: 300.5, y: 724.25, width: 64, height: 64), CGRect(x: 635.5, y: 724, width: 64, height: 64)])
+func ringIsWholePointsInsideTheDock(item: CGRect) {
+    let halfPointDock = CGRect(x: 300.5, y: 716.25, width: 399, height: 79.5)
+    guard let rect = DockIcon.captureRect(around: item, dock: halfPointDock) else {
+        Issue.record("an item inside the Dock has a capture")
+        return
+    }
+    #expect(rect == rect.integral && halfPointDock.contains(rect), "\(rect) in \(halfPointDock)")
+}

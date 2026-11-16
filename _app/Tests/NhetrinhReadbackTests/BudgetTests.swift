@@ -90,3 +90,20 @@ let reviewSamplesCases = [
 func memoryBudgetReviewGaps(run: SamplesCase) {
     #expect(Budget.Reading(run.samples).holds == run.holds)
 }
+
+/// P0-REV-2 gap. `memorySamples` writes app 0 (and the total of what is left) when the app process
+/// is not found: the app quit or crashed while R8 read. Those zeros pull the median down and pass.
+/// A sample without the app is no reading, and no reading is never a pass (NOT READ BACK).
+let missingAppCases = [
+    SamplesCase(name: "the app is gone after 4 samples over the budget", samples: [
+        Budget.Sample(app: 35, total: 200), Budget.Sample(app: 35, total: 200), Budget.Sample(app: 35, total: 200),
+        Budget.Sample(app: 35, total: 200),
+    ] + Array(repeating: Budget.Sample(app: 0, total: 0), count: 5), holds: false),
+    SamplesCase(name: "the app is missing in 1 of 9", samples: nine([4: Budget.Sample(app: 0, total: 0)]),
+                holds: false),
+]
+
+@Test(arguments: missingAppCases)
+func memoryBudgetNeedsTheAppInEverySample(run: SamplesCase) {
+    #expect(Budget.Reading(run.samples).holds == run.holds)
+}

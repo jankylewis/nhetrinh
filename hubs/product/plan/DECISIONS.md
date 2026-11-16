@@ -26,6 +26,9 @@ row stays and is marked "replaced by".
 | D17 | The work is done by a fleet: the agent is the matemaster (steers, reviews, runs the readback, ships) with 2 mates, each in its own worktree | headmate | 2026-11-16 |
 | D18 | The readback acts only through the Accessibility API (press, set value, confirm). It never moves the mouse or types keys, starts the app without taking the focus, and uses its own browsing profile | agent, as owner | 2026-11-16 |
 | D19 | Settings Hub: one small native window, ⌘, (nhetrinh > Settings Hub…), holding Appearance (System, Light, Dark; headmate request: dark and light theme), Search engine, Unload idle tabs after N minutes, Clear Website Data. Replaces "no settings window in v1". Planned, not built (D14): scheduled in P4 (`M2_REAL_SITES_WORK.md`); may move to P2 if the headmate asks | headmate | 2026-11-16 |
+| D20 | The bundle icon on a tile while the app is not running (pinned Dock item, Finder, Launchpad) is accepted, like the headmate's other apps: no Xcode, no Icon Composer. Closes the known limit of NT-BUG-002 | headmate | 2026-11-16 |
+| D21 | The fleet tool's onboarding row 8 (needs an ADO epic) is ignored for this personal project | headmate | 2026-11-16 |
+| D22 | P1 preparation may start before P0 closes: failing tests only, in `NhetrinhCore` only, no change to the app's behaviour. Narrows D14 for this one case | headmate | 2026-11-16 |
 
 ## Assumed, then accepted with the plan (D15)
 

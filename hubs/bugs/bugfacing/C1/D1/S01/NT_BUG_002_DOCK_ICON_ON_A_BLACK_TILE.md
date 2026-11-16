@@ -26,4 +26,5 @@ screenshot on 2026-11-16. It stays OBSERVED until readback R2 passes (NT-TG-001)
 When the app is not running (a pinned Dock item, Finder, Launchpad), macOS draws the bundle
 `.icns` on a tile (NT-BLD-001); the runtime icon applies only while the app runs. R2 checks the
 running app only. An Icon Composer icon is a candidate fix (not proven). Icon Composer needs
-Xcode 26; the build uses Command Line Tools only. Headmate ruling pending.
+Xcode 26; the build uses Command Line Tools only. Accepted by the headmate on 2026-11-16, like
+the headmate's other apps: no Xcode, no Icon Composer (`hubs/product/plan/DECISIONS.md` D20).
