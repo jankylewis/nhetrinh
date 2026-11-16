@@ -3,7 +3,7 @@ import Testing
 @testable import NhetrinhCore
 
 // P3 (hubs/product/plan/M2_REAL_SITES_WORK.md): which failures show the error page, the page's
-// title, and the address Retry loads. The reasons and their words are in ErrorPageTests.swift.
+// title, and the address Retry loads. The reasons and their words are in _ErrorPageTests.swift.
 
 /// A load the user or the app ended is not an error: Stop (R18), a new address typed during a load,
 /// a link handed to another app (WebKit 102), a page handled by a plug-in (WebKit 204).

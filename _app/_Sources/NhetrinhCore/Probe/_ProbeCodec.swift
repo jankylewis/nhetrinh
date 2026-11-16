@@ -27,6 +27,9 @@ public enum ProbeRequest: Equatable, Sendable {
     case find(String)
     /// The Settings Hub's control `name` set to `value` as a user picks it ("Search engine", "DuckDuckGo") (P4).
     case setting(name: String, value: String)
+    /// The download row `row` (0 top) in the sidebar footer: "Cancel" pressed, or the row clicked
+    /// ("Show in Finder") (P5).
+    case download(row: Int, item: String)
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -57,6 +60,7 @@ public enum ProbeCodec {
         case .front: return try line(["op": "front"])
         case .find(let text): return try line(["op": "find", "text": text])
         case .setting(let name, let value): return try line(["op": "setting", "name": name, "text": value])
+        case .download(let row, let item): return try line(["op": "download", "index": row, "text": item])
         }
     }
 
@@ -81,6 +85,8 @@ public enum ProbeCodec {
             guard let name = object["name"] as? String, !name.isEmpty else { throw Failure.malformed(line) }
             return .setting(name: name, value: value)
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
+        case ("download", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
+            return .download(row: row, item: item)
         case ("rowMenu", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
             return .rowMenu(row: row, item: item)
         case ("linkMenu", .some(let item), _) where !item.isEmpty: return .linkMenu(item: item)

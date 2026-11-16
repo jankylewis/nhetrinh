@@ -31,6 +31,8 @@ final class BrowserWindowController: NSWindowController {
     let findBar = FindBar()
     var findBarHeight: NSLayoutConstraint?
     var hub: SettingsHub?
+    /// P5 (`../Page/Outside/`): this launch's downloads, shown in the sidebar footer.
+    let downloads = Downloads()
 
     init() {
         let window = NSWindow(
@@ -108,6 +110,7 @@ final class BrowserWindowController: NSWindowController {
         toolbar.onZoomBadge = { [weak self] in self?.actualSize(nil) }
         findBar.onFind = { [weak self] text, backwards in self?.find(text, backwards: backwards) }
         findBar.onClose = { [weak self] in self?.closeFind() }
+        wireDownloads()
     }
 
     // MARK: - Chrome

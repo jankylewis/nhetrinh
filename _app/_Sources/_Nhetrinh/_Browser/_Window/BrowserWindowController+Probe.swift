@@ -33,6 +33,7 @@ extension BrowserWindowController {
         case .setting(let name, let value):
             guard let hub, hub.window?.isVisible == true else { return .failed("the Settings Hub is not shown") }
             return hub.set(name, to: value) ? .done : .failed("the Settings Hub has no \(name) \(value)")
+        case .download(let row, let item): return pressDownload(row: row, item: item)
         }
     }
 
@@ -53,6 +54,7 @@ extension BrowserWindowController {
         state.reloadButton = toolbar.reloadLabel
         state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
         readSheet(into: &state)
+        readDownloads(into: &state)
         return state
     }
 

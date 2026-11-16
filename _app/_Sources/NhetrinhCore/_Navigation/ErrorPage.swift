@@ -1,6 +1,6 @@
 import Foundation
 
-// P3 (hubs/product/plan/M2_REAL_SITES_WORK.md); tests in ErrorPageTests.swift and ErrorPageShownTests.swift.
+// P3 (hubs/product/plan/M2_REAL_SITES_WORK.md); tests in ErrorPage/_ErrorPageTests.swift and ErrorPageShownTests.swift.
 
 /// The page a tab shows when a load fails: the reason in plain words and a Retry button.
 /// Never the raw error (its domain, code or system text) and never unescaped page input.
