@@ -18,6 +18,8 @@ R2 (readback) still captures a region: the Dock item and a ring clamped to the D
 frame (`DockIcon.captureRect(around:dock:)`, test `ringNeverLeavesTheDock`), to a temporary file
 deleted in the same step; `.gitignore` holds `hubs/failures/evidence/readback/*.png` as a guard.
 Not proven: that the Dock's Accessibility frame holds only Dock pixels on the real screen.
+Seen against it (NT-GAT-007, 19:40 capture): on a left Dock the frame's far 5 pt are a lighter,
+uneven strip past the Dock's visible edge. What shows there is not proven (wallpaper or border).
 
 ## Wanted
 

@@ -76,9 +76,10 @@ enum DockIcon {
         return width < 1 || height < 1 ? nil : CGRect(x: minX, y: minY, width: width, height: height)
     }
 
-    /// Capture the item and its ring to a temporary PNG, read it, delete it. Returns the bitmap
-    /// and the item inside it, in pixels, origin top left, and the PNG's bytes, which R2 writes
-    /// out only with `--keep-capture` (never into a repository). Nothing else is kept on disk.
+    /// Capture the item and its ring to a temporary PNG, read it, delete it. Returns the bitmap;
+    /// the item in it, in pixels, origin top left, not clamped to the capture (an item can reach past
+    /// the Dock's frame, and its icon is centred on the whole item: NT-GAT-007); and the PNG's
+    /// bytes, which R2 writes out only with `--keep-capture`, never into a repository.
     static func capture(_ item: DockItem) throws -> (image: NSBitmapImageRep, item: CGRect, png: Data) {
         guard let frame = captureRect(around: item.frame, dock: item.dock) else {
             throw StepError.cannotDrive("the Dock item is outside the Dock's frame")
@@ -95,9 +96,9 @@ enum DockIcon {
               let image = NSBitmapImageRep(data: data) else {
             throw StepError.cannotDrive("the Dock item could not be captured; " + Grant.noScreenRecording() + "?")
         }
-        let scale = Double(image.pixelsWide) / frame.width, inner = item.frame.intersection(frame)
-        let inside = CGRect(x: (inner.minX - frame.minX) * scale, y: (inner.minY - frame.minY) * scale,
-                            width: inner.width * scale, height: inner.height * scale)
+        let scale = Double(image.pixelsWide) / frame.width, whole = item.frame
+        let inside = CGRect(x: (whole.minX - frame.minX) * scale, y: (whole.minY - frame.minY) * scale,
+                            width: whole.width * scale, height: whole.height * scale)
         return (image, inside, data)
     }
 

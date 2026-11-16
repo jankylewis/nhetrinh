@@ -37,7 +37,8 @@ enum CornerCase: String, CaseIterable {
 @Test(arguments: CornerCase.allCases)
 func dockCornerReviewGaps(capture: CornerCase) {
     let drawn = capture.draw()
-    let match = IconMatch.measure(capture: drawn.image, icon: bitmap(side: 256) { drawIcon(in: $0) }, item: drawn.item)
+    let match = IconMatch.measure(capture: drawn.image, icon: bitmap(side: 256) { drawIcon(in: $0) }, item: drawn.item,
+                                  axis: .horizontal)
     let verdict = "\(capture.rawValue): agreement \(match.agreement), scale \(match.scale)"
     guard capture == .paleTileOnLightDock else {
         #expect(match.showsBareIcon == capture.showsBareIcon, "\(verdict)")
@@ -82,7 +83,8 @@ func ringNeverLeavesTheDock(item: CGRect) {
 @Test func noRingIsNeverAPass() {
     let drawn = bitmap(side: 128) { drawIcon(in: $0.insetBy(dx: 6, dy: 6)) }
     let icon = bitmap(side: 256) { drawIcon(in: $0) }
-    #expect(!IconMatch.measure(capture: drawn, icon: icon, item: CGRect(x: 0, y: 0, width: 128, height: 128))
+    #expect(!IconMatch.measure(capture: drawn, icon: icon, item: CGRect(x: 0, y: 0, width: 128, height: 128),
+                                    axis: .horizontal)
         .showsBareIcon)
 }
 
