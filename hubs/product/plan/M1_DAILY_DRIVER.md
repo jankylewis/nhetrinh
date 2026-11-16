@@ -77,8 +77,8 @@ Exit: the gate, R1-R12 PASS.
 Goal: the sidebar feels finished.
 
 Build:
-- Row: favicon (16 pt), title, close button on hover. Middle-click closes.
-- Drag a row to reorder. ⌃Tab and ⌃⇧Tab: next and previous tab.
+- Row: favicon (16 pt), title, close button on hover. Middle-click closes. Row menu: Close Tab (today).
+- Drag a row to reorder, or Tabs > Move Tab Up / Move Tab Down. ⌃Tab and ⌃⇧Tab: next and previous tab.
 - File > Reopen Closed Tab (⌘⇧T) reopens the last closed tab (Core `ClosedTabs`: the last 20, this run only).
 - ⌘-click a link, or its context-menu item Open Link in New Tab: a new tab in the background.
 - Toolbar: reload becomes stop while a page loads; a thin progress line under the toolbar.
@@ -88,8 +88,8 @@ Tests: `ClosedTabs` (push, pop, cap); `TabOrder.move(from:to:)` index math; favi
 resolution (relative, absolute, missing).
 
 Readback adds:
-- R13 hover a row: a close button appears; press it: rows -1.
-- R14 drag row 3 above row 1: the new order shows, and stays after a relaunch.
+- R13 show a row's menu (`AXShowMenu`), press Close Tab: rows -1. Hover stays the user's way.
+- R14 select row 3, Tabs > Move Tab Up twice: it is row 1, and stays after a relaunch. Drag stays the user's way.
 - R15 File > Reopen Closed Tab: the row is back with the same URL.
 - R16 a site that has an icon shows it in its row.
 - R17 a local test page: show the link's menu (`AXShowMenu`), press Open Link in New Tab: rows +1,
