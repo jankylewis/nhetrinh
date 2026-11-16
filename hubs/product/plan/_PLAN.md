@@ -43,7 +43,7 @@ Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it
 3. Build the phase.
 4. `python3 _app/scripts/conventions/_check.py`: 0 violations.
 5. `nice -n 10 _app/scripts/test.sh`: all green (never plain `swift test`, NT-GAT-001). The report quotes the count.
-6. `_build.sh`, then `install.sh` (the readback runs on the installed app, never on the build folder).
+6. `_build.sh`, then `install/_install.sh` (the readback runs on the installed app, never on the build folder).
 7. Readback: every step of this phase and of all earlier phases is PASS.
 8. Lightness budget, measured inside the readback (table below).
 9. Hubs in the same PR: feature rows, bug / failure / lesson / tool-gap entries, evidence paths.

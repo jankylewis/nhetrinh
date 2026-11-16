@@ -2,8 +2,13 @@ import Foundation
 
 /// A command line the tool does not understand. It stops the run with exit 2 before anything
 /// runs, so a typo never falls back to a full run that overwrites _LATEST.md (NT-GAT-003).
+/// The message goes to stderr and the `--log` file: the home folder reads `~` (P0-REV-3).
 struct UsageError: Error {
     let message: String
+
+    init(message: String) {
+        self.message = Report.tilde(message)
+    }
 }
 
 struct Options {

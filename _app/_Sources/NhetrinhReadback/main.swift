@@ -34,7 +34,7 @@ do {
     finish(2)
 }
 guard FileManager.default.fileExists(atPath: options.app.path) else {
-    print("no app at \(options.app.path); run _app/scripts/install/_install.sh first")
+    print("no app at \(Report.tilde(options.app.path)); run _app/scripts/install/_install.sh first")
     finish(2)
 }
 let kept = options.keepsEvidence ? options.evidence ?? evidenceFolder() : nil
