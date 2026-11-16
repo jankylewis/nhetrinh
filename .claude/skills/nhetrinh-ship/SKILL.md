@@ -1,6 +1,6 @@
 ---
 name: nhetrinh-ship
-description: "Ship one nhetrinh phase: one PR, CI green, readback PASS, self-merge, version bump in _app/scripts/VERSION, tag."
+description: "Ship one nhetrinh phase: one PR, CI green, readback PASS, self-merge, version bump in _app/scripts/VERSION, tag; the tag publishes a GitHub Release (release.yml), read back with R44 and R45."
 ---
 
 # nhetrinh-ship
@@ -42,10 +42,37 @@ The matemaster merges and ships (`CLAUDE.md`). A mate never pushes, merges or to
 ## Merge and tag
 
 1. Self-merge the PR when CI is green and the readback is PASS.
-2. Tag the merge commit on `master` `v<version>` from `VERSION`, for example `v0.1.0`
-   (`M3_V1_RELEASE.md`: the release workflow runs on a tag `v*`).
+2. Tag the merge commit on `master` `v<version>` from `VERSION`, for example `v0.1.0`, and push the
+   tag. Every tag `v*` publishes a GitHub Release (see "Release" below): tag only what may be downloaded.
 3. Entries whose fix is now on `master` with a cited proof move from OBSERVED to FIXED, in the
    entry, its `_INDEX.md` row and its TRIAGE row.
+
+## Release (a tag `v*`, P8)
+
+Only when the brief names the seat and the headmate asked for the release; a mate never tags.
+
+1. `VERSION` holds the release's version (`1.0.0` for P8, D13), bumped on the phase branch and merged.
+   `release.yml` refuses a tag that is not exactly `v` + `VERSION`.
+2. `git tag v<version> <merge commit on master>`, then `git push origin v<version>`.
+3. `.github/workflows/release.yml` runs: the tag check; `build.yml`'s own job on the tag (checker, its
+   tests, `test.sh`, build, bundle and size checks, arm64 only), which uploads
+   `nhetrinh-<version>-arm64.zip`; then the zip's SHA-256 (`.sha256`), the notes
+   (`_app/scripts/install/release_notes.py <version>`, from `hubs/product/features/`) and the Release.
+   Watch it: `gh run watch` (or `gh run list --workflow release.yml`).
+4. A macOS runner that is short or stuck: "Re-run failed jobs", or
+   `gh workflow run release.yml -f tag=v<version>`. A re-run replaces the Release's files and notes;
+   it never makes a second Release. A red run gets its hub entries (family `CIP`).
+5. R44, on the seat, once the Release is up: `cd _app && swift run nhetrinh-readback --steps R44
+   --release-url https://github.com/<owner>/<repo>/releases/download/v<version>/nhetrinh-<version>-arm64.zip`.
+   It checks the SHA-256 and runs R1-R8 on the downloaded copy; PASS only when all 8 pass. R2 needs the
+   granted readback app (NT-TG-003). The macOS first-open warning is not read back: check it by hand
+   on a copy downloaded in a browser (README "The first open").
+6. R45: install the release (`_app/scripts/install/_install.sh` from the tagged commit, or the
+   downloaded `nhetrinh.app` copied to ~/Applications), then the full run `swift run nhetrinh-readback`
+   (R1-R43; it writes `_LATEST.md`). Fill the 1.0.0 column of `hubs/product/rnd/LIGHTNESS_1_0.md`
+   from R8, R38 and R44, and add the evidence rows.
+7. P8 exits when R1-R45 PASS, CI and the release run are green, and every hub item is FIXED or a
+   known limit in `README.md` (`M3_V1_RELEASE.md`).
 
 ## Report to the headmate
 
