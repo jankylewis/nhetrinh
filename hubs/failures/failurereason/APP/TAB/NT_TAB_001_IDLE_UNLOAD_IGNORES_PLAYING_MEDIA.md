@@ -5,9 +5,9 @@ family: TAB
 status: OPEN
 date: 2026-11-16
 signature: background tab stops playing after about 10 minutes
-source: _app/_Sources/_Nhetrinh/_Browser/_BrowserWindowController.swift `unloadIdleTabs`
+source: _app/_Sources/_Nhetrinh/_Browser/_BrowserWindowController.swift `unloadIdleTabs` (P0; since P1-BUILD-1: `_Browser/Lifecycle/IdleUnload.swift`)
 observed: not seen live; found by reading the code while writing the plan
-links: fix=no lesson=no evidence=no toolgap=none
+links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Mechanism
 
@@ -30,3 +30,6 @@ code, then pass after `UnloadPolicy` asks for the media playback state.
 Red unit tests first (P1-PREP-1, `DECISIONS.md` D22, commit cba933c):
 `_app/Tests/_NhetrinhCoreTests/UnloadPolicyTests.swift`, the table idle time x selected x playing;
 a playing tab is never unloaded. They fail on the stub `UnloadPolicy.tabsToUnload` until P1.
+
+P1-BUILD-1 built the fix (`../../../failfix/APP/TAB/NT_TAB_001_IDLE_UNLOAD_IGNORES_PLAYING_MEDIA.md`):
+the policy tests are green; R11 has not run on the installed app yet, so the status stays OPEN.

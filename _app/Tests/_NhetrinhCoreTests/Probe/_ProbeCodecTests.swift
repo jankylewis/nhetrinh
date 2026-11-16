@@ -6,6 +6,7 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     var state = ProbeState()
     state.title = "Example Domain"
     state.rows = rows
+    state.loaded = rows.map { $0 != "A" }
     state.selected = selected
     state.address = "https://example.com/"
     state.windowShown = true
@@ -23,6 +24,8 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .closeTab,
     .select(0),
     .select(7),
+    .menu(["nhetrinh", "Quit nhetrinh"]),
+    .menu(["Tabs", "Back"]),
 ])
 func requestRoundTrips(request: ProbeRequest) throws {
     let line = try ProbeCodec.encode(request)
@@ -43,7 +46,8 @@ func responseRoundTrips(response: ProbeResponse) throws {
 }
 
 @Test(arguments: ["", "{", "[]", "{\"op\":\"format-disk\"}", "{\"op\":\"select\"}", "{\"op\":\"select\",\"index\":-1}",
-                  "{\"op\":\"navigate\"}"])
+                  "{\"op\":\"navigate\"}", "{\"op\":\"menu\"}", "{\"op\":\"menu\",\"path\":[]}",
+                  "{\"op\":\"menu\",\"path\":\"Tabs > Back\"}"])
 func malformedRequestThrows(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
 }

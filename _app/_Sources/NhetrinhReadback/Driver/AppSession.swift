@@ -7,6 +7,8 @@ import NhetrinhCore
 final class AppSession {
     static let installed = FileManager.default.homeDirectoryForCurrentUser
         .appendingPathComponent("Applications/nhetrinh.app")
+    /// The app runs in this profile (NHT_PROFILE): its own cookies, cache and saved session.
+    static let profile = "readback"
 
     let appURL: URL
     private(set) var pid: pid_t = 0
@@ -31,7 +33,7 @@ final class AppSession {
         let config = NSWorkspace.OpenConfiguration()
         config.createsNewApplicationInstance = true
         config.activates = false
-        let base = ["NHT_PROFILE": "readback"].merging(probe ? [ProbePath.variable: "1"] : [:]) { _, new in new }
+        let base = ["NHT_PROFILE": Self.profile].merging(probe ? [ProbePath.variable: "1"] : [:]) { _, new in new }
         config.environment = base.merging(env) { _, new in new }
         let done = DispatchSemaphore(value: 0)
         var failure: Error?
@@ -58,6 +60,20 @@ final class AppSession {
         pid = 0
         probing = false
         Thread.sleep(forTimeInterval: 2)  // let WebKit's helper processes exit as well
+    }
+
+    /// The app ended by itself (its own Quit, or a kill): wait up to `timeout`, then forget it.
+    func waitForEnd(_ timeout: TimeInterval) -> Bool {
+        guard waitUntil(timeout, { !self.isRunning }) else { return false }
+        pid = 0
+        probing = false
+        Thread.sleep(forTimeInterval: 2)  // let WebKit's helper processes exit as well
+        return true
+    }
+
+    /// Signal 9, as a crash or a power cut does: the app saves nothing more.
+    func killNow() {
+        if isRunning { kill(pid, SIGKILL) }
     }
 
     /// A step that reads the system through Accessibility (R2, the Dock) calls this first: without

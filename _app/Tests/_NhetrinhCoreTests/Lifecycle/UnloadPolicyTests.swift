@@ -2,14 +2,14 @@ import Foundation
 import Testing
 @testable import NhetrinhCore
 
-// P1 tests (hubs/product/plan/M1_DAILY_DRIVER.md), red first (P1-PREP-1, DECISIONS.md D22):
-// `UnloadPolicy.tabsToUnload` is a stub, so every case here fails until P1 builds it.
+// P1 tests (hubs/product/plan/M1_DAILY_DRIVER.md), written red first on a stub (P1-PREP-1, DECISIONS.md D22);
+// green since P1-BUILD-1 built `UnloadPolicy.tabsToUnload`.
 
 private let now = Date(timeIntervalSinceReferenceDate: 1_000_000)
 private let limit: TimeInterval = 600
 
 /// How long the tab under test has been idle. Today's code unloads a tab strictly older than the
-/// limit (_app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift:87).
+/// limit (P0's `unloadIdleTabs`, _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift:87).
 enum Idle: TimeInterval, CustomStringConvertible {
     case underTheLimit = 599
     case atTheLimit = 600

@@ -7,8 +7,8 @@ date: 2026-11-16
 signature: R2 the Dock icon has no tile | PASS (with a tile as large as the Dock item)
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift `borderColour` (commit 2e05899: whole border)
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift `borderColour` (commit 4ee85bf: 4 corners)
-source: _app/Tests/NhetrinhReadbackTests/_IconMatchTests.swift `dockCaptureVerdict`, case `iconOnTileToTheEdge` (commit 4ee85bf)
-source: _app/Tests/NhetrinhReadbackTests/_IconMatchTests.swift `dockCornerReviewGaps`, 4 cases (commit 90b8cab)
+source: _app/Tests/NhetrinhReadbackTests/_Dock/_IconMatchTests.swift `dockCaptureVerdict`, case `iconOnTileToTheEdge` (commit 4ee85bf)
+source: _app/Tests/NhetrinhReadbackTests/_Dock/_IconMatchTests.swift `dockCornerReviewGaps`, 4 cases (commit 90b8cab)
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Mechanism

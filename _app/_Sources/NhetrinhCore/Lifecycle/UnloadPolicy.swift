@@ -1,7 +1,6 @@
 import Foundation
 
-// P1 (hubs/product/plan/M1_DAILY_DRIVER.md). STUB, red first (P1-PREP-1, DECISIONS.md D22):
-// the types compile, the behaviour is not built; the tests in UnloadPolicyTests.swift fail until P1.
+// P1 (hubs/product/plan/M1_DAILY_DRIVER.md), NT-TAB-001.
 
 /// Which background tabs to unload. A pure function: the app asks WebKit if a tab plays
 /// (`requestMediaPlaybackState`) and passes the answer in; a playing tab is never unloaded (NT-TAB-001).
@@ -19,8 +18,13 @@ public enum UnloadPolicy {
         }
     }
 
-    /// The indexes of the tabs to unload now, in ascending order.
+    /// The indexes of the tabs to unload now, in ascending order: loaded, not selected, silent,
+    /// and idle for longer than `idleLimit` (exactly at the limit is not yet idle).
     public static func tabsToUnload(_ tabs: [TabState], selected: Int?, now: Date, idleLimit: TimeInterval) -> [Int] {
-        []  // STUB
+        tabs.indices.filter { index in
+            let tab = tabs[index]
+            let idle = now.timeIntervalSince(tab.lastActive) > idleLimit
+            return index != selected && tab.isLoaded && !tab.isPlaying && idle
+        }
     }
 }

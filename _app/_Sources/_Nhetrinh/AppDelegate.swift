@@ -18,7 +18,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 
-    func applicationWillTerminate(_ notification: Notification) { probe?.stop() }
+    /// Quit saves the session at once (P1); the probe's socket goes away.
+    func applicationWillTerminate(_ notification: Notification) {
+        browser?.saveSession()
+        probe?.stop()
+    }
 
     private func startProbe(_ browser: BrowserWindowController) {
         do {

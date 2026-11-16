@@ -7,14 +7,18 @@ public enum ProbeRequest: Equatable, Sendable {
     case newTab
     case closeTab
     case select(Int)
+    /// A menu item by its path, ["Tabs", "Back"], performed as a click on it once the answer is sent.
+    case menu([String])
 }
 
-/// What the app shows, as the readback needs it (R1, R3-R7). Every field has a default, so an
+/// What the app shows, as the readback needs it (R1, R3-R7, R9-R12). Every field has a default, so an
 /// answer from an older app still decodes; the readback then sees the default and says so.
 public struct ProbeState: Equatable, Sendable {
     public var title = ""
     /// The sidebar rows, top to bottom, as the table shows them.
     public var rows: [String] = []
+    /// Per row: whether its tab is loaded (a dimmed row is not).
+    public var loaded: [Bool] = []
     /// The selected sidebar row; nil when none is selected.
     public var selected: Int?
     /// The text in the address field.
@@ -46,6 +50,7 @@ public enum ProbeCodec {
         case .newTab: return try line(["op": "newTab"])
         case .closeTab: return try line(["op": "closeTab"])
         case .select(let index): return try line(["op": "select", "index": index])
+        case .menu(let path): return try line(["op": "menu", "path": path])
         }
     }
 
@@ -65,6 +70,9 @@ public enum ProbeCodec {
         case ("newTab", _, _): return .newTab
         case ("closeTab", _, _): return .closeTab
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
+        case ("menu", _, _):
+            guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
+            return .menu(path)
         default: throw Failure.malformed(line)
         }
     }
@@ -95,8 +103,9 @@ public enum ProbeCodec {
 
 extension ProbeState {
     var object: [String: Any] {
-        var object: [String: Any] = ["title": title, "rows": rows, "address": address, "windowShown": windowShown,
-                                     "sidebarWidth": sidebarWidth, "addressShown": addressShown, "shortcuts": shortcuts]
+        var object: [String: Any] = ["title": title, "rows": rows, "loaded": loaded, "address": address,
+                                     "windowShown": windowShown, "sidebarWidth": sidebarWidth,
+                                     "addressShown": addressShown, "shortcuts": shortcuts]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -105,6 +114,7 @@ extension ProbeState {
     init(_ object: [String: Any]) {
         title = object["title"] as? String ?? ""
         rows = object["rows"] as? [String] ?? []
+        loaded = object["loaded"] as? [Bool] ?? []
         selected = object["selected"] as? Int
         address = object["address"] as? String ?? ""
         windowShown = object["windowShown"] as? Bool ?? false

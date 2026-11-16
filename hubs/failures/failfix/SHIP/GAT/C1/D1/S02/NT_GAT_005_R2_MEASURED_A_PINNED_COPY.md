@@ -6,8 +6,8 @@ status: OBSERVED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift (`DockItem`, `items()`, `launchedItem(_:app:)`)
 source: _app/_Sources/NhetrinhReadback/Driver/_AX.swift (`flag`, `url`)
-source: _app/_Sources/NhetrinhReadback/_Steps/SystemSteps.swift `dockIconHasNoTile`
-source: _app/Tests/NhetrinhReadbackTests/DockRingTests.swift `r2MeasuresOnlyTheLaunchedApp` (6 cases)
+source: _app/_Sources/NhetrinhReadback/_Steps/System/_SystemSteps.swift `dockIconHasNoTile`
+source: _app/Tests/NhetrinhReadbackTests/_Dock/DockRingTests.swift `r2MeasuresOnlyTheLaunchedApp` (6 cases)
 links: fix=yes lesson=no evidence=yes toolgap=none
 
 ## Fix that holds

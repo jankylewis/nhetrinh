@@ -6,7 +6,7 @@ status: OPEN
 date: 2026-11-16
 source: `_app/_Sources/NhetrinhReadback/_Steps/Step.swift` `WindowRole.pick`
 source: `_app/_Sources/NhetrinhReadback/Driver/AppSession.swift` `window()`
-source: `_app/Tests/NhetrinhReadbackTests/Steps/EmptyReadsTests.swift` `windowIsPickedByRole` (5 cases)
+source: `_app/Tests/NhetrinhReadbackTests/_Dock/EmptyReadsTests.swift` `windowIsPickedByRole` (5 cases)
 links: fix=yes lesson=no evidence=yes toolgap=NT-TG-003
 
 ## Fix that holds

@@ -66,7 +66,7 @@ the installed readback app is signed with it (`Authority=nhetrinh local signing`
 
 A window with no child or 0 Dock items read is a refused read: the step is NOT READ BACK
 `Accessibility reads are empty: re-grant nhetrinh-readback.app (…, read error <AXError>)`, never
-FAIL (`EmptyReads` in `_Steps/Step.swift`; tests in `Steps/EmptyReadsTests.swift`). R7 now reads
+FAIL (`EmptyReads` in `_Steps/Step.swift`; tests in `_Dock/EmptyReadsTests.swift`). R7 now reads
 the row count once more after the wait instead of reporting -1. The read error of the window's
 children is in the reason, so the next empty run says why.
 At 20:01 the window had children but no `nhetrinh.*` identifier, so R1, R3-R7 still said FAIL.

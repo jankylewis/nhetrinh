@@ -4,8 +4,8 @@ id: NT-PRF-002
 family: PRF
 status: OPEN
 date: 2026-11-16
-source: _app/_Sources/NhetrinhReadback/_Steps/Budget.swift (`Budget.Reading`: median, rise, highest sample)
-source: _app/_Sources/NhetrinhReadback/_Steps/SystemSteps.swift `budgetHolds`, `memorySamples`
+source: _app/_Sources/NhetrinhReadback/_Steps/System/Budget.swift (`Budget.Reading`: median, rise, highest sample)
+source: _app/_Sources/NhetrinhReadback/_Steps/System/_SystemSteps.swift `budgetHolds`, `memorySamples`
 source: _app/Tests/NhetrinhReadbackTests/Steps/_BudgetTests.swift `memoryBudgetJudgesTheSamples`, `memoryBudgetReviewGaps`
 links: fix=yes lesson=no evidence=yes toolgap=none
 
@@ -42,6 +42,6 @@ Not proven: R8 with this code on the installed app (this seat may not start the 
 `memorySamples` writes app 0 when the app process is not found (it quit or crashed). Those zeros
 pulled the median down and passed. Now any sample without the app is no reading:
 `Budget.Reading.noReading` names it and R8 reports NOT READ BACK with that reason
-(`_app/_Sources/NhetrinhReadback/_Steps/Budget.swift`, `SystemSteps.swift`).
+(`_app/_Sources/NhetrinhReadback/_Steps/System/Budget.swift`, `System/_SystemSteps.swift`).
 Red first: commit 7181133, 2 issues in `memoryBudgetNeedsTheAppInEverySample`. Green after.
 Not proven: R8 with this code on the installed app.

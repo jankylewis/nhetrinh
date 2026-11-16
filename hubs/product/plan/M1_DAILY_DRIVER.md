@@ -40,7 +40,7 @@ NT-TG-002 are closed by the tool.
 
 Needs from the headmate: Accessibility for `nhetrinh-readback.app`, for R2 only (D23).
 
-## P1 — Tab lifecycle: session restore and safe unload (0.2.0, size M, status TODO)
+## P1 — Tab lifecycle: session restore and safe unload (0.2.0, size M, status DOING)
 
 Goal: quit and open again without losing tabs. An idle tab is never unloaded while it plays.
 

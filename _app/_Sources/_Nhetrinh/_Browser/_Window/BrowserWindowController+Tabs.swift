@@ -2,15 +2,20 @@ import AppKit
 import NhetrinhCore
 import WebKit
 
-/// Tab lifecycle: open, select, load on first use, close, unload when idle.
+/// Tab lifecycle: open, select, load on first use, close. Restore and idle unload: `../Lifecycle/`.
 extension BrowserWindowController {
+    /// The saved session (P1), or with NHT_BENCH_URLS the seeded tabs (no session read or written).
     func openInitialTabs() {
+        defer { Bench.startPolling { [weak self] in self?.current } }
+        if let folder = Self.sessionFolder(), let home = Self.homeURL {
+            openSavedSession(in: folder, home: home)
+            return
+        }
         let urls = Bench.urls.isEmpty ? [Self.homeURL].compactMap { $0 } : Bench.urls
         tabs = urls.map { Tab(url: $0, title: $0.host ?? $0.absoluteString) }
         if tabs.isEmpty { tabs = [Tab(url: nil)] }
         select(0)
         if Bench.loadAll { loadRemainingTabs(from: 1) }
-        Bench.startPolling { [weak self] in self?.current }
     }
 
     /// Measurement only: load the other tabs one at a time, never in a burst (NT-ENV-001).
@@ -26,7 +31,10 @@ extension BrowserWindowController {
 
     func select(_ index: Int) {
         guard tabs.indices.contains(index) else { return }
-        if tabs.indices.contains(selected) { tabs[selected].webView?.removeFromSuperview() }
+        if tabs.indices.contains(selected) {
+            tabs[selected].webView?.removeFromSuperview()
+            tabs[selected].lastActive = Date()  // idle from the moment it is left
+        }
         selected = index
         let tab = tabs[index]
         tab.lastActive = Date()
@@ -42,6 +50,7 @@ extension BrowserWindowController {
 
     /// Create the web view on first use: a tab that was never opened costs no process.
     /// `adopted` is a web view WebKit made for a popup; it already carries its own request.
+    /// A tab unloaded before gets its `interactionState` back: its history and scroll position.
     func load(_ tab: Tab, adopting adopted: WKWebView? = nil) {
         guard tab.webView == nil else { return }
         let webView = adopted ?? WKWebView(frame: .zero, configuration: WebConfig.shared)
@@ -50,7 +59,13 @@ extension BrowserWindowController {
         webView.allowsBackForwardNavigationGestures = true
         tab.webView = webView
         observe(webView, for: tab)
-        if adopted == nil, let url = tab.url { webView.load(URLRequest(url: url)) }
+        guard adopted == nil else { return }
+        if let state = tab.savedState {
+            tab.savedState = nil
+            webView.interactionState = state
+        } else if let url = tab.url {
+            webView.load(URLRequest(url: url))
+        }
     }
 
     /// Keep the tab's title and URL, and the toolbar buttons, in step with the page.
@@ -82,19 +97,12 @@ extension BrowserWindowController {
         select(min(index, tabs.count - 1))
     }
 
-    func unloadIdleTabs() {
-        let cutoff = Date().addingTimeInterval(-Self.unloadAfter)
-        for (index, tab) in tabs.enumerated() where index != selected && tab.isLoaded && tab.lastActive < cutoff {
-            tab.unload()
-        }
-        refreshChrome()
-    }
-
     /// Address bar text: go to the URL, or search for the words.
     func navigate(_ text: String) {
         guard let url = AddressParser.url(from: text), tabs.indices.contains(selected) else { return }
         let tab = tabs[selected]
         tab.url = url
+        tab.savedState = nil  // a new address replaces the history kept at unload
         if let webView = tab.webView {
             webView.load(URLRequest(url: url))
         } else {

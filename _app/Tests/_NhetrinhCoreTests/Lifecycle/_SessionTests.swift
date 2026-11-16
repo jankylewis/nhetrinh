@@ -2,8 +2,8 @@ import Foundation
 import Testing
 @testable import NhetrinhCore
 
-// P1 tests (hubs/product/plan/M1_DAILY_DRIVER.md), red first (P1-PREP-1, DECISIONS.md D22):
-// Session and SessionStore are stubs, so every test here fails until P1 builds them.
+// P1 tests (hubs/product/plan/M1_DAILY_DRIVER.md), written red first on stubs (P1-PREP-1, DECISIONS.md D22);
+// green since P1-BUILD-1 built Session and SessionStore.
 
 private let home = URL(string: "https://www.google.com") ?? URL(fileURLWithPath: "/")
 

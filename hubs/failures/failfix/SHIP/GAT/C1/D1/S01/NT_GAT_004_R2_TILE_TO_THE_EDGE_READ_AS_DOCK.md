@@ -6,8 +6,8 @@ status: OBSERVED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift (`ringPoints`, `captureRect(around:dock:)`, `capture`)
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift (`measure(capture:icon:item:)`, `ringColour`)
-source: _app/Tests/NhetrinhReadbackTests/_IconMatchTests.swift `dockCaptureVerdict` (6 captures x 2 Docks)
-source: _app/Tests/NhetrinhReadbackTests/DockRingTests.swift `dockCornerReviewGaps`, `ringNeverLeavesTheDock`, `ringIsSmallerAtTheDocksEdge`, `noRingIsNeverAPass`
+source: _app/Tests/NhetrinhReadbackTests/_Dock/_IconMatchTests.swift `dockCaptureVerdict` (6 captures x 2 Docks)
+source: _app/Tests/NhetrinhReadbackTests/_Dock/DockRingTests.swift `dockCornerReviewGaps`, `ringNeverLeavesTheDock`, `ringIsSmallerAtTheDocksEdge`, `noRingIsNeverAPass`
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Fix that holds

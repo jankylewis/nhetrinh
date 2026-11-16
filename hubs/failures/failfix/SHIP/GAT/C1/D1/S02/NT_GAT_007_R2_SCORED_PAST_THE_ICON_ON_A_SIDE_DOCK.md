@@ -6,8 +6,8 @@ status: OBSERVED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift (`DockAxis`, `scoredSquare`, `lineColours`, `measure(...axis:)`)
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift `capture` (the item no longer clamped)
-source: _app/_Sources/NhetrinhReadback/_Steps/SystemSteps.swift `dockIconHasNoTile` (`DockAxis.of(item.dock)`)
-source: _app/Tests/NhetrinhReadbackTests/Steps/DockAxisTests.swift `r2JudgesTheIconNotItsNeighbours` (4 cases), `dockAxisFollowsTheDocksLongSide`, `scoredSquareIsTheItemsLengthCentred`
+source: _app/_Sources/NhetrinhReadback/_Steps/System/_SystemSteps.swift `dockIconHasNoTile` (`DockAxis.of(item.dock)`)
+source: _app/Tests/NhetrinhReadbackTests/_Dock/DockAxisTests.swift `r2JudgesTheIconNotItsNeighbours` (4 cases), `dockAxisFollowsTheDocksLongSide`, `scoredSquareIsTheItemsLengthCentred`
 links: fix=yes lesson=no evidence=yes toolgap=NT-TG-002
 
 ## Fix that holds

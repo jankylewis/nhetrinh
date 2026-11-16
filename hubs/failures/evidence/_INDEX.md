@@ -14,3 +14,4 @@ One row per kept evidence path (a file per id only past 3 paths).
 | NT-GAT-006 | `hubs/failures/evidence/readback/_LATEST.md` (branch `p0/harness-docs`, run 19:27) | R6 NOT READ BACK: -25202 on `AXSelected` | R6 after the fix, on the next rebuild |
 | R2 (19:28) | none kept: the capture was deleted | R2 FAIL on the running app's item, agreement 77 %, scale 84 %; the headmate sees no tile | see NT-GAT-007 |
 | NT-GAT-007 | outside the repository only: the 19:40 `--keep-capture` folder (PNG shows other apps' icons; never copied in) | R2 FAIL 76 %: item 34 x 22 pt on a left Dock, a lighter strip past the Dock's edge | R2 after the fix, on the next rebuild |
+| R9-R12 (P1) | none yet | the P1 steps are built; not read back (the app seat was held by another seat) | a full readback, R1-R12, on the installed P1 build |

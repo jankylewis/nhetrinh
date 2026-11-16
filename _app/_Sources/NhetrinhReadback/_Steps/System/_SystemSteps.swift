@@ -48,7 +48,7 @@ enum SystemSteps {
         Thread.sleep(forTimeInterval: 4)
         let pages = Footprint.pageProcesses(of: app.pid).count
         try expect(pages == 1, "3 tabs, 1 selected: \(pages) page process(es) run, 1 is expected")
-        return "started with 3 tabs (seeded by the launch environment; real restore comes with P1): "
+        return "started with 3 tabs (seeded by the launch environment; a restored session is R9): "
             + "3 rows, 1 page process"
     }
 

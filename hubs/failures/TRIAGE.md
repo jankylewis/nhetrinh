@@ -9,7 +9,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-BLD-002 | `cp: .build/arm64-apple-macosx/release/Nhetrinh: No such file or directory` | OBSERVED | Script asks SwiftPM for the path (`--show-bin-path`), never hard-codes it |
 | NT-GAT-001 | `error: plugin for module 'TestingMacros' not found` | OBSERVED | Was it plain `swift test`? Run `_app/scripts/test.sh`; compare `swift test -v` compile commands |
 | NT-GAT-002 | `no testTarget depends on NhetrinhReadback` | OBSERVED | Does `_app/Package.swift` have `NhetrinhReadbackTests`? |
-| NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? (not seen live yet) |
+| NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`IdleUnload.swift`); R11 not read back yet |
 | NT-UIX-001 | `after New Tab the sidebar has 1 rows, not 2` | OBSERVED | Nil-target menu item and no key window (app not active)? Browser items target the controller |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
