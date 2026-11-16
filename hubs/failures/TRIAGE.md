@@ -16,6 +16,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-ENV-003 | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |
 | NT-GAT-003 | `verdict: PASS (0 of 0)` | OBSERVED | Did a typo in `--steps` or a flag run every step? It must exit 2 with a usage error |
 | NT-GAT-004 | `R2 ... PASS` with a tile as large as the Dock item | OBSERVED | Is the Dock colour read from a ring outside the item? Pale tile on a light Dock: known limit |
+| NT-GAT-005 | `R2 FAIL` with two Dock items titled nhetrinh | OBSERVED | Is a copy of nhetrinh pinned in the Dock? R2 must take the running item of the launched bundle |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | OBSERVED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |

@@ -24,6 +24,9 @@ struct AXNode {
     func number(_ name: String) -> Int? { raw(name) as? Int }
     func nodes(_ name: String) -> [AXNode] { (raw(name) as? [AXUIElement] ?? []).map(AXNode.init) }
 
+    func flag(_ name: String) -> Bool { raw(name) as? Bool ?? false }
+    var url: URL? { raw(kAXURLAttribute) as? URL }
+
     func node(_ name: String) -> AXNode? {
         guard let value = raw(name), CFGetTypeID(value) == AXUIElementGetTypeID() else { return nil }
         return AXNode(element: value as! AXUIElement)  // force: the CF type is checked on the line above
