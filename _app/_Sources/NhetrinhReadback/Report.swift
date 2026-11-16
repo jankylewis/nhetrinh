@@ -19,7 +19,9 @@ enum Report {
             "app: \(tilde(app.path)), version \(plist(app, "CFBundleShortVersionString")), "
                 + "built from commit \(plist(app, "NHTCommit"))",
             "verdict: \(verdict)", "",
-            "A step acts on the app through the Accessibility API, as a user would, and says what it saw.",
+            "Each step acts on the app as a user would and says what it saw. "
+                + "R1, R3-R7 act through the app's readback probe (`NHT_READBACK=1`, D23), along the user's own paths;",
+            "R2 reads the Dock through the Accessibility API; R8 measures a normal launch, without the probe.",
             "NOT READ BACK means the step could not run. It is never counted as passed.", "",
             "| Step | Verdict | What the readback did and saw |", "|---|---|---|",
         ]

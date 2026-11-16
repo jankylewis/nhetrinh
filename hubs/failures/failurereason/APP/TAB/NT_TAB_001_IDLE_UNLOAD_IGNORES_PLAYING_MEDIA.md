@@ -32,4 +32,5 @@ Red unit tests first (P1-PREP-1, `DECISIONS.md` D22, commit cba933c):
 a playing tab is never unloaded. They fail on the stub `UnloadPolicy.tabsToUnload` until P1.
 
 P1-BUILD-1 built the fix (`../../../failfix/APP/TAB/NT_TAB_001_IDLE_UNLOAD_IGNORES_PLAYING_MEDIA.md`):
-the policy tests are green; R11 has not run on the installed app yet, so the status stays OPEN.
+the policy tests are green and R11 passed (22:09). The symptom was never seen on P0's code, so the
+status stays OPEN.
