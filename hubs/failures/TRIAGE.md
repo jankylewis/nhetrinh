@@ -14,6 +14,6 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
 | NT-ENV-003 | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | OBSERVED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
-| NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | Did the GPU helper spike in this run only? Measure again before blaming the app |
+| NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? Read the median of 5 samples, not one |
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |
 | NT-TG-002 | `screenshot shows other windows` | OPEN | Capture one window by id, never a screen region |
