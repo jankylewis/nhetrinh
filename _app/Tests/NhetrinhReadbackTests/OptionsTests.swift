@@ -117,3 +117,17 @@ func logIsFoundBeforeTheCommandLineIsChecked(arguments: [String], path: String?)
 func lastLogLineHoldsTheExitCode(code: Int32) {
     #expect(Report.exitLine(code) == "exit: \(code)")
 }
+
+/// P0-REV-3 gap. main.swift writes a usage error to stderr; with `--log` it lands in the log that
+/// readback_app.sh prints. The home folder in a path given to `--evidence` must read `~` there.
+@Test func usageErrorNamesNoPersonalPath() {
+    let home = FileManager.default.homeDirectoryForCurrentUser.path
+    do {
+        _ = try Options(["readback", "--evidence", home + "/elsewhere"], known: known, exists: inFakeRepo)
+        Issue.record("a path outside the repository is a usage error")
+    } catch let error as UsageError {
+        #expect(!error.message.contains(home), "\(Report.tilde(error.message))")
+    } catch {
+        Issue.record("not a UsageError: \(error)")
+    }
+}
