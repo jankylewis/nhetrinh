@@ -7,7 +7,7 @@ date: 2026-11-16
 signature: com.apple.WebKit.GPU above 40 MB, 6 s after one simple tab
 source: hubs/failures/evidence/prf/_NT_PRF_001_RUNS.jsonl (`by_proc` rows)
 source: hubs/failures/evidence/prf/NT_PRF_002_GPU_SAMPLES.jsonl (8 runs x 30 samples, `gpu_samples.py`)
-links: fix=no lesson=no evidence=yes toolgap=none
+links: fix=yes lesson=no evidence=yes toolgap=none
 
 ## What is seen
 

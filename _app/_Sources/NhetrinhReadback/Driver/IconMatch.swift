@@ -3,7 +3,7 @@ import AppKit
 /// Decides from pixels if a Dock item shows our icon as it is: no tile behind it, and large.
 ///
 /// The Dock item is sampled on a grid. A cell is "occupied" when its colour is far from the
-/// Dock's own background (taken from the item's border). The icon's transparency says which
+/// Dock's own background (taken from the item's corners). The icon's transparency says which
 /// cells should be occupied for a given size and offset. The best size and offset are searched;
 /// `agreement` is the share of cells that match there, `scale` the icon size relative to the item.
 /// A tile makes many cells occupied where the icon is transparent, or makes the icon small.
@@ -62,13 +62,19 @@ struct IconMatch {
         return Double(matches) / Double(grid * grid)
     }
 
-    /// The median colour of the capture's outer ring: the Dock's own background.
+    /// The median colour of the capture's four corners: the Dock's own background. Not the whole
+    /// border: a tile as large as the item covers the border, and was then taken for the Dock, so
+    /// an icon on that tile passed (NT-GAT-004). A rounded tile never covers the very corners.
     private static func borderColour(of capture: NSBitmapImageRep) -> [Double] {
         let wide = capture.pixelsWide, high = capture.pixelsHigh
-        var ring: [[Double]] = []
-        for x in stride(from: 0, to: wide, by: 2) { ring += [rgb(capture, x, 1), rgb(capture, x, high - 2)] }
-        for y in stride(from: 0, to: high, by: 2) { ring += [rgb(capture, 1, y), rgb(capture, wide - 2, y)] }
-        return (0..<3).map { channel in ring.map { $0[channel] }.sorted()[ring.count / 2] }
+        var corners: [[Double]] = []
+        for dx in 1...3 {
+            for dy in 1...3 {
+                corners += [rgb(capture, dx, dy), rgb(capture, wide - 1 - dx, dy),
+                            rgb(capture, dx, high - 1 - dy), rgb(capture, wide - 1 - dx, high - 1 - dy)]
+            }
+        }
+        return (0..<3).map { channel in corners.map { $0[channel] }.sorted()[corners.count / 2] }
     }
 
     private static func rgb(_ image: NSBitmapImageRep, _ x: Int, _ y: Int) -> [Double] {

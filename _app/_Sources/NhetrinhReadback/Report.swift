@@ -12,6 +12,7 @@ enum Report {
             let word = failed > 0 ? "FAIL" : "INCOMPLETE"
             verdict = "\(word) (\(passed) passed, \(failed) failed, \(skipped) not read back)"
         }
+        if results.isEmpty { verdict = "INCOMPLETE (no step ran)" }  // nothing read back is never a pass
         var lines = [
             "# Readback — latest run", "",
             "date: \(timestamp())",
@@ -31,10 +32,10 @@ enum Report {
         try Data(text.utf8).write(to: folder.appendingPathComponent("_LATEST.md"), options: .atomic)
     }
 
-    /// 0 = every step passed; 1 = a step failed; 2 = no failure, but a step could not run.
+    /// 0 = every step passed; 1 = a step failed; 2 = no failure, but a step could not run, or no step ran.
     static func exitCode(_ results: [StepResult]) -> Int32 {
         if results.contains(where: { $0.verdict == .fail }) { return 1 }
-        return results.contains { $0.verdict == .notReadBack } ? 2 : 0
+        return results.isEmpty || results.contains { $0.verdict == .notReadBack } ? 2 : 0
     }
 
     private static func plist(_ app: URL, _ key: String) -> String {
@@ -49,8 +50,12 @@ enum Report {
         return format.string(from: Date())
     }
 
-    /// Never write a personal path into the evidence: the home folder becomes `~`.
-    private static func tilde(_ text: String) -> String {
-        text.replacingOccurrences(of: FileManager.default.homeDirectoryForCurrentUser.path, with: "~")
+    /// Never write a personal path into the evidence: the home folder becomes `~`, only as a whole
+    /// path part (`/Users/someone2` is another folder and stays as it is).
+    static func tilde(_ text: String, home: String = FileManager.default.homeDirectoryForCurrentUser.path) -> String {
+        let pattern = NSRegularExpression.escapedPattern(for: home) + "(?![A-Za-z0-9._-])"
+        guard !home.isEmpty, let expression = try? NSRegularExpression(pattern: pattern) else { return text }
+        let range = NSRange(text.startIndex..., in: text)
+        return expression.stringByReplacingMatches(in: text, range: range, withTemplate: "~")
     }
 }

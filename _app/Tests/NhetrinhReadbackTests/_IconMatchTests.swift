@@ -3,31 +3,40 @@ import Testing
 @testable import NhetrinhReadback
 
 /// R2 decides from a capture of the Dock item. These captures are drawn here, so the verdict is
-/// known: the bare icon passes; a small icon on a dark tile, or an empty item, fails.
+/// known: the bare icon passes; an icon on a dark tile, a small icon, or an empty item fails.
+/// Each criterion has more than one case, on a light and on a dark Dock (NT-GAT-004).
 enum DockCapture: String, CaseIterable {
     case bareIconOnDock = "the icon alone on a plain Dock colour"
     case smallIconOnDarkTile = "the same icon smaller on a dark rounded tile"
+    case iconOnTileToTheEdge = "the icon at 76 % on a dark rounded tile as large as the item"
+    case iconOnTileNearTheEdge = "the icon at 84 % on a dark rounded tile at 96 % of the item"
+    case smallBareIcon = "the icon alone at 40 % of the item"
     case blank = "a blank capture"
 
     var showsBareIcon: Bool { self == .bareIconOnDock }
 
-    func draw() -> NSBitmapImageRep {
+    func draw(dock: CGFloat) -> NSBitmapImageRep {
         bitmap(side: 128) { rect in
-            NSColor(white: 0.85, alpha: 1).setFill()
+            NSColor(white: dock, alpha: 1).setFill()
             rect.fill()
             switch self {
-            case .bareIconOnDock:
-                drawIcon(in: rect.insetBy(dx: rect.width * 0.05, dy: rect.height * 0.05))
-            case .smallIconOnDarkTile:
-                NSColor(white: 0.08, alpha: 1).setFill()
-                let tile = rect.insetBy(dx: rect.width * 0.08, dy: rect.height * 0.08)
-                NSBezierPath(roundedRect: tile, xRadius: tile.width * 0.22, yRadius: tile.width * 0.22).fill()
-                drawIcon(in: rect.insetBy(dx: rect.width * 0.22, dy: rect.height * 0.22))
-            case .blank:
-                break
+            case .bareIconOnDock: drawIcon(in: rect.insetBy(dx: rect.width * 0.05, dy: rect.height * 0.05))
+            case .smallIconOnDarkTile: drawTile(rect, tile: 0.08, icon: 0.22)
+            case .iconOnTileToTheEdge: drawTile(rect, tile: 0, icon: 0.12)
+            case .iconOnTileNearTheEdge: drawTile(rect, tile: 0.02, icon: 0.08)
+            case .smallBareIcon: drawIcon(in: rect.insetBy(dx: rect.width * 0.30, dy: rect.height * 0.30))
+            case .blank: break
             }
         }
     }
+}
+
+/// A dark rounded tile inset by `tile`, and the icon on it inset by `icon` (shares of the side).
+func drawTile(_ rect: NSRect, tile: CGFloat, icon: CGFloat) {
+    NSColor(white: 0.08, alpha: 1).setFill()
+    let shape = rect.insetBy(dx: rect.width * tile, dy: rect.height * tile)
+    NSBezierPath(roundedRect: shape, xRadius: shape.width * 0.22, yRadius: shape.width * 0.22).fill()
+    drawIcon(in: rect.insetBy(dx: rect.width * icon, dy: rect.height * icon))
 }
 
 /// A figure that is not a square: a round head on a narrower body, the rest transparent.
@@ -53,10 +62,11 @@ func bitmap(side: Int, _ body: (NSRect) -> Void) -> NSBitmapImageRep {
     return image
 }
 
-@Test(arguments: DockCapture.allCases)
-func dockCaptureVerdict(capture: DockCapture) {
+/// A light Dock and a dark Dock (the dark one is still far enough from the tile's colour).
+@Test(arguments: DockCapture.allCases, [0.85, 0.25])
+func dockCaptureVerdict(capture: DockCapture, dock: CGFloat) {
     let icon = bitmap(side: 256) { drawIcon(in: $0) }
-    let match = IconMatch.measure(capture: capture.draw(), icon: icon)
+    let match = IconMatch.measure(capture: capture.draw(dock: dock), icon: icon)
     #expect(match.showsBareIcon == capture.showsBareIcon,
-            "\(capture.rawValue): agreement \(match.agreement), scale \(match.scale)")
+            "\(capture.rawValue), Dock \(dock): agreement \(match.agreement), scale \(match.scale)")
 }

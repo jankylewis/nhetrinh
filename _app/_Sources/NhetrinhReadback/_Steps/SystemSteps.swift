@@ -1,13 +1,5 @@
 import AppKit
 
-/// The lightness budget (hubs/product/plan/_PLAN.md). A phase that breaks it stops.
-enum Budget {
-    static let appMegabytes = 40.0
-    static let totalMegabytes = 110.0
-    static let bundleKilobytes = 1024
-    static let idleCpuPercent = 2.0
-}
-
 /// Steps that look at the system around the app: the Dock, its processes, its size.
 enum SystemSteps {
     static var evidenceFolder = FileManager.default.temporaryDirectory
@@ -49,23 +41,38 @@ enum SystemSteps {
             + "3 rows, 1 page process"
     }
 
+    /// R8: 6 s after the page process starts, 5 memory samples 1 s apart; the median is judged
+    /// (NT-PRF-002), the highest sample is shown. Then idle CPU over 5 s, and the bundle size.
     static func budgetHolds(_ app: AppSession) throws -> String {
         try app.launch(env: [seedKey: "https://example.com"])
         let started = waitUntil(15) { !Footprint.pageProcesses(of: app.pid).isEmpty }
         try expect(started, "no page process after 15 s")
         Thread.sleep(forTimeInterval: 6)
-        let processes = Footprint.processes(of: app.pid)
-        let main = processes.first { $0.pid == app.pid }?.megabytes ?? 0
-        let total = processes.reduce(0) { $0 + $1.megabytes }
+        let (memory, helpers) = memorySamples(of: app.pid)
         let cpu = Footprint.cpuPercent(of: app.pid, over: 5)
         let kilobytes = bundleKilobytes(app.appURL)
-        let seen = String(format: "app %.1f MB (max %.0f); app + %d helpers %.1f MB (max %.0f); idle CPU %.1f %% "
-                          + "(max %.0f); bundle %d KB (max %d)", main, Budget.appMegabytes, processes.count - 1, total,
-                          Budget.totalMegabytes, cpu, Budget.idleCpuPercent, kilobytes, Budget.bundleKilobytes)
-        let holds = main <= Budget.appMegabytes && total <= Budget.totalMegabytes
-            && cpu <= Budget.idleCpuPercent && kilobytes <= Budget.bundleKilobytes
-        try expect(main > 0 && holds, "one simple tab (example.com): \(seen)")
+        let seen = String(format: "median of %d samples 1 s apart: app %.1f MB (max %.0f); app + %d helpers %.1f MB "
+                          + "(max %.0f); highest sample: app %.1f MB, total %.1f MB; idle CPU %.1f %% (max %.0f); "
+                          + "bundle %d KB (max %d)", memory.count, memory.app, Budget.appMegabytes, helpers,
+                          memory.total, Budget.totalMegabytes, memory.highestApp, memory.highestTotal, cpu,
+                          Budget.idleCpuPercent, kilobytes, Budget.bundleKilobytes)
+        let holds = memory.holds && cpu <= Budget.idleCpuPercent && kilobytes <= Budget.bundleKilobytes
+        try expect(memory.app > 0 && holds, "one simple tab (example.com): \(seen)")
         return "one simple tab (example.com), 6 s after load: \(seen)"
+    }
+
+    /// `Budget.sampleCount` samples, 1 s apart, and the most helper processes seen in one sample.
+    private static func memorySamples(of pid: pid_t) -> (Budget.Reading, Int) {
+        var samples: [Budget.Sample] = []
+        var helpers = 0
+        for index in 0..<Budget.sampleCount {
+            if index > 0 { Thread.sleep(forTimeInterval: 1) }
+            let processes = Footprint.processes(of: pid)
+            let app = processes.first { $0.pid == pid }?.megabytes ?? 0
+            samples.append(Budget.Sample(app: app, total: processes.reduce(0) { $0 + $1.megabytes }))
+            helpers = max(helpers, processes.count - 1)
+        }
+        return (Budget.Reading(samples), helpers)
     }
 
     /// Size on disk (allocated blocks), the number `du -sk` prints.

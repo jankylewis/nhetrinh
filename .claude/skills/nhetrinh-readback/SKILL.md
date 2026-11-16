@@ -42,7 +42,8 @@ only one app instance.
 | `NOT READ BACK` | the step could not run (`StepError.cannotDrive`); never counted as passed |
 
 The run verdict: `PASS (n of n)`; `FAIL (...)` when a step failed; `INCOMPLETE (...)` when no
-step failed but one was not read back. Exit code: 0 all PASS, 1 a FAIL, 2 a NOT READ BACK.
+step failed but one was not read back. Exit code: 0 all PASS, 1 a FAIL, 2 a NOT READ BACK or no step ran. A flag it does not know,
+a flag without a value or an unknown step id is a usage error: exit 2, no step runs (NT-GAT-003).
 A phase is DONE only when every step of it and of all earlier phases is PASS.
 
 ## The base steps (`_app/_Sources/NhetrinhReadback/_Steps/_BaseSteps.swift`, every phase)

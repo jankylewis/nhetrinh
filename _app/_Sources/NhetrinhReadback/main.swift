@@ -7,19 +7,41 @@ import Foundation
 //   swift run nhetrinh-readback --steps R1,R2       only these steps (nothing is kept)
 //   swift run nhetrinh-readback --app <path>        another copy of the app (nothing is kept)
 //
-// Exit code: 0 every step passed, 1 a step failed, 2 a step could not run (NOT READ BACK).
+// Exit code: 0 every step passed, 1 a step failed, 2 a step could not run (NOT READ BACK), no step
+// ran, or the command line is wrong (nothing runs then).
+
+/// A command line the tool does not understand. It stops the run with exit 2 before anything
+/// runs, so a typo never falls back to a full run that overwrites _LATEST.md (NT-GAT-003).
+struct UsageError: Error {
+    let message: String
+}
 
 struct Options {
     var app = AppSession.installed
     var steps: Set<String> = []
 
-    init(_ arguments: [String]) {
+    /// `known`: the step ids that exist. Every flag needs a value.
+    init(_ arguments: [String], known: Set<String>) throws {
         var rest = arguments.dropFirst()
         while let flag = rest.popFirst() {
-            guard let value = rest.popFirst() else { break }
+            guard flag == "--app" || flag == "--steps" else { throw UsageError(message: "unknown argument `\(flag)`") }
+            guard let value = rest.popFirst(), !value.isEmpty, !value.hasPrefix("--") else {
+                throw UsageError(message: "`\(flag)` needs a value")
+            }
             if flag == "--app" { app = URL(fileURLWithPath: value) }
-            if flag == "--steps" { steps = Set(value.split(separator: ",").map(String.init)) }
+            if flag == "--steps" { steps = try Self.stepIds(value, known: known) }
         }
+    }
+
+    private static func stepIds(_ value: String, known: Set<String>) throws -> Set<String> {
+        let ids = Set(value.split(separator: ",").map(String.init))
+        guard !ids.isEmpty else { throw UsageError(message: "`--steps` lists no step") }
+        let unknown = ids.subtracting(known).sorted()
+        guard unknown.isEmpty else {
+            let all = known.sorted().joined(separator: ",")
+            throw UsageError(message: "no step \(unknown.joined(separator: ", ")); the steps are \(all)")
+        }
+        return ids
     }
 
     /// Evidence is kept only for a full run on the installed app.
@@ -37,7 +59,15 @@ func evidenceFolder() -> URL? {
     return nil
 }
 
-let options = Options(CommandLine.arguments)
+let options: Options
+do {
+    options = try Options(CommandLine.arguments, known: Set(BaseSteps.all.map(\.id)))
+} catch {
+    let message = (error as? UsageError)?.message ?? "\(error)"
+    let usage = "usage: nhetrinh-readback [--steps R1,R2] [--app <path>]"
+    FileHandle.standardError.write(Data("usage error: \(message)\n\(usage)\n".utf8))
+    exit(2)
+}
 guard FileManager.default.fileExists(atPath: options.app.path) else {
     print("no app at \(options.app.path); run _app/scripts/install.sh first")
     exit(2)
