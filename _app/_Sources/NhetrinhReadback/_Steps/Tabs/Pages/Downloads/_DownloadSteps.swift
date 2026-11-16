@@ -50,8 +50,9 @@ enum DownloadSteps {
         try app.act(.download(row: 0, item: "Cancel"), "download row 1: Cancel")
         _ = try ToolSteps.until(app, { $0.downloadStates.first == "cancelled" },
                                 else: { "Cancel pressed: the row shows \($0.downloadStates)" })
-        Thread.sleep(forTimeInterval: 2)  // the app removes a cancelled file at once and again 0.5 s later
-        let left = try (0...5).map { DownloadPages.copy(slow, clash: $0) }.filter { try DownloadFiles.size($0) != nil }
+        Thread.sleep(forTimeInterval: 2)  // the app removes a cancelled file at once and when WebKit confirms
+        let names = (0...5).map { DownloadPages.copy(slow, clash: $0) }.flatMap { [$0, DownloadNamer.partial($0)] }
+        let left = try names.filter { try DownloadFiles.size($0) != nil }
         try expect(left.isEmpty, "cancelled, 2 s later ~/Downloads still has \(left)")
         return "\(slow) at \(running.downloadStates.first ?? ""), Cancel: the row says cancelled, no file is left"
     }

@@ -13,7 +13,25 @@ extension BrowserWindowController {
         let disposition = (response.response as? HTTPURLResponse)?.value(forHTTPHeaderField: "Content-Disposition")
         let decision = DownloadPolicy.decide(type: response.response.mimeType, canShow: response.canShowMIMEType,
                                              disposition: disposition)
-        decisionHandler(decision == .download && response.isForMainFrame ? .download : .allow)
+        guard decision == .download, response.isForMainFrame else { return decisionHandler(.allow) }
+        admitDownload(from: webView) { decisionHandler($0 ? .download : .cancel) }
+    }
+
+    /// F2: a download the page starts without the user's click or key counts; past 5 a sheet asks, once
+    /// for the page (its web view and host). Closing the tab while asked answers no.
+    func admitDownload(from webView: WKWebView, then: @escaping (Bool) -> Void) {
+        let host = webView.url?.host ?? "this page"
+        let page = "\(ObjectIdentifier(webView).hashValue) \(host)"
+        let clicked = DownloadGate.isClicked(lastInput: (webView as? BrowserWebView)?.lastInput, now: Date())
+        downloads.admit(page: page, clicked: clicked, ask: { [weak self, weak webView] done in
+            let alert = NSAlert()
+            alert.messageText = "\(host) wants to download more files"
+            alert.informativeText = "It started \(DownloadGate.freeUnclicked) downloads without a click. Allow more?"
+            alert.addButton(withTitle: "Allow")
+            alert.addButton(withTitle: "Don't Allow")
+            guard let self else { return done(false) }
+            self.ask(alert, for: webView) { done($0 == 0) }
+        }, then: then)
     }
 
     func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
@@ -29,12 +47,12 @@ extension BrowserWindowController {
         sidebar.downloads.show(downloads.list.shownItems)
     }
 
-    /// Links from other apps: each `http`/`https` URL opens as a new tab at the end, selected.
+    /// Links from other apps: each `http`/`https` URL opens as a new tab at the end; the last is selected.
     func openIncoming(_ urls: [URL]) {
-        for url in urls where ["http", "https"].contains(url.scheme?.lowercased() ?? "") {
-            tabs.append(Tab(url: url))
-            select(tabs.count - 1)
-        }
+        let web = urls.filter { ["http", "https"].contains($0.scheme?.lowercased() ?? "") }
+        guard !web.isEmpty else { return }
+        web.forEach { tabs.append(Tab(url: $0)) }  // F3: added unloaded; only the last is shown and loads
+        select(tabs.count - 1)
     }
 
     func wireDownloads() {

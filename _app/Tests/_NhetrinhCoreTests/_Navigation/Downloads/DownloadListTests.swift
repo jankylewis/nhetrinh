@@ -14,15 +14,16 @@ func showsTheState(state: DownloadItem.State, text: String) {
     #expect(DownloadItem(id: 1, name: "a", state: state).stateText == text)
 }
 
-/// Newest first; the footer shows 3; a 4th row drops the oldest that no longer runs.
-@Test(arguments: [(0, false), (1, true)])
-func keepsTheNewestThree(running: Int, oldestKept: Bool) {
+/// Newest first; the footer shows 3; a 4th row drops the oldest that no longer runs. A running download
+/// is always shown (P5-FIX-1, F2: it was kept but hidden), in its place.
+@Test(arguments: [(0, ["four", "three", "two"]), (1, ["four", "three", "one"])])
+func keepsTheNewestThree(running: Int, shown: [String]) {
     var list = DownloadList()
     let first = list.add("one")
     if running == 0 { list.set(first, .finished) }
     for name in ["two", "three", "four"] { list.set(list.add(name), .finished) }
-    #expect(list.shownItems.map(\.name) == ["four", "three", "two"])
-    #expect((list.item(first) != nil) == oldestKept, "a running download is kept, not shown")
+    #expect(list.shownItems.map(\.name) == shown)
+    #expect((list.item(first) != nil) == (running == 1), "a running download is kept and shown")
 }
 
 /// A row is found by its id, renamed and set; an unknown id changes nothing.

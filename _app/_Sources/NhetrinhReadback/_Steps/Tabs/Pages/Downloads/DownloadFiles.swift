@@ -9,11 +9,12 @@ enum DownloadFiles {
     static let noAccess = "macOS has not let nhetrinh into the Downloads folder: the headmate allows it "
         + "(the macOS prompt, or System Settings > Privacy & Security > Files and Folders)"
 
-    /// Every name a run can make: the two pages' names and their first 5 copies.
+    /// Every name a run can make: the two pages' names and their first 5 copies, each also as the partial
+    /// file of a download not complete (P5-FIX-1: `<name>.download`).
     static var ours: [String] {
         [DownloadPages.attachmentName, DownloadPages.slowName].flatMap { name in
             (0...5).map { DownloadPages.copy(name, clash: $0) }
-        }
+        }.flatMap { [$0, DownloadNamer.partial($0)] }
     }
 
     /// Remove the readback's own files; the names that were there.

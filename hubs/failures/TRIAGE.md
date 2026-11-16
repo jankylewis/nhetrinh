@@ -41,3 +41,11 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TG-004 | `end: the app still runs`, a nhetrinh with `NHT_PROFILE=readback` after the run | OPEN | Read the report's `end:` line; `pgrep -fl 'Applications/nhetrinh.app'`; end only a `readback` profile instance, by pid |
 | NT-TG-005 | `Cannot request fullscreen in a hidden document`, `media: asking (hidden)` | OPEN | R26a, R26b NOT READ BACK: the app runs without the focus (D18), WebKit counts the page as hidden; run with `--allow-focus` (D25) |
 | NT-TG-006 | `file choice: unit test only` | OPEN | R22: panel and Cancel read back; the file choice is `UploadTests` (ruling, as R17) |
+| NT-NAV-005 | `aCancelNeverRemovesTheNextDownloadsFile` | OBSERVED | A cancel deletes the next download's file? P5-FIX-1 (p5/review) |
+| NT-NAV-006 | `everyRunningDownloadCanBeCancelled` | OBSERVED | Running downloads hidden, a page downloads without asking? P5-FIX-1 (p5/review) |
+| NT-NAV-007 | `linksFromAnotherAppLoadOnlyTheShownTab` | OBSERVED | Links from another app load every tab? P5-FIX-1 (p5/review) |
+| NT-NAV-008 | `cleanRemovesLineBreakingSeparators` | OBSERVED | A line separator kept in a file name? P5-FIX-1 (p5/review) |
+| NT-NAV-009 | `aDownloadIsPartialUntilDoneThenQuarantined` | OBSERVED | A download quarantined as sandboxed, not as a web download? P5-FIX-1 (p5/review) |
+| NT-NAV-010 | `race.txt.download` | OBSERVED | A partial download under its final name? P5-FIX-1 (p5/review) |
+| NT-NAV-011 | `isRunning(entry)` | OBSERVED | A cancel while the name is chosen? P5-FIX-1 (p5/review) |
+| NT-NAV-012 | `sameFileIgnoresCaseAndNormalization` | OBSERVED | Two spellings of one name? P5-FIX-1 (p5/review) |

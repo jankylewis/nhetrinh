@@ -15,7 +15,7 @@ private func free(_ suggested: String, taken: Set<String>) -> String? {
 @Test(arguments: [
     ("a.pdf", [], "a.pdf"), ("a.pdf", ["a.pdf"], "a (1).pdf"), ("a.pdf", ["a.pdf", "a (1).pdf"], "a (2).pdf"),
     ("a.pdf", ["a (1).pdf"], "a.pdf"), ("README", ["README"], "README (1)"),
-    ("README", ["README", "README (1)"], "README (2)"), (".env", [], ".env"), (".env", [".env"], ".env (1)"),
+    ("README", ["README", "README (1)"], "README (2)"), (".env", [], "env"), (".env", ["env"], "env (1)"),
     ("a.tar.gz", ["a.tar.gz"], "a.tar (1).gz"), ("a.", ["a."], "a. (1)"),
 ] as [(String, Set<String>, String)])
 func takesTheFirstFreeName(suggested: String, taken: Set<String>, expected: String) {
