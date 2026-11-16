@@ -70,3 +70,41 @@ func dockCaptureVerdict(capture: DockCapture, dock: CGFloat) {
     #expect(match.showsBareIcon == capture.showsBareIcon,
             "\(capture.rawValue), Dock \(dock): agreement \(match.agreement), scale \(match.scale)")
 }
+
+/// P0-REV-1 gaps in the corner rule (NT-GAT-004). Each capture is 128 px; the icon is at 76 %.
+enum CornerCase: String, CaseIterable {
+    case squareTileToTheEdge = "a dark tile with square corners as large as the item"
+    case paleTileOnLightDock = "a rounded tile 0.80 on a 0.85 Dock (within the colour distance)"
+    case lightTileLightCornersBelow = "a light rounded tile on a dark Dock, 2 bottom corners light (outside the Dock)"
+    case bareIconLightCornersBelow = "the bare icon on a dark Dock, 2 bottom corners light (outside the Dock)"
+
+    var showsBareIcon: Bool { self == .bareIconLightCornersBelow }
+
+    func draw() -> NSBitmapImageRep {
+        bitmap(side: 128) { rect in
+            let dock: CGFloat = self == .paleTileOnLightDock ? 0.85 : 0.25
+            NSColor(white: dock, alpha: 1).setFill()
+            rect.fill()
+            let tile: CGFloat = self == .squareTileToTheEdge ? 0.08 : (self == .paleTileOnLightDock ? 0.80 : 0.92)
+            NSColor(white: tile, alpha: 1).setFill()
+            let radius = self == .squareTileToTheEdge ? 0 : rect.width * 0.22
+            if self != .bareIconLightCornersBelow {
+                NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).fill()
+            }
+            if self == .lightTileLightCornersBelow || self == .bareIconLightCornersBelow {
+                NSColor(white: 0.92, alpha: 1).setFill()
+                NSRect(x: 0, y: 0, width: 6, height: 6).fill()
+                NSRect(x: rect.width - 6, y: 0, width: 6, height: 6).fill()
+            }
+            drawIcon(in: rect.insetBy(dx: rect.width * 0.12, dy: rect.height * 0.12))
+        }
+    }
+}
+
+@Test(arguments: CornerCase.allCases)
+func dockCornerReviewGaps(capture: CornerCase) {
+    let icon = bitmap(side: 256) { drawIcon(in: $0) }
+    let match = IconMatch.measure(capture: capture.draw(), icon: icon)
+    #expect(match.showsBareIcon == capture.showsBareIcon,
+            "\(capture.rawValue): agreement \(match.agreement), scale \(match.scale)")
+}

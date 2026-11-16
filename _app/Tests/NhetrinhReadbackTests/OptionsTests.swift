@@ -49,3 +49,14 @@ let badCommandLines: [[String]] = [
 func badCommandLineIsAUsageError(arguments: [String]) {
     #expect(throws: UsageError.self) { try Options(arguments, known: known) }
 }
+
+/// P0-REV-1 gap: a repeated flag silently keeps only its last value (`--steps R1 --steps R2` runs R2 only).
+let repeatedFlags = [
+    ["readback", "--steps", "R1", "--steps", "R2"],
+    ["readback", "--app", "/tmp/a.app", "--app", "/tmp/b.app"],
+]
+
+@Test(arguments: repeatedFlags)
+func repeatedFlagIsAUsageError(arguments: [String]) {
+    #expect(throws: UsageError.self) { try Options(arguments, known: known) }
+}

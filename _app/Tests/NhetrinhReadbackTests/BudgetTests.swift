@@ -40,3 +40,21 @@ func memoryBudgetJudgesTheMedian(run: SamplesCase) {
     #expect(reading.app == 35 && reading.total == 95)
     #expect(reading.highestApp == 38 && reading.highestTotal == 215)
 }
+
+/// P0-REV-1 gaps. The burst shape is real: hubs/failures/evidence/prf/NT_PRF_002_GPU_SAMPLES.jsonl
+/// has bursts of 3 consecutive samples in runs 1, 6 and 7. No app-process burst was ever seen there.
+let reviewSamplesCases = [
+    SamplesCase(name: "one 3 s GPU burst (3 consecutive samples)", samples: [rest, burst, burst, burst, rest],
+                holds: true),
+    SamplesCase(name: "the total grows across the budget in the last 2 samples", samples: (0..<5).map {
+        Budget.Sample(app: 35, total: 100 + 4 * Double($0))
+    }, holds: false),
+    SamplesCase(name: "the app process over budget in 2 of 5", samples: [
+        rest, Budget.Sample(app: 45, total: 100), rest, Budget.Sample(app: 45, total: 100), rest,
+    ], holds: false),
+]
+
+@Test(arguments: reviewSamplesCases)
+func memoryBudgetReviewGaps(run: SamplesCase) {
+    #expect(Budget.Reading(run.samples).holds == run.holds)
+}
