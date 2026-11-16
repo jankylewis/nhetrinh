@@ -16,6 +16,8 @@ final class AppSession {
     private(set) var probing = false
     /// R2 keeps its capture here (`--keep-capture`); nil: the capture is deleted at once.
     var keepCapture: URL?
+    /// D25: R26a and R26b may bring the app to the front (`--allow-focus`).
+    var allowFocus = false
 
     init(appURL: URL) { self.appURL = appURL }
 

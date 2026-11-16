@@ -10,6 +10,8 @@ import Foundation
 //   swift run nhetrinh-readback --app <path>        another copy of the app (nothing is kept)
 //   --evidence <repo>   keep the verdict in this repository (for nhetrinh-readback.app, which runs in /)
 //   --log <file>        stdout and stderr go to this file, its last line `exit: <code>` (NT-TG-003)
+//   --allow-focus       R26a and R26b may bring nhetrinh to the front and take the focus (D25); without
+//                       it they are NOT READ BACK when WebKit counts the page as hidden
 //   --keep-capture <dir>  R2 keeps its capture and its numbers in <dir>, never inside a repository;
 //                         without it the capture is deleted at once and nothing is kept
 //
@@ -47,11 +49,12 @@ LifecycleSteps.forgetSession()
 let kept = options.keepsEvidence ? options.evidence ?? evidenceFolder() : nil
 let session = AppSession(appURL: options.app)
 session.keepCapture = options.keepCapture
+session.allowFocus = options.allowFocus
 let steps = allSteps.filter { options.steps.isEmpty || options.steps.contains($0.id) }
 let results = Runner.run(steps, in: session)
 let ending = session.quit()
 FileHandle.standardError.write(Data((ending.line + "\n").utf8))
-let text = Report.text(results, app: options.app, ending: ending)
+let text = Report.text(results, app: options.app, ending: ending, allowFocus: options.allowFocus)
 print(text)
 do {
     if let kept { try Report.write(text, to: kept) }

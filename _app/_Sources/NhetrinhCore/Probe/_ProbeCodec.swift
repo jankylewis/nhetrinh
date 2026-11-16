@@ -21,6 +21,8 @@ public enum ProbeRequest: Equatable, Sendable {
     case sheetButton(String)
     /// The window's sheet: type `text` into its text field `index` (0 first), as a user replaces it (P3).
     case sheetField(index: Int, text: String)
+    /// Bring nhetrinh to the front and take the focus: only R26a and R26b, only with `--allow-focus` (D25).
+    case front
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -48,6 +50,7 @@ public enum ProbeCodec {
         case .click(let selector): return try line(["op": "click", "text": selector])
         case .sheetButton(let label): return try line(["op": "sheetButton", "text": label])
         case .sheetField(let index, let text): return try line(["op": "sheetField", "index": index, "text": text])
+        case .front: return try line(["op": "front"])
         }
     }
 
@@ -66,6 +69,7 @@ public enum ProbeCodec {
         case ("navigate", .some(let text), _): return .navigate(text)
         case ("newTab", _, _): return .newTab
         case ("closeTab", _, _): return .closeTab
+        case ("front", _, _): return .front
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
         case ("rowMenu", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
             return .rowMenu(row: row, item: item)

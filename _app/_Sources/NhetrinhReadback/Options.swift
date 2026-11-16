@@ -13,7 +13,7 @@ struct UsageError: Error {
 
 struct Options {
     static let usage = "usage: nhetrinh-readback [--steps R1,R2] [--app <path>] [--evidence <repo>] [--log <file>]"
-        + " [--keep-capture <dir>]"
+        + " [--keep-capture <dir>] [--allow-focus]"
     var app = AppSession.installed
     var steps: Set<String> = []
     /// The repository's readback evidence folder, from `--evidence`; nil: found from the current directory.
@@ -23,18 +23,24 @@ struct Options {
     /// Where R2 keeps its capture and its numbers, from `--keep-capture`; nil: nothing is kept.
     /// Never inside a repository: a capture is a picture of the screen, and the repository is public.
     var keepCapture: URL?
+    /// D25 (amends D18): R26a and R26b may bring nhetrinh to the front and take the focus. A flag, no value.
+    var allowFocus = false
 
-    /// `known`: the step ids that exist. Every flag needs a value and is given at most once: a
+    /// `known`: the step ids that exist. Every flag but `--allow-focus` needs a value; each is given at most once: a
     /// repeated flag would keep only its last value (`--steps R1 --steps R2` ran R2 only).
     init(_ arguments: [String], known: Set<String>,
          exists: (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) throws {
         var rest = arguments.dropFirst()
         var seen: Set<String> = []
         while let flag = rest.popFirst() {
-            guard ["--app", "--steps", "--evidence", "--log", "--keep-capture"].contains(flag) else {
+            guard ["--app", "--steps", "--evidence", "--log", "--keep-capture", "--allow-focus"].contains(flag) else {
                 throw UsageError(message: "unknown argument `\(flag)`")
             }
             guard seen.insert(flag).inserted else { throw UsageError(message: "`\(flag)` is given more than once") }
+            if flag == "--allow-focus" {
+                allowFocus = true
+                continue
+            }
             guard let value = rest.popFirst(), !value.isEmpty, !value.hasPrefix("--") else {
                 throw UsageError(message: "`\(flag)` needs a value")
             }

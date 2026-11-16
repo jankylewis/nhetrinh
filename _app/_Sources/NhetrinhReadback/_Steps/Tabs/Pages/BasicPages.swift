@@ -8,8 +8,8 @@ import Foundation
 ///   /mailto      #mail, a `mailto:` link
 ///   /media       #mic, #camera ask for the microphone, the camera: "media: granted", "media: <error name>";
 ///                "media: asking (hidden)" while it waits in a page WebKit counts as hidden
-///   /fullscreen  #full: "fullscreen: on", then the page leaves fullscreen by itself: "fullscreen: off";
-///                refused: "fullscreen: <WebKit's message>"
+///   /fullscreen  #full puts #box (a video and #leave) in fullscreen: "fullscreen: on"; #leave leaves
+///                it: "fullscreen: off"; refused: "fullscreen: <WebKit's message>"
 enum BasicPages {
     static let user = "nhetrinh"
     static let password = "readback-pass"  // a test page's password, not a secret
@@ -80,17 +80,18 @@ enum BasicPages {
         """
 
     private static let fullscreen = """
-        <video id="v" style="width:320px;height:180px;background:#000"></video><button id="full">fullscreen</button>
+        <div id="box"><video style="width:320px;height:180px;background:#000"></video>
+        <button id="leave">leave fullscreen</button></div><button id="full">fullscreen</button>
         <script>
         full.onclick = () => {
-          const p = (v.requestFullscreen || v.webkitRequestFullscreen).call(v)
+          const p = (box.requestFullscreen || box.webkitRequestFullscreen).call(box)
           if (p) p.catch(e => { document.title = 'fullscreen: ' + e.message })
         }
+        leave.onclick = () => (document.exitFullscreen || document.webkitExitFullscreen).call(document)
         const shown = () => document.fullscreenElement || document.webkitFullscreenElement
-        const leave = () => (document.exitFullscreen || document.webkitExitFullscreen).call(document)
         const change = 'onfullscreenchange' in document ? 'fullscreenchange' : 'webkitfullscreenchange'
         document.addEventListener(change, () => {
-          if (shown()) { document.title = 'fullscreen: on'; setTimeout(leave, 1500) }
+          if (shown()) document.title = 'fullscreen: on'
           else if (document.title == 'fullscreen: on') document.title = 'fullscreen: off'
         })
         </script>

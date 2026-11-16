@@ -8,6 +8,8 @@ extension BrowserWindowController {
     func readSheet(into state: inout ProbeState) {
         state.sheetsShown = sheets.shown
         state.handedOff = sheets.handedOff
+        state.fullscreen = NSApp.windows.contains { $0.isVisible && $0.styleMask.contains(.fullScreen) }
+        state.active = NSApp.isActive
         guard let sheet = window?.attachedSheet else { return }
         state.sheetKind = sheet === sheets.openPanel ? "open" : sheets.printing ? "print" : "alert"
         let views = Self.views(in: sheet.contentView)
@@ -38,6 +40,16 @@ extension BrowserWindowController {
         let fields = Self.views(in: sheet.contentView).compactMap { $0 as? NSTextField }.filter(\.isEditable)
         guard fields.indices.contains(index) else { return .failed("the sheet has \(fields.count) field(s)") }
         fields[index].stringValue = text
+        return .done
+    }
+
+    /// D25: the readback asks for this only in R26a and R26b, and only when run with `--allow-focus`:
+    /// WebKit refuses fullscreen, camera and microphone in a page it counts as hidden.
+    func comeToFront() -> ProbeResponse {
+        guard let window else { return .failed("the browser window is gone") }
+        if #available(macOS 14.0, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()  // in front even when macOS does not let the app become active
         return .done
     }
 

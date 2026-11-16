@@ -28,8 +28,15 @@ sees it shown and presses Cancel through `NSOpenPanel.cancel`.
 The macOS camera / microphone prompt (TCC) was never reached, so risk R-2 (grants lost after a
 rebuild) was not checked in P3: not proven either way.
 
-## Workaround
+## Workaround (D25, not read back yet)
 
-Read back by hand: the headmate opens the local pages (`/media`, `/fullscreen` of the readback's
-test server) in a focused nhetrinh. A ruling is needed to let the probe bring the window to the
-front (`orderFrontRegardless`, no activation): it would cover the headmate's windows.
+`--allow-focus`: R26a and R26b only bring nhetrinh to the front (probe op `front`: activate, then
+`orderFrontRegardless`, since macOS 14 may refuse the activation) and say so on their line. R26a
+answers Don't Allow only, so the macOS prompt is never asked for and R-2 stays unchecked.
+Without the flag both stay NOT READ BACK. Not proven: that a page in front is no longer hidden.
+
+Run 2026-11-16 (`--steps R26a,R26b --allow-focus`, headmate away, exit 2 twice): both NOT READ
+BACK, the page still hidden after `front`. The screen was locked and the display asleep
+(`CGSSessionScreenIsLocked` 1, `CGDisplayIsAsleep` true, idle ~1005 s): macOS hides every window.
+The steps now name that cause. No camera prompt, no fullscreen Space, nhetrinh quit.
+Next: run them with the screen on and unlocked.

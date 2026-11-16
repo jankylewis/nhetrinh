@@ -27,6 +27,7 @@ extension BrowserWindowController {
         case .click(let selector): return clickInPage(selector)
         case .sheetButton(let label): return pressSheetButton(label)
         case .sheetField(let index, let text): return typeInSheet(field: index, text)
+        case .front: return comeToFront()
         }
     }
 

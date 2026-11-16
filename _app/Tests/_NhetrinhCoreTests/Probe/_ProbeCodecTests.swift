@@ -22,6 +22,8 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     state.sheetButtons = ["Allow", "Don't Allow"]
     state.sheetsShown = 3
     state.handedOff = 1
+    state.fullscreen = true
+    state.active = true
     return state
 }
 
@@ -42,6 +44,7 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .sheetButton("Cancel"),
     .sheetField(index: 1, text: "secret \"x\""),
     .sheetField(index: 0, text: ""),
+    .front,
 ])
 func requestRoundTrips(request: ProbeRequest) throws {
     let line = try ProbeCodec.encode(request)

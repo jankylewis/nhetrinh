@@ -33,6 +33,10 @@ public struct ProbeState: Equatable, Sendable {
     public var sheetsShown = 0
     /// How many links were handed to another app through macOS since launch (P3).
     public var handedOff = 0
+    /// Whether a window of the app is in fullscreen (P3, R26b).
+    public var fullscreen = false
+    /// Whether the app is the active app, with the focus (D25: R26a, R26b say whether they took it).
+    public var active = false
 
     public init() {}
 }
@@ -44,7 +48,8 @@ extension ProbeState {
                                      "addressShown": addressShown, "shortcuts": shortcuts, "icons": icons,
                                      "loading": loading, "reloadButton": reloadButton, "webMenu": webMenu,
                                      "sheet": sheet, "sheetKind": sheetKind, "sheetButtons": sheetButtons,
-                                     "sheetsShown": sheetsShown, "handedOff": handedOff]
+                                     "sheetsShown": sheetsShown, "handedOff": handedOff, "fullscreen": fullscreen,
+                                     "active": active]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -69,5 +74,7 @@ extension ProbeState {
         sheetButtons = object["sheetButtons"] as? [String] ?? []
         sheetsShown = object["sheetsShown"] as? Int ?? 0
         handedOff = object["handedOff"] as? Int ?? 0
+        fullscreen = object["fullscreen"] as? Bool ?? false
+        active = object["active"] as? Bool ?? false
     }
 }
