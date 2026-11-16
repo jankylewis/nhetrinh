@@ -23,7 +23,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 
 | Phase | Version | Size | What the headmate gets | Status | Detail |
 |---|---|---|---|---|---|
-| P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | TODO | `M1_DAILY_DRIVER.md` |
+| P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | DONE (readback 8/8, 2026-11-16 21:24, `hubs/failures/evidence/readback/_LATEST.md`) | `M1_DAILY_DRIVER.md` |
 | P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | TODO | `M1_DAILY_DRIVER.md` |
 | P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | TODO | `M1_DAILY_DRIVER.md` |
 | P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
