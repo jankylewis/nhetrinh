@@ -1,4 +1,5 @@
 import AppKit
+import NhetrinhCore
 
 /// One running instance of the app under readback. It is started through LaunchServices, like
 /// a Dock click, without taking the focus, and in the profile "readback", so the user's own
@@ -9,6 +10,8 @@ final class AppSession {
 
     let appURL: URL
     private(set) var pid: pid_t = 0
+    /// Whether the running instance was started with the probe on.
+    private(set) var probing = false
     /// R2 keeps its capture here (`--keep-capture`); nil: the capture is deleted at once.
     var keepCapture: URL?
 
@@ -20,13 +23,16 @@ final class AppSession {
         if !isRunning { try launch() }
     }
 
-    /// Start a fresh instance (the old one is quit first). `env` is added to the launch environment.
-    func launch(env: [String: String] = [:]) throws {
+    /// Start a fresh instance (the old one is quit first). `env` is added to the launch environment;
+    /// `probe` adds `NHT_READBACK=1`, so the app answers the readback probe (D23). R8 never asks
+    /// for it: the budget is measured on a normal launch.
+    func launch(env: [String: String] = [:], probe: Bool = false) throws {
         quit()
         let config = NSWorkspace.OpenConfiguration()
         config.createsNewApplicationInstance = true
         config.activates = false
-        config.environment = ["NHT_PROFILE": "readback"].merging(env) { _, new in new }
+        let base = ["NHT_PROFILE": "readback"].merging(probe ? [ProbePath.variable: "1"] : [:]) { _, new in new }
+        config.environment = base.merging(env) { _, new in new }
         let done = DispatchSemaphore(value: 0)
         var failure: Error?
         NSWorkspace.shared.openApplication(at: appURL, configuration: config) { app, error in
@@ -37,6 +43,7 @@ final class AppSession {
         done.wait()
         if let failure { throw StepError.cannotDrive("launch failed: \(failure.localizedDescription)") }
         guard isRunning else { throw StepError.cannotDrive("the app did not start") }
+        probing = probe
     }
 
     /// Quit like the user does (terminate request); force it only if the app does not answer.
@@ -49,71 +56,16 @@ final class AppSession {
             waitUntil(3) { !self.isRunning }
         }
         pid = 0
+        probing = false
         Thread.sleep(forTimeInterval: 2)  // let WebKit's helper processes exit as well
     }
 
-    // MARK: - What the user sees
-
-    /// Every step that reads or acts on the interface calls this first: without the permission
-    /// the step is NOT READ BACK; it must never look like a failure of the app, or like a pass.
+    /// A step that reads the system through Accessibility (R2, the Dock) calls this first: without
+    /// the permission it is NOT READ BACK; never a failure of the app, never a pass.
     func requireAccessibility() throws {
         guard AXNode.isTrusted else {
             throw StepError.cannotDrive(Grant.noAccessibility())
         }
-    }
-
-    private func root() throws -> AXNode {
-        try requireAccessibility()
-        try ensureRunning()
-        return AXNode.application(pid: pid)
-    }
-
-    /// The app's window: the first element `AXWindows` gives whose role is AXWindow (NT-GAT-008).
-    func window() throws -> AXNode {
-        let app = try root()
-        var windows: [AXNode] = []
-        waitUntil(10) {
-            windows = app.windows
-            return (try? WindowRole.pick(windows.map(\.role))) != nil
-        }
-        guard let index = try WindowRole.pick(windows.map(\.role)) else { throw StepError.fail("no window after 10 s") }
-        return windows[index]
-    }
-
-    /// A window holding none of the app's identifiers was not read: NOT READ BACK (`EmptyReads`, NT-TG-003).
-    func element(_ id: String) throws -> AXNode {
-        let window = try window()
-        guard let found = window.find(id: id) else { throw EmptyReads.missing(id, in: WindowRead(window)) }
-        return found
-    }
-
-    func menuItem(_ path: [String]) throws -> AXNode {
-        guard let item = try root().menuItem(path) else {
-            throw StepError.fail("no menu item \(path.joined(separator: " > "))")
-        }
-        return item
-    }
-
-    func rowCount() throws -> Int { try element("nhetrinh.sidebar").rows.count }
-    func addressText() throws -> String { try element("nhetrinh.address").value }
-
-    /// Select the sidebar row `fromEnd` places above the last, as a click does. The rows are read
-    /// fresh right before acting and again for the one retry, never kept (NT-GAT-006).
-    func selectRow(fromEnd offset: Int) throws {
-        try Fresh.retryingOnce {
-            let rows = try element("nhetrinh.sidebar").rows
-            guard let index = Fresh.rowIndex(fromEnd: offset, count: rows.count) else {
-                throw StepError.fail("the sidebar has \(rows.count) row(s); \(offset + 1) are needed")
-            }
-            try rows[index].set(kAXSelectedAttribute, to: kCFBooleanTrue)
-        }
-    }
-
-    /// Put `text` in the address field and confirm it, as Return does.
-    func navigate(_ text: String) throws {
-        let field = try element("nhetrinh.address")
-        try field.set(kAXValueAttribute, to: text as CFString)
-        try field.confirm()
     }
 }
 

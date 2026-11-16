@@ -50,8 +50,8 @@ _app/scripts/install/_install.sh          # -> ~/Applications/nhetrinh.app
 cd _app && swift run nhetrinh-readback   # use the installed app as its end user
 ```
 
-The readback drives the installed app through the Accessibility API and needs that
-permission for the terminal. A full run writes its verdict to
+The readback reads and acts on the installed app through a probe the app opens only when the
+readback starts it (D23); only R2 (the Dock icon) needs the Accessibility permission. A full run writes its verdict to
 [`hubs/failures/evidence/readback/_LATEST.md`](hubs/failures/evidence/readback/_LATEST.md).
 
 ## Shortcuts

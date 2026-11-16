@@ -1,7 +1,10 @@
 import AppKit
+import NhetrinhCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browser: BrowserWindowController?
+    /// Exists only when started with `NHT_READBACK=1` (D23); a normal launch makes no socket.
+    private var probe: ProbeServer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setDockIcon()
@@ -10,9 +13,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.mainMenu = AppMenu.build(browser: browser)
         browser.showWindow(nil)
         browser.openInitialTabs()
+        if ProbePath.isOn(ProcessInfo.processInfo.environment) { startProbe(browser) }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+
+    func applicationWillTerminate(_ notification: Notification) { probe?.stop() }
+
+    private func startProbe(_ browser: BrowserWindowController) {
+        do {
+            probe = try ProbeServer(folder: ProbePath.folder(pid: getpid()), queue: .main) { [weak browser] in
+                browser?.probeAnswer($0) ?? .failed("the browser window is gone")
+            }
+            Log.app.info("readback probe on (NHT_READBACK=1)")
+        } catch {
+            Log.app.error("readback probe could not start: \(String(describing: error), privacy: .public)")
+        }
+    }
 
     /// macOS draws a bundle (.icns) icon on a tile; an image set at runtime is drawn as-is (NT-BLD-001).
     /// AppIcon.png is 256 px: the app keeps decoded copies of it, and 1024 px cost 33 MB (NT-PRF-001).

@@ -79,3 +79,18 @@ BACK `none of the app's identifiers (nhetrinh.*) is in the window, its tree was 
 tests `missingElement`, `notReadTreeSaysWhatWasRead`; red under the old rule, checked by mutation).
 Not proven on the app (no rebuild, no run since).
 At 20:07 the "window" read was not a window (children AXApplication, AXMenuBar): NT-GAT-008.
+
+## Remedy: the readback probe (P0-PROBE-1, D23; written, not run on the app)
+
+source: brief P0-PROBE-1 (2026-11-16): the fleet waited 75 min for re-grants after rebuilds
+R1, R3-R7 no longer use Accessibility. The readback starts nhetrinh with `NHT_READBACK=1`; only then
+the app opens a Unix socket in a 0700 folder of its own (`ProbeServer`, `NhetrinhCore/Probe/`) and
+answers state and actions through the user's own paths (`BrowserWindowController+Probe.swift`).
+So these steps need no grant and run from any terminal; a rebuild of the readback app touches only R2.
+Checked by tests, not by a run: socket round trip, folder 0700 and socket 0600, a malformed line
+answered `failed` with the server still up (`ProbeSocketTests`); the menu item, the address field and a sidebar click
+(`ProbeAnswerTests`); refused action FAIL, unreachable probe NOT READ BACK (`ProbeReplyTests`).
+Each was red under a mutation (P0-PROBE-1 state file). The AX window reads (`WindowRole`,
+`EmptyReads.missing`, `Fresh` retry; NT-GAT-006, NT-GAT-008) are removed with their tests.
+Not proven: the refusal of another user's peer (`getpeereid`, no test); that the installed app answers it (needs install and a launch on the app seat); that R2
+still reads the Dock when run as `nhetrinh-readback.app` (unchanged code, not re-run).
