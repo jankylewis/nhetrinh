@@ -51,7 +51,7 @@ Read first, in this order:
 | `_app/_Sources/_Nhetrinh/` | the app: `_Browser/` (window, tabs, WebKit), `UI/`, `Support/` (log, bench hooks) |
 | `_app/_Sources/NhetrinhCore/` | pure logic, no AppKit: address parsing, profiles; unit tested |
 | `_app/_Sources/NhetrinhReadback/` | the readback tool: `_Steps/` (R1-R8), `Driver/` (Accessibility, processes, Dock) |
-| `_app/Tests/` | Swift Testing tests of `NhetrinhCore` |
+| `_app/Tests/` | Swift Testing: `_NhetrinhCoreTests/` (`NhetrinhCore`), `NhetrinhReadbackTests/` (readback tool) |
 | `_app/scripts/` | `_build.sh`, `install.sh`, `test.sh`, `conventions/` (the checker), `VERSION` |
 | `_app/assets/_icon/` | the app icon and the tools that made it |
 | `hubs/` | learnings (bugs, failures, lessons, tool gaps) and product (features, plan, rnd) |
