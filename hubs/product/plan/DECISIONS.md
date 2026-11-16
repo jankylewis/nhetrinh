@@ -25,6 +25,7 @@ row stays and is marked "replaced by".
 | D16 | The briefing file is `CLAUDE.md` at the root (not `AGENTS.md` + `.claude/CLAUDE.md`): the fleet tool refuses to start a mate without it, the fleet is Claude-only, and the root has one free slot. Replaces the file names in A2 | agent, as owner | 2026-11-16 |
 | D17 | The work is done by a fleet: the agent is the matemaster (steers, reviews, runs the readback, ships) with 2 mates, each in its own worktree | headmate | 2026-11-16 |
 | D18 | The readback acts only through the Accessibility API (press, set value, confirm). It never moves the mouse or types keys, starts the app without taking the focus, and uses its own browsing profile | agent, as owner | 2026-11-16 |
+| D19 | Settings Hub: one small native window, ⌘, (nhetrinh > Settings Hub…), holding Appearance (System, Light, Dark; headmate request: dark and light theme), Search engine, Unload idle tabs after N minutes, Clear Website Data. Replaces "no settings window in v1". Planned, not built (D14): scheduled in P4 (`M2_REAL_SITES_WORK.md`); may move to P2 if the headmate asks | headmate | 2026-11-16 |
 
 ## Assumed, then accepted with the plan (D15)
 
@@ -32,7 +33,7 @@ Proposed by the agent; accepted as a group when the headmate approved the plan.
 
 | Id | Assumption | If the headmate says no |
 |---|---|---|
-| A1 | Caps: `.md` 100 lines; `.swift` and other code 150 lines; function 30 lines; line 120 characters; 5 parameters | change the numbers in `check_conventions.py`; nothing else moves |
+| A1 | Caps: `.md` 100 lines; `.swift` and other code 150 lines; function 30 lines; line 120 characters; 5 parameters | change the numbers in `_app/scripts/conventions/sizes.py` (read by `conventions/_check.py`); nothing else moves |
 | A2 | `rnd/` moves to `hubs/product/rnd/`, so `AGENTS.md` can sit at the root (5 root entries) | keep `rnd/` at the root and put the agent files only under `.claude/` |
 | A3 | The readback tool drives the app through macOS Accessibility; this needs one permission grant for the terminal | weaker checks from inside the app, reported as such (risk R-1) |
 

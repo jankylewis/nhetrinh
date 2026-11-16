@@ -41,8 +41,8 @@ Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it
 1. Read `hubs/bugs/TRIAGE.md` and `hubs/failures/TRIAGE.md`. Write the phase's foreseen risks.
 2. Write the failing tests first, in `NhetrinhCore`, parameterized.
 3. Build the phase.
-4. `check_conventions.py`: 0 violations.
-5. `swift test`: all green. The report quotes the count.
+4. `python3 _app/scripts/conventions/_check.py`: 0 violations.
+5. `nice -n 10 _app/scripts/test.sh`: all green (never plain `swift test`, NT-GAT-001). The report quotes the count.
 6. `_build.sh`, then `install.sh` (the readback runs on the installed app, never on the build folder).
 7. Readback: every step of this phase and of all earlier phases is PASS.
 8. Lightness budget, measured inside the readback (table below).

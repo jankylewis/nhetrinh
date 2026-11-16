@@ -52,19 +52,24 @@ Build:
   address bar when the level is not 100 %.
 - Core `Prefs`, saved as `prefs.json`: zoom levels, search engine (Google, DuckDuckGo, Bing),
   idle-unload minutes. A corrupt file gives the defaults and the bad file is kept.
-- Menu item "Clear Website Data…" (cookies and cache; all, or the last hour) with a confirm sheet.
-- No settings window in v1: the search engine and the unload minutes are menu items.
+- Settings Hub (D19): one small native window, opened with ⌘, (menu nhetrinh > Settings Hub…).
+  It holds Appearance (System, Light, Dark: `Prefs` key `appearance`, applied with `NSApp.appearance`,
+  nil for System; pages follow `prefers-color-scheme`), Search engine, Unload idle tabs after
+  N minutes, and Clear Website Data… (cookies and cache; all, or the last hour; a confirm sheet).
 
 Tests: zoom steps (50 % to 300 %, clamped at both ends); host key (lower case, port ignored);
-`Prefs` round trip, corrupt file, missing keys; the search URL per engine through `AddressParser`.
+`Prefs` round trip, corrupt file, missing keys; `appearance` round trip, an unknown value gives
+System; the search URL per engine through `AddressParser`.
 
 Readback adds:
 - R27 ⌘F, type "Example": found. Type "zzzz": the not-found state. Esc: the bar is gone.
 - R28 ⌘+ twice: the badge shows 125 %. Relaunch: still 125 % on that host, 100 % on another.
 - R29 change the search engine: the next search goes to that engine's URL.
 - R30 Clear Website Data: a cookie set by a local page is gone.
+- R30a nhetrinh > Settings Hub…, Appearance Dark: the window is dark and a local page that reads
+  `prefers-color-scheme` shows dark. Relaunch: still dark. Appearance System: the system look again.
 
-Exit: the gate, R1-R30 PASS.
+Exit: the gate, R1-R30 and R30a PASS.
 
 ## P5 — Downloads and links from other apps (0.6.0, size M, status TODO)
 

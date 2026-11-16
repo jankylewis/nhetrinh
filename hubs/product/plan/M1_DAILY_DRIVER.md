@@ -8,7 +8,7 @@ like a real one, and background music is not cut. The gate is in `_PLAN.md`.
 Goal: every later phase is built, checked and read back in the same way.
 
 Build:
-1. `check_conventions.py` replaces `check_tree.py`. It checks: one `_` entry per folder, 5 entries
+1. `_app/scripts/conventions/_check.py` replaces `check_tree.py`. It checks: one `_` entry per folder, 5 entries
    per folder, `.md` 100 lines, `.swift` / `.py` / `.c` / `.sh` 150 lines, function 30 lines,
    line 120 characters, 5 parameters, no package dependencies. It has its own tests: one broken
    tree per rule.
@@ -34,7 +34,7 @@ Readback steps (the base set, run again in every later phase):
 - R7 start with 3 tabs: 1 page process runs.
 - R8 the lightness budget.
 
-Exit: checker 0 violations; `swift test` green; R1-R8 PASS on `~/Applications/nhetrinh.app`;
+Exit: checker 0 violations; `_app/scripts/test.sh` green; R1-R8 PASS on `~/Applications/nhetrinh.app`;
 CI green; NT-BUG-001, NT-BUG-002, NT-ENV-001, NT-BLD-002 are FIXED with proof; NT-TG-001 and
 NT-TG-002 are closed by the tool.
 

@@ -8,14 +8,15 @@ on:
 jobs:
   macos:
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Folder taxonomy (one `_` mark, max 5 entries)
-        run: python3 -I _app/scripts/check_tree.py
-      - name: Unit tests
-        working-directory: _app
-        run: swift test
+      - name: Conventions (0 violations)
+        run: python3 _app/scripts/conventions/_check.py
+      - name: The checker's own tests
+        run: python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'
+      - name: Unit tests (test.sh, never plain swift test, NT-GAT-001)
+        run: _app/scripts/test.sh
       - name: Build nhetrinh.app
         run: _app/scripts/_build.sh
       - name: Check bundle
@@ -30,7 +31,11 @@ jobs:
           kb=$(du -sk _app/build/nhetrinh.app | cut -f1)
           echo "nhetrinh.app: ${kb} KB"
           test "$kb" -le 1024
-      - name: Bench tools compile
+      - name: Readback tool compiles (not run in CI, it needs Accessibility)
+        working-directory: _app
+        run: swift build -c release --product nhetrinh-readback
+      - name: Bench tools compile (never run in CI)
         run: |
-          clang -O2 -Wall -Werror -o /tmp/memsum hubs/product/rnd/_bench/measure/_memsum.c
-          python3 -m py_compile hubs/product/rnd/_bench/_bench.py hubs/product/rnd/_bench/summarize.py
+          clang -O2 -Wall -Werror -o "$RUNNER_TEMP/memsum" hubs/product/rnd/_bench/measure/_memsum.c
+          python3 -m py_compile hubs/product/rnd/_bench/_bench.py hubs/product/rnd/_bench/procs.py \
+            hubs/product/rnd/_bench/measure/summarize.py

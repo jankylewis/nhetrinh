@@ -5,18 +5,22 @@ family: BLD
 status: OBSERVED
 date: 2026-11-16
 signature: cp: .build/arm64-apple-macosx/release/Nhetrinh: No such file or directory
-source: _app/scripts/_build.sh (copy step)
+source: _app/scripts/_build.sh:9 (`BIN=$(swift build -c release --arch arm64 --show-bin-path)`)
+observed: 2026-11-16, P0-HAR-1 seat: `swift build -c release --arch arm64 --show-bin-path` printed `_app/.build/out/Products/Release`, not the hard-coded folder
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Mechanism
 
-The script hard-coded SwiftPM's output folder. `swift test` on this machine reported the target `arm64e-apple-macos14.0`, so the folder name differs.
-Not proven: the exact folder SwiftPM used for the release build.
+The script hard-coded SwiftPM's output folder `.build/arm64-apple-macosx/release`. SwiftPM on
+this machine puts the release binary in another folder (`.build/out/Products/Release`, observed
+above), so the copy step failed.
+Not proven: which SwiftPM version or setting moves the folder.
 
 ## Confirm
 
-`swift build -c release --show-bin-path`.
+`swift build -c release --arch arm64 --show-bin-path` from `_app/`.
 
 ## Fix
 
-`_build.sh` reads the folder from `--show-bin-path` (scaffold, not yet on `master`).
+`_build.sh` asks SwiftPM for the folder (`--show-bin-path`, line 9) and copies `$BIN/Nhetrinh`.
+Status stays OBSERVED until the fix is on `master`.
