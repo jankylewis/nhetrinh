@@ -25,7 +25,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 |---|---|---|---|---|---|
 | P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | DONE (readback 8/8, 2026-11-16 21:24, `hubs/failures/evidence/readback/_LATEST.md`) | `M1_DAILY_DRIVER.md` |
 | P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | DOING (built, R9-R12 not read back) | `M1_DAILY_DRIVER.md` |
-| P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | TODO | `M1_DAILY_DRIVER.md` |
+| P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | DOING (built, R13-R18 not read back) | `M1_DAILY_DRIVER.md` |
 | P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
 | P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
 | P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | TODO | `M2_REAL_SITES_WORK.md` |
@@ -80,6 +80,9 @@ accepts a new number (recorded in `DECISIONS.md`).
 | R-3 | WebKit limits: no find match count; some sites refuse non-Safari WebKit apps | Listed as known limits; the user agent already ends like Safari's |
 | R-4 | P7 (tab folders) is the largest phase | It can move after 1.0 without blocking it (`DECISIONS.md` Q2) |
 | R-5 | A feature costs memory | The budget gate stops the phase |
+| R-6 | P2: the link's menu is WebKit's own; the probe opens it with an in-app right click, not proven to work | R17 says NOT READ BACK when no menu is seen, never PASS |
+| R-7 | P2: favicons fetch in the app process (URLSession) and keep images | 32 px each, 200 at most (800 KB); R8 measures the app with example.com's icon request |
+| R-8 | P2: ⌃⇥ / ⌃⇧⇥ may be taken by the web view before the menu; hover and drag are not read back (D18) | Tested on the menu items only; reported as not read back |
 
 ## Not in v1 (only when the headmate asks)
 

@@ -1,9 +1,23 @@
 import WebKit
 
-/// WebKit callbacks: page events, popups, and failures (logged; the error page comes with P3).
+/// WebKit callbacks: page events, popups, links for a background tab, and failures (logged; the error
+/// page comes with P3).
 extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {  // force: WebKit's signature
         Bench.reportFirstLoad()
+        findIcon(of: webView)
+    }
+
+    /// ⌘-click on a link: the page stays, the link opens in a background tab (P2).
+    func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        if action.navigationType == .linkActivated, action.modifierFlags.contains(.command),
+           let url = action.request.url {
+            decisionHandler(.cancel)
+            openInBackground(url)
+            return
+        }
+        decisionHandler(.allow)
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!,  // force: WebKit's
@@ -17,9 +31,16 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     }
 
     /// target=_blank and window.open become a new tab that adopts the web view WebKit asks for.
+    /// Open Link in New Tab and a ⌘-click on a target=_blank link open a background tab instead: it
+    /// loads when it is first selected, so WebKit gets no web view (P2).
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        let popup = WKWebView(frame: .zero, configuration: configuration)
+        let menuAsked = (webView as? BrowserWebView)?.takesBackgroundOpen() ?? false
+        if menuAsked || action.modifierFlags.contains(.command), let url = action.request.url {
+            openInBackground(url)
+            return nil
+        }
+        let popup = BrowserWebView(frame: .zero, configuration: configuration)
         let tab = Tab(url: action.request.url)
         load(tab, adopting: popup)
         tabs.append(tab)

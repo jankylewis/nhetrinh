@@ -19,6 +19,11 @@ extension BrowserWindowController {
         case .select(let row):
             return sidebar.selectAsClick(row) ? .done : .failed("the sidebar has no row \(row)")
         case .menu(let path): return Self.perform(path, in: menu, afterAnswer: true)
+        case .rowMenu(let row, let item):
+            return sidebar.pressRowMenu(row, item: item) ? .done : .failed("row \(row) has no menu item \(item)")
+        case .linkMenu(let item): return showLinkMenu(pressing: item).map { .failed($0) } ?? .done
+        case .button(let label):
+            return toolbar.press(label) ? .done : .failed("the toolbar has no button \(label)")
         }
     }
 
@@ -34,6 +39,10 @@ extension BrowserWindowController {
         state.sidebarWidth = sidebarShown ? Double(sidebar.frame.width) : 0
         state.addressShown = toolbar.address.window != nil && !toolbar.address.isHiddenOrHasHiddenAncestor
         state.shortcuts = menu.map { Self.shortcuts(in: $0, path: []) } ?? [:]
+        state.icons = Array(tabs.map { $0.icon != nil }.prefix(state.rows.count))
+        state.loading = current?.isLoading ?? false
+        state.reloadButton = toolbar.reloadLabel
+        state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
         return state
     }
 

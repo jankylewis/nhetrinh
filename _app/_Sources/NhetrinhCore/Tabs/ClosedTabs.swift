@@ -1,7 +1,6 @@
 import Foundation
 
-// P2 (hubs/product/plan/M1_DAILY_DRIVER.md). STUB, red first (P2-PREP-1, DECISIONS.md D24):
-// the types compile, the behaviour is not built; the tests in ClosedTabsTests.swift fail until P2.
+// P2 (hubs/product/plan/M1_DAILY_DRIVER.md); tests in ClosedTabsTests.swift.
 
 /// A closed tab, kept so File > Reopen Closed Tab can bring it back where it was.
 public struct ClosedTab: Equatable, Sendable {
@@ -21,20 +20,23 @@ public struct ClosedTabs: Sendable {
     /// At most this many are kept; pushing one more drops the oldest.
     public static let capacity = 20
 
+    private var tabs: [ClosedTab] = []
+
     public init() {}
 
     /// How many tabs can be reopened now.
     public var count: Int {
-        0  // STUB
+        tabs.count
     }
 
     /// Keeps a tab that was just closed.
     public mutating func push(_ tab: ClosedTab) {
-        // STUB
+        tabs.append(tab)
+        if tabs.count > Self.capacity { tabs.removeFirst(tabs.count - Self.capacity) }
     }
 
     /// The tab closed last, removed from the list; nil when there is none.
     public mutating func pop() -> ClosedTab? {
-        nil  // STUB
+        tabs.popLast()
     }
 }

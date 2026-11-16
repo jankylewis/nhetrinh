@@ -51,3 +51,11 @@ func indexAgreesWithMove(from: Int, to: Int) {
     let found = tabs.indices.map { TabOrder.index($0, afterMoveFrom: from, to: to, count: tabs.count) }
     #expect(found.map { moved.indices.contains($0) ? moved[$0] : "?" } == tabs)
 }
+
+/// A row dropped between rows: `droppedAbove` is the row it lands above (count: after the last).
+@Test(arguments: [(1, 4, 3), (0, 5, 4), (3, 1, 1), (4, 0, 0), (2, 2, 2), (2, 3, 2)])
+func dropAboveGivesTheIndexOnceMoved(from: Int, droppedAbove: Int, expected: Int) {
+    let to = TabOrder.destination(from: from, droppedAbove: droppedAbove)
+    #expect(to == expected)
+    #expect(TabOrder.move(tabs, from: from, to: to).firstIndex(of: tabs[from]) == expected)
+}

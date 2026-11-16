@@ -51,7 +51,7 @@ enum LifecycleSteps {
     }
 
     /// The probe's state once the launched app shows `rows` rows (10 s at most).
-    private static func restored(_ app: AppSession, rows: Int) throws -> ProbeState {
+    static func restored(_ app: AppSession, rows: Int) throws -> ProbeState {
         var state = try app.state()
         waitUntil(10) {
             state = (try? app.state()) ?? state

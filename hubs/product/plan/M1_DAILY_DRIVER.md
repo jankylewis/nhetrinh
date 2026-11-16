@@ -72,7 +72,7 @@ Readback adds:
 
 Exit: the gate, R1-R12 PASS.
 
-## P2 — Sidebar and tab handling (0.3.0, size M, status TODO)
+## P2 — Sidebar and tab handling (0.3.0, size M, status DOING)
 
 Goal: the sidebar feels finished.
 

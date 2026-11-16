@@ -13,6 +13,10 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     state.sidebarWidth = 220
     state.addressShown = true
     state.shortcuts = ["File > New Tab": "⌘T", "File > Close Tab": "⌘W"]
+    state.icons = rows.map { $0 == "B" }
+    state.loading = true
+    state.reloadButton = "Stop"
+    state.webMenu = ["Open Link in New Tab", "Copy Link"]
     return state
 }
 
@@ -26,6 +30,9 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .select(7),
     .menu(["nhetrinh", "Quit nhetrinh"]),
     .menu(["Tabs", "Back"]),
+    .rowMenu(row: 2, item: "Close Tab"),
+    .linkMenu(item: "Open Link in New Tab"),
+    .button("Stop"),
 ])
 func requestRoundTrips(request: ProbeRequest) throws {
     let line = try ProbeCodec.encode(request)
@@ -47,7 +54,9 @@ func responseRoundTrips(response: ProbeResponse) throws {
 
 @Test(arguments: ["", "{", "[]", "{\"op\":\"format-disk\"}", "{\"op\":\"select\"}", "{\"op\":\"select\",\"index\":-1}",
                   "{\"op\":\"navigate\"}", "{\"op\":\"menu\"}", "{\"op\":\"menu\",\"path\":[]}",
-                  "{\"op\":\"menu\",\"path\":\"Tabs > Back\"}"])
+                  "{\"op\":\"menu\",\"path\":\"Tabs > Back\"}", "{\"op\":\"rowMenu\",\"text\":\"Close Tab\"}",
+                  "{\"op\":\"rowMenu\",\"index\":-1,\"text\":\"Close Tab\"}", "{\"op\":\"rowMenu\",\"index\":0}",
+                  "{\"op\":\"linkMenu\"}", "{\"op\":\"button\"}", "{\"op\":\"button\",\"text\":\"\"}"])
 func malformedRequestThrows(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
 }

@@ -38,10 +38,14 @@ public struct ShortcutKeys: OptionSet, Sendable {
 }
 
 /// A shortcut as the menu shows it: modifiers in the order ⌃⌥⇧⌘, then the key in capitals.
+/// A capital key is typed with Shift, so it shows ⇧ ("T" is ⇧⌘T); the Tab key shows ⇥.
 public enum Shortcut {
     public static func text(key: String, keys: ShortcutKeys) -> String {
         guard !key.isEmpty else { return "" }
+        var keys = keys
+        if key != key.lowercased() { keys.insert(.shift) }
         let marks: [(ShortcutKeys, String)] = [(.control, "⌃"), (.option, "⌥"), (.shift, "⇧"), (.command, "⌘")]
-        return marks.filter { keys.contains($0.0) }.map(\.1).joined() + key.uppercased()
+        let shown = key == "\t" ? "⇥" : key.uppercased()
+        return marks.filter { keys.contains($0.0) }.map(\.1).joined() + shown
     }
 }

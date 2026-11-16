@@ -11,6 +11,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-002 | `no testTarget depends on NhetrinhReadback` | FIXED | Does `_app/Package.swift` have `NhetrinhReadbackTests`? |
 | NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`IdleUnload.swift`); R11 not read back yet |
 | NT-UIX-001 | `after New Tab the sidebar has 1 rows, not 2` | FIXED | Nil-target menu item and no key window (app not active)? Browser items target the controller |
+| NT-UIX-002 | `the selected tab stays` | OBSERVED | Did a close of a row that is not selected select another tab? `close(at:)` selects only when the selected tab closes |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
 | NT-ENV-003 | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |
@@ -20,6 +21,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-006 | `cannot set AXSelected (accessibility error -25202)` | FIXED | Did a step keep an element across a navigation? Look it up again right before acting |
 | NT-GAT-007 | `R2 FAIL` with no tile seen, Dock on a side | FIXED | Is the Dock item wider than its icon? Score the icon's square; background per line along the Dock |
 | NT-GAT-008 | `none has the role AXWindow`, `first roles [AXApplication, AXMenuBar]` | OPEN | Since D23 R1, R3-R7 read no AX window (probe); before: which roles did `AXWindows` give? Not the code (5f2592e..d76fce8 has no AX change); see NT-TG-003 |
+| NT-GAT-009 | `exited with unexpected signal code 5` | OBSERVED | Does a `@MainActor` test run `RunLoop.main`? It runs other tests inside; press the item at once |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | FIXED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |

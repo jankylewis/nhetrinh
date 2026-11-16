@@ -4,11 +4,11 @@ id: NT-TAB-001
 family: TAB
 status: OPEN
 date: 2026-11-16
-source: _app/_Sources/NhetrinhCore/Lifecycle/UnloadPolicy.swift (`tabsToUnload`: a playing tab is never named)
+source: _app/_Sources/NhetrinhCore/Tabs/Lifecycle/UnloadPolicy.swift (`tabsToUnload`: a playing tab is never named)
 source: _app/_Sources/_Nhetrinh/_Browser/Lifecycle/IdleUnload.swift (`unloadIdleTabs`, `requestMediaPlaybackState`)
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift (`select`: `lastActive` when left)
-source: _app/Tests/_NhetrinhCoreTests/Lifecycle/UnloadPolicyTests.swift (table of 12 + 2 edges, P1-PREP-1)
-source: _app/_Sources/NhetrinhReadback/_Steps/Lifecycle/UnloadSteps.swift (`playingTabStaysLoaded`, R11)
+source: _app/Tests/_NhetrinhCoreTests/Tabs/Lifecycle/UnloadPolicyTests.swift (table of 12 + 2 edges, P1-PREP-1)
+source: _app/_Sources/NhetrinhReadback/_Steps/Tabs/UnloadSteps.swift (`playingTabStaysLoaded`, R11)
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Fix that holds (built in P1-BUILD-1, not read back)
