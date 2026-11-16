@@ -4,6 +4,17 @@ on:
   push:
     branches: [master]
   pull_request:
+  # P8: release.yml runs these same steps on a tag, then uploads the zipped app for the Release.
+  workflow_call:
+    inputs:
+      ref:
+        description: the tag to build
+        type: string
+        required: true
+      upload:
+        description: zip the app and upload it as the artifact nhetrinh-app
+        type: boolean
+        default: false
 
 jobs:
   macos:
@@ -11,10 +22,14 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - name: Conventions (0 violations)
         run: python3 _app/scripts/conventions/_check.py
       - name: The checker's own tests
         run: python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'
+      - name: The release notes script's tests (P8)
+        run: python3 -m unittest discover -s _app/scripts/install -p 'test_*.py'
       - name: Unit tests (test.sh, never plain swift test, NT-GAT-001)
         run: _app/scripts/test.sh
       - name: Build nhetrinh.app
@@ -31,6 +46,23 @@ jobs:
           kb=$(du -sk _app/build/nhetrinh.app | cut -f1)
           echo "nhetrinh.app: ${kb} KB"
           test "$kb" -le 1024
+      - name: Apple silicon only (P8)
+        run: test "$(lipo -archs _app/build/nhetrinh.app/Contents/MacOS/nhetrinh)" = arm64
+      - name: Zip the app for the Release (release.yml only)
+        if: ${{ inputs.upload }}
+        run: |
+          VERSION=$(cat _app/scripts/VERSION)
+          mkdir -p "$RUNNER_TEMP/release"
+          ditto -c -k --sequesterRsrc --keepParent _app/build/nhetrinh.app \
+            "$RUNNER_TEMP/release/nhetrinh-$VERSION-arm64.zip"
+      - name: Upload the zip (release.yml only)
+        if: ${{ inputs.upload }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: nhetrinh-app
+          path: ${{ runner.temp }}/release/*.zip
+          if-no-files-found: error
+          retention-days: 7
       - name: Readback tool compiles (not run in CI, it needs Accessibility)
         working-directory: _app
         run: swift build -c release --product nhetrinh-readback

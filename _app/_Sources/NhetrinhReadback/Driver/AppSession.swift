@@ -18,6 +18,8 @@ final class AppSession {
     var keepCapture: URL?
     /// D25: R26a and R26b may bring the app to the front (`--allow-focus`).
     var allowFocus = false
+    /// P8, R44: the released zip's URL, from `--release-url`; nil: R44 does not run.
+    var releaseURL: URL?
 
     init(appURL: URL) { self.appURL = appURL }
 

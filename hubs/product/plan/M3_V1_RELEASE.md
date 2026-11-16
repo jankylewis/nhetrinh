@@ -73,7 +73,7 @@ keeps it as `session.bad.json` (no downgrade is planned).
 
 Note: this is the largest phase. It can move after 1.0 without blocking it (`DECISIONS.md` Q2).
 
-## P8 — Release 1.0 (1.0.0, size S, status TODO)
+## P8 — Release 1.0 (1.0.0, size S, status DOING)
 
 Goal: anyone can download and run nhetrinh. The headmate's installed app is the released build.
 

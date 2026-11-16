@@ -13,7 +13,7 @@ struct UsageError: Error {
 
 struct Options {
     static let usage = "usage: nhetrinh-readback [--steps R1,R2] [--app <path>] [--evidence <repo>] [--log <file>]"
-        + " [--keep-capture <dir>] [--allow-focus]"
+        + " [--keep-capture <dir>] [--allow-focus] [--release-url <https …/nhetrinh-<version>-arm64.zip>]"
     var app = AppSession.installed
     var steps: Set<String> = []
     /// The repository's readback evidence folder, from `--evidence`; nil: found from the current directory.
@@ -25,6 +25,8 @@ struct Options {
     var keepCapture: URL?
     /// D25 (amends D18): R26a and R26b may bring nhetrinh to the front and take the focus. A flag, no value.
     var allowFocus = false
+    /// P8, R44: the released zip, from `--release-url` (https, a .zip). R44 runs only with it.
+    var releaseURL: URL?
 
     /// `known`: the step ids that exist. Every flag but `--allow-focus` needs a value; each is given at most once: a
     /// repeated flag would keep only its last value (`--steps R1 --steps R2` ran R2 only).
@@ -33,7 +35,7 @@ struct Options {
         var rest = arguments.dropFirst()
         var seen: Set<String> = []
         while let flag = rest.popFirst() {
-            guard ["--app", "--steps", "--evidence", "--log", "--keep-capture", "--allow-focus"].contains(flag) else {
+            guard Self.flags.contains(flag) else {
                 throw UsageError(message: "unknown argument `\(flag)`")
             }
             guard seen.insert(flag).inserted else { throw UsageError(message: "`\(flag)` is given more than once") }
@@ -49,11 +51,27 @@ struct Options {
             if flag == "--evidence" { evidence = try Self.readbackFolder(value, exists: exists) }
             if flag == "--log" { log = try Self.absolute(value, flag: flag) }
             if flag == "--keep-capture" { keepCapture = try Self.outsideRepository(value, exists: exists) }
+            if flag == "--release-url" { releaseURL = try Self.releaseZip(value) }
         }
     }
 
-    /// Evidence is kept only for a full run on the installed app.
-    var keepsEvidence: Bool { steps.isEmpty && app == AppSession.installed }
+    static let flags = ["--app", "--steps", "--evidence", "--log", "--keep-capture", "--allow-focus", "--release-url"]
+
+    /// Evidence is kept only for a full run on the installed app (R44 is never part of it).
+    var keepsEvidence: Bool { steps.isEmpty && app == AppSession.installed && releaseURL == nil }
+
+    /// Whether step `id` runs: the listed steps, or every step; R44 only with `--release-url`.
+    func runs(_ id: String) -> Bool {
+        guard steps.isEmpty else { return steps.contains(id) }
+        return id != ReleaseCheck.step.id || releaseURL != nil
+    }
+
+    private static func releaseZip(_ value: String) throws -> URL {
+        guard let url = URL(string: value), url.scheme == "https", url.host != nil, url.pathExtension == "zip" else {
+            throw UsageError(message: "`--release-url` needs an https URL of a .zip")
+        }
+        return url
+    }
 
     /// The `--log` file, read before the command line is checked so that a usage error lands in it too.
     static func logPath(_ arguments: [String]) -> URL? {

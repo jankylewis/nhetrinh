@@ -1,0 +1,99 @@
+name: release
+
+# P8 (hubs/product/plan/M3_V1_RELEASE.md): a tag v<VERSION> builds, checks and publishes nhetrinh.
+# The build is build.yml's own job (checker, its tests, test.sh, build, bundle and size checks), called
+# with the tag; this file only adds the zip, its SHA-256 and the GitHub Release.
+# macOS runners are sometimes short: a failed or stuck run can be re-run ("Re-run failed jobs"), or started
+# again by hand for the same tag (workflow_dispatch). Publishing is repeatable: an existing Release gets its
+# files and notes replaced, never a second Release.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: an existing tag v<VERSION> to build and publish again
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: The tag is v<VERSION> (_app/scripts/VERSION)
+        id: check
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          VERSION=$(cat _app/scripts/VERSION)
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag $TAG is not v<major>.<minor>.<patch>"
+            exit 1
+          fi
+          [[ "$TAG" == "v$VERSION" ]] || { echo "::error::tag $TAG but _app/scripts/VERSION is $VERSION"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: tag
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ needs.tag.outputs.tag }}
+      upload: true
+
+  publish:
+    needs: [tag, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.tag.outputs.tag }}
+      VERSION: ${{ needs.tag.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.tag.outputs.tag }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: nhetrinh-app
+          path: release
+      - name: The zip and its SHA-256
+        working-directory: release
+        run: |
+          ZIP="nhetrinh-$VERSION-arm64.zip"
+          test -f "$ZIP"
+          unzip -l "$ZIP" | grep -q 'nhetrinh.app/Contents/MacOS/nhetrinh$'
+          sha256sum "$ZIP" > "$ZIP.sha256"
+          sha256sum -c "$ZIP.sha256"
+          cat "$ZIP.sha256"
+      - name: Release notes from hubs/product/features
+        run: |
+          python3 -m unittest discover -s _app/scripts/install -p 'test_*.py'
+          python3 _app/scripts/install/release_notes.py "$VERSION" > release/notes.md
+          printf '\nSHA-256: `%s`\n' "$(cut -d' ' -f1 "release/nhetrinh-$VERSION-arm64.zip.sha256")" >> release/notes.md
+      - name: GitHub Release (created, or its files and notes replaced on a re-run)
+        run: |
+          FILES=("release/nhetrinh-$VERSION-arm64.zip" "release/nhetrinh-$VERSION-arm64.zip.sha256")
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "${FILES[@]}" --clobber
+            gh release edit "$TAG" --title "nhetrinh $VERSION" --notes-file release/notes.md
+          else
+            gh release create "$TAG" "${FILES[@]}" --verify-tag --title "nhetrinh $VERSION" \
+              --notes-file release/notes.md
+          fi

@@ -1,64 +1,93 @@
 # nhetrinh
 
-A very small macOS browser. Just browsing, a vertical tab sidebar, and the basics.
-Nothing else: no extensions, no sync, no accounts, no telemetry.
+A very small macOS browser: WebKit (built into macOS), a vertical tab sidebar, and the basics.
+No extensions, no sync, no accounts, no telemetry. Lightness first: one simple tab costs about 32 MB
+in the app and 90 MB with WebKit's helpers; the app is under 1 MB (`hubs/product/rnd/LIGHTNESS_1_0.md`).
 
-Engine: **WebKit** (built into macOS). Shell: **Swift + AppKit**. No third-party dependencies.
-Chosen by measurement against Chromium (CEF): see [`hubs/product/rnd/_bench/results/_RESULTS.md`](hubs/product/rnd/_bench/results/_RESULTS.md).
+## Install
 
-## Goals
+Apple silicon, macOS 13 or later.
 
-1. **Lightweight**: smallest app, lowest memory. Budget: app process <= 40 MB, one simple tab <= 110 MB, app <= 1 MB.
-2. **Fast**: start instantly, render as fast as WebKit allows.
-3. **Basic**: new features only when asked for.
+1. From the [Releases](../../releases) page, download `nhetrinh-<version>-arm64.zip` and its `.sha256`.
+2. Check it: `shasum -a 256 -c nhetrinh-<version>-arm64.zip.sha256` must print `OK`.
+3. Unzip it and move `nhetrinh.app` to Applications.
 
-## Plan
+### The first open
 
-Phases, gate, budget and decisions: [`hubs/product/plan/_PLAN.md`](hubs/product/plan/_PLAN.md).
+nhetrinh is not notarized (there is no Apple Developer ID), so macOS refuses the first open of a
+downloaded copy with a warning. Check the SHA-256 first, then, once:
 
-## Layout
+- macOS 15 or later: open nhetrinh, close the warning, go to System Settings > Privacy & Security,
+  and press **Open Anyway** next to "nhetrinh was blocked"; confirm.
+- macOS 13 and 14: Control-click nhetrinh.app in Finder, choose **Open**, then **Open**.
 
-```
-CLAUDE.md      briefing for every agent: the laws and the commands
-_app/          the app (Swift Package Manager, Command Line Tools only, no Xcode)
-  _Sources/    _Nhetrinh (AppKit + WebKit UI), NhetrinhCore (pure logic, unit tested),
-               NhetrinhReadback (the readback tool)
-  Tests/       Swift Testing tests of NhetrinhCore and of the readback tool's pure parts
-  scripts/     _build.sh, install/_install.sh, test.sh, conventions/ (the checker), VERSION
-  assets/      _icon (Hirono, pixel style)
-hubs/          learnings (bugs, failures, lessons, tool gaps) and product (features, plan, rnd);
-               read _SCHEMA.md
-  product/rnd/ the WebKit vs Chromium benchmark and its results
-.claude/       agent skills: nhetrinh-develop, nhetrinh-readback, nhetrinh-hubs, nhetrinh-ship
-```
+After that it opens like any app. To make it your default browser: System Settings > Desktop & Dock >
+Default web browser. nhetrinh never changes that setting itself.
 
-Conventions are checked by tool, locally and in CI: `_app/scripts/conventions/_check.py`.
-Every folder: exactly one entry starts with `_` (its most critical entry), and at most 5 entries.
-`.md` 100 lines; code 150 lines and 120 characters a line; function 30 lines and 5 parameters;
-no force unwrap, `try!` or `as!`; no package dependency.
+## Use
 
-## Build
-
-macOS 13+, Apple silicon, Command Line Tools. From the repository root:
-
-```sh
-python3 _app/scripts/conventions/_check.py                               # conventions: 0 violations
-python3 -m unittest discover -s _app/scripts/conventions -p 'test_*.py'  # the checker's own tests
-_app/scripts/test.sh             # unit tests (not plain `swift test`: NT-GAT-001)
-_app/scripts/_build.sh           # -> _app/build/nhetrinh.app
-_app/scripts/install/_install.sh          # -> ~/Applications/nhetrinh.app
-cd _app && swift run nhetrinh-readback   # use the installed app as its end user
-```
-
-The readback reads and acts on the installed app through a probe the app opens only when the
-readback starts it (D23); only R2 (the Dock icon) needs the Accessibility permission. A full run writes its verdict to
-[`hubs/failures/evidence/readback/_LATEST.md`](hubs/failures/evidence/readback/_LATEST.md).
+- **Sidebar**: one row per tab. Drag to reorder; hover for the close button; middle-click closes.
+  Right-click a row: New Folder…, Move to Folder, Close Tab; a folder's row: Rename, Collapse, Delete
+  (its tabs stay). A collapsed folder that holds the shown tab is bold with a dot.
+- **Tabs** come back after a quit. A tab not used for a while gives its memory back and reloads
+  when you click it, with its history; a tab that plays sound is kept. When macOS is short of memory,
+  nhetrinh unloads background tabs at once.
+- **Downloads** go to ~/Downloads; the sidebar footer shows them, with Cancel. A click on a finished
+  one shows it in Finder.
+- **Pages** can ask (alerts, sign-in, camera, a link to another app): always in a sheet on the window.
 
 ## Shortcuts
 
-⌘T new tab · ⌘W close tab · ⌘L address bar · ⌘R reload · ⌘[ ⌘] back / forward · ⌘1-9 switch tab · ⌘S toggle sidebar
+| Keys | Does | Keys | Does |
+|---|---|---|---|
+| ⌘T | New Tab | ⌘W | Close Tab |
+| ⇧⌘T | Reopen Closed Tab | ⌘L | Address bar |
+| ⌘R / ⌘. | Reload / Stop | ⌘[ / ⌘] | Back / Forward |
+| ⌃⇥ / ⌃⇧⇥ | Next / previous tab | ⌘1-⌘8, ⌘9 | A shown tab, the last one |
+| ⌘F, ⌘G, ⇧⌘G | Find, next, previous | ⌘+ / ⌘- / ⌘0 | Zoom in / out / actual size |
+| ⌘S | Show or hide the sidebar | ⌘P | Print |
+| ⌘, | Settings Hub | ⌘Q | Quit |
 
-## Icon
+⌘1-⌘9 count the tabs you see: the tabs of a collapsed folder are skipped. Zoom is kept per site.
 
-Hirono (a Pop Mart character), pixel style, no background: [`_app/assets/_icon`](_app/assets/_icon).
-The app also sets its Dock icon at launch, because macOS draws bundle icons on a tile.
+## Settings Hub (⌘,)
+
+Appearance (System, Light, Dark) · Search engine (Google, DuckDuckGo, Bing) · Unload idle tabs after
+N minutes · Clear Website Data… (the last hour, or all). Your tabs and settings stay on this Mac:
+`~/Library/Application Support/nhetrinh/` (`session.json`, `prefs.json`).
+
+## Known limits
+
+- Not notarized: the macOS warning at the first open (above). Apple silicon only.
+- No extensions, bookmarks, history list, address-bar suggestions, sync, password manager, private
+  window, reader mode or content blocker; one window. These come only when asked for.
+- A WebKit app that is not Safari: password autofill from Safari or iCloud may not work, some sites
+  refuse its sign-in, and sites that work only in Chrome do not work.
+- Find says found or not found, with no match count. Web Inspector: from Safari's Develop menu only.
+- A certificate error shows an error page, with no "proceed anyway".
+- A camera or microphone answer lasts until quit. A page's question brings its tab to the front
+  (NT-TAB-002), and a page may ask to open another app without a click; the sheet asks every time
+  (NT-NAV-004).
+- In the Dock, a pinned nhetrinh that is not running shows its icon on a tile (D20).
+- WebKit's GPU helper can use about 100 MB more for 1 to 3 seconds (NT-PRF-002).
+
+Every open item, with its status: `hubs/bugs/TRIAGE.md` and `hubs/failures/TRIAGE.md`.
+
+## Build from source
+
+Command Line Tools only (no Xcode). From the repository root:
+
+```sh
+python3 _app/scripts/conventions/_check.py   # conventions: 0 violations
+_app/scripts/test.sh                         # unit tests (not plain `swift test`: NT-GAT-001)
+_app/scripts/_build.sh                       # -> _app/build/nhetrinh.app
+_app/scripts/install/_install.sh             # -> ~/Applications/nhetrinh.app
+cd _app && swift run nhetrinh-readback       # use the installed app as its end user
+```
+
+`CLAUDE.md` holds the laws and the map; `hubs/product/plan/_PLAN.md` the phases, the gate and the
+budget. A tag `v<version>` runs `.github/workflows/release.yml`: the same checks and build as CI, the
+zip, its SHA-256 and the Release, with notes from `hubs/product/features/`.
+
+Engine chosen by measurement against Chromium: `hubs/product/rnd/_bench/results/_RESULTS.md`.
+Icon: Hirono (a Pop Mart character), pixel style: `_app/assets/_icon`.

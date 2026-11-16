@@ -35,6 +35,7 @@ let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicStep
     + DownloadSteps.all  // P5: R31-R35
     + PressureSteps.all  // P6: R36-R38
     + FolderSteps.all  // P7: R39-R43
+    + [ReleaseCheck.step]  // P8: R44, only with --release-url
 let options: Options
 do {
     options = try Options(CommandLine.arguments, known: Set(allSteps.map(\.id)))
@@ -54,7 +55,8 @@ let kept = options.keepsEvidence ? options.evidence ?? evidenceFolder() : nil
 let session = AppSession(appURL: options.app)
 session.keepCapture = options.keepCapture
 session.allowFocus = options.allowFocus
-let steps = allSteps.filter { options.steps.isEmpty || options.steps.contains($0.id) }
+session.releaseURL = options.releaseURL
+let steps = allSteps.filter { options.runs($0.id) }
 let results = Runner.run(steps, in: session)
 let ending = session.quit()
 let removed = DownloadFiles.cleanUp()  // P5: the readback's own files in ~/Downloads, never another
