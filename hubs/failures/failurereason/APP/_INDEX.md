@@ -6,3 +6,4 @@ Index of this folder; `_SCHEMA.md` has the rules.
 |---|---|
 | `NAV/` | address bar, navigation, search |
 | `TAB/` | tab lifecycle: lazy load, unload, session |
+| `UIX/` | window, sidebar, toolbar, menus, keys, Dock icon |

@@ -22,6 +22,8 @@ let package = Package(
         // The pure parts of the readback tool: icon match, report, options.
         .testTarget(name: "NhetrinhReadbackTests", dependencies: ["NhetrinhReadback"],
                     path: "Tests/NhetrinhReadbackTests"),
+        // The app's AppKit wiring that needs no running app: the menu reaches the browser (NT-UIX-001).
+        .testTarget(name: "NhetrinhTests", dependencies: ["Nhetrinh"], path: "Tests/NhetrinhTests"),
     ],
     swiftLanguageModes: [.v5]
 )

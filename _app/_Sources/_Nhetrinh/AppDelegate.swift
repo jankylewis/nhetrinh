@@ -4,10 +4,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browser: BrowserWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.mainMenu = AppMenu.build()
         setDockIcon()
         let browser = BrowserWindowController()
         self.browser = browser
+        NSApp.mainMenu = AppMenu.build(browser: browser)
         browser.showWindow(nil)
         browser.openInitialTabs()
     }

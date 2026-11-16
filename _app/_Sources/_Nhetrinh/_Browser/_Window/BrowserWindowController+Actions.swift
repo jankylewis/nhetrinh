@@ -1,6 +1,6 @@
 import AppKit
 
-/// Menu actions. They reach the window controller through the responder chain (see AppMenu).
+/// Menu actions. Their menu items target the window controller directly (see AppMenu, NT-UIX-001).
 extension BrowserWindowController {
     @objc func newTab(_ sender: Any?) {
         tabs.append(Tab(url: nil))

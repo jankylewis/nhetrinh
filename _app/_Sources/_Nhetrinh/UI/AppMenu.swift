@@ -1,10 +1,13 @@
 import AppKit
 
 /// The main menu. Every keyboard shortcut of the app is defined here, and nowhere else.
+/// Browser items target the window controller directly: with no key window (the app not active,
+/// as the readback starts it, D18) a nil target reaches nobody (NT-UIX-001).
+/// Edit items keep a nil target: they act on the focused text, through the responder chain.
 enum AppMenu {
-    static func build() -> NSMenu {
+    static func build(browser: BrowserWindowController) -> NSMenu {
         let main = NSMenu()
-        [appMenu(), fileMenu(), editMenu(), viewMenu(), tabsMenu()].forEach(main.addItem)
+        [appMenu(), fileMenu(browser), editMenu(), viewMenu(browser), tabsMenu(browser)].forEach(main.addItem)
         return main
     }
 
@@ -12,11 +15,11 @@ enum AppMenu {
         submenu("nhetrinh", [item("Quit nhetrinh", #selector(NSApplication.terminate(_:)), "q")])
     }
 
-    private static func fileMenu() -> NSMenuItem {
+    private static func fileMenu(_ browser: BrowserWindowController) -> NSMenuItem {
         submenu("File", [
-            item("New Tab", #selector(BrowserWindowController.newTab(_:)), "t"),
-            item("Close Tab", #selector(BrowserWindowController.closeTab(_:)), "w"),
-            item("Open Location", #selector(BrowserWindowController.focusAddress(_:)), "l"),
+            item("New Tab", #selector(BrowserWindowController.newTab(_:)), "t", browser),
+            item("Close Tab", #selector(BrowserWindowController.closeTab(_:)), "w", browser),
+            item("Open Location", #selector(BrowserWindowController.focusAddress(_:)), "l", browser),
         ])
     }
 
@@ -32,21 +35,22 @@ enum AppMenu {
         ])
     }
 
-    private static func viewMenu() -> NSMenuItem {
+    private static func viewMenu(_ browser: BrowserWindowController) -> NSMenuItem {
         submenu("View", [
-            item("Toggle Sidebar", #selector(BrowserWindowController.toggleTabSidebar(_:)), "s"),
-            item("Reload", #selector(BrowserWindowController.reload(_:)), "r"),
+            item("Toggle Sidebar", #selector(BrowserWindowController.toggleTabSidebar(_:)), "s", browser),
+            item("Reload", #selector(BrowserWindowController.reload(_:)), "r", browser),
         ])
     }
 
-    private static func tabsMenu() -> NSMenuItem {
+    private static func tabsMenu(_ browser: BrowserWindowController) -> NSMenuItem {
         var items = [
-            item("Back", #selector(BrowserWindowController.goBack(_:)), "["),
-            item("Forward", #selector(BrowserWindowController.goForward(_:)), "]"),
+            item("Back", #selector(BrowserWindowController.goBack(_:)), "[", browser),
+            item("Forward", #selector(BrowserWindowController.goForward(_:)), "]", browser),
             NSMenuItem.separator(),
         ]
         for number in 1...9 {
-            let entry = item("Tab \(number)", #selector(BrowserWindowController.selectTabByNumber(_:)), "\(number)")
+            let select = #selector(BrowserWindowController.selectTabByNumber(_:))
+            let entry = item("Tab \(number)", select, "\(number)", browser)
             entry.tag = number
             items.append(entry)
         }
@@ -61,7 +65,10 @@ enum AppMenu {
         return holder
     }
 
-    private static func item(_ title: String, _ action: Selector, _ key: String) -> NSMenuItem {
-        NSMenuItem(title: title, action: action, keyEquivalent: key)
+    private static func item(_ title: String, _ action: Selector, _ key: String,
+                             _ target: AnyObject? = nil) -> NSMenuItem {
+        let entry = NSMenuItem(title: title, action: action, keyEquivalent: key)
+        entry.target = target
+        return entry
     }
 }

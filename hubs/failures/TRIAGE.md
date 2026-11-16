@@ -10,6 +10,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-001 | `error: plugin for module 'TestingMacros' not found` | OBSERVED | Was it plain `swift test`? Run `_app/scripts/test.sh`; compare `swift test -v` compile commands |
 | NT-GAT-002 | `no testTarget depends on NhetrinhReadback` | OBSERVED | Does `_app/Package.swift` have `NhetrinhReadbackTests`? |
 | NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? (not seen live yet) |
+| NT-UIX-001 | `after New Tab the sidebar has 1 rows, not 2` | OBSERVED | Nil-target menu item and no key window (app not active)? Browser items target the controller |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
 | NT-ENV-003 | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |

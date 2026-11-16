@@ -10,3 +10,4 @@ One row per kept evidence path (a file per id only past 3 paths).
 | readback (R1-R8) | `hubs/failures/evidence/readback/_LATEST.md` | the verdict per step of the last full readback on the installed app; written only by a full run (`cd _app && swift run nhetrinh-readback`) | a run with the Accessibility permission granted |
 | NT-PRF-001 | `prf/_NT_PRF_001_RUNS.jsonl`, `prf/measure.py` | 32 runs: icon, icon size, profile, page, build; per-process MB | R8 on the installed app after the fix |
 | NT-PRF-002 | `prf/NT_PRF_002_GPU_SAMPLES.jsonl`, `prf/gpu_samples.py` | 8 runs x 30 s: GPU bursts of ~100 MB for 1-3 s | the work that makes a burst (not known) |
+| NT-UIX-001 | `hubs/failures/evidence/readback/_LATEST.md` (branch `p0/harness-docs`, run 18:57) | R5, R6 FAIL: New Tab from the menu added no row | R5 and R6 after the fix (P0-FIX-1) |
