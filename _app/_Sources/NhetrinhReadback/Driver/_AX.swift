@@ -20,6 +20,12 @@ struct AXNode {
         return value
     }
 
+    /// The accessibility error of reading `name`, `.success` when it reads: why a read is empty.
+    func readError(_ name: String) -> AXError {
+        var value: CFTypeRef?
+        return AXUIElementCopyAttributeValue(element, name as CFString, &value)
+    }
+
     func string(_ name: String) -> String { raw(name) as? String ?? "" }
     func number(_ name: String) -> Int? { raw(name) as? Int }
     func nodes(_ name: String) -> [AXNode] { (raw(name) as? [AXUIElement] ?? []).map(AXNode.init) }

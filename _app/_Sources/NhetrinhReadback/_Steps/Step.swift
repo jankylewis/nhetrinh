@@ -64,3 +64,19 @@ func waitUntil(_ timeout: TimeInterval, every interval: TimeInterval = 0.1, _ co
 func expect(_ condition: Bool, _ seen: @autoclosure () -> String) throws {
     if !condition { throw StepError.fail(seen()) }
 }
+
+/// NT-TG-003, readback 19:51: the grant record was kept and `AXIsProcessTrusted` was true, yet every
+/// read came back empty. A window always has children (its close, minimise and zoom buttons at
+/// least) and the Dock always has items, so a window with none, or 0 Dock items, is a read that was
+/// refused: the step is NOT READ BACK and asks for a new grant, never a FAIL of the app.
+enum EmptyReads {
+    static func reason(_ seen: String, error: Int32? = nil, grantee: String = Grant.grantee()) -> String {
+        "Accessibility reads are empty: re-grant \(grantee) (\(seen)" + (error.map { ", read error \($0))" } ?? ")")
+    }
+
+    /// What a step throws when no element `id` is in a window with `children` children.
+    static func missing(_ id: String, children: Int, error: Int32, grantee: String = Grant.grantee()) -> StepError {
+        guard children == 0 else { return .fail("no element `\(id)` in the window") }
+        return .cannotDrive(reason("no element `\(id)`, the window has 0 children", error: error, grantee: grantee))
+    }
+}

@@ -43,7 +43,8 @@ enum SystemSteps {
         let urls = "https://example.com,https://example.org,https://example.net"
         try app.launch(env: [seedKey: urls])
         let three = waitUntil(10) { (try? app.rowCount()) == 3 }
-        try expect(three, "started with 3 tabs; the sidebar has \((try? app.rowCount()) ?? -1) row(s)")
+        let rows = three ? 3 : try app.rowCount()  // a refused read is NOT READ BACK, never -1 rows
+        try expect(rows == 3, "started with 3 tabs; the sidebar has \(rows) row(s)")
         waitUntil(15) { !Footprint.pageProcesses(of: app.pid).isEmpty }
         Thread.sleep(forTimeInterval: 4)
         let pages = Footprint.pageProcesses(of: app.pid).count

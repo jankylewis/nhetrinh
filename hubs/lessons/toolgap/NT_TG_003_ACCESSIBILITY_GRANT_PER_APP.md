@@ -7,6 +7,8 @@ date: 2026-11-16
 source: brief P0-RBK-3 (2026-11-16): `AXIsProcessTrusted` false in an agent session although the terminal app is switched on in Accessibility
 source: `_app/_Sources/NhetrinhReadback/Driver/_AX.swift` (`AXNode.isTrusted`)
 source: brief P0-SIGN-1 (2026-11-16): grants dropped after a rebuild of the ad-hoc signed readback app, seen 19:09
+source: `hubs/failures/evidence/readback/_LATEST.md` (19:51, commit 4a745ed): R1, R3-R7 "no element", R2 0 Dock items
+observed: 2026-11-16 brief P0-FIX-5, read only: `codesign -d -r-`, TCC.db row, `csreq -t`, `log show` of tccd 19:39-19:41 and 19:51-19:53
 observed: `open -W -n <app>` returned 0 for a test app that exits 3 (2026-11-16, scratch app, not kept)
 links: fix=no lesson=no evidence=no toolgap=NT-TG-003
 
@@ -40,5 +42,29 @@ Not proven: a full run through the app (not launched yet; waits for the grant).
 headmate typed yes. `readback_app.sh` signs with it when `signing.sh identity` finds it (ad hoc
 otherwise); its SHA-1 joins `NHTSourceHash`, so the switch rebuilds once; with no identity the
 hash is as before (checked by hand 2026-11-16, same 16 hex digits).
-Not proven: the identity was not created (the keychain change waits for the headmate), `codesign`
-with it, and that macOS keeps the grants over a rebuild signed with it.
+Since 19:29 the identity exists (certificate notBefore 12:29 UTC, SHA-1 `E325…6B85`), and
+the installed readback app is signed with it (`Authority=nhetrinh local signing`, signed 19:51:07).
+
+## Readback 19:51: grant kept, reads empty (brief P0-FIX-5, read only)
+
+- Designated requirement of the installed readback app (`codesign -d -r-`): `identifier
+  "io.github.jankylewis.nhetrinh.readback" and certificate leaf = H"e325…6b85"`; valid on disk.
+- The TCC rows (system TCC.db, Accessibility 19:39:31, Screen Recording 19:40:02, `auth_value` 2)
+  hold a `csreq` that decodes (`csreq -r- -t`) to the same requirement, and `codesign -v -R` says
+  the installed app satisfies it. So the 19:34 build that got the grant at 19:39 was already signed
+  with the same certificate: TCC stores the requirement of the code it granted. Its binary is gone
+  (rebuilt in place), so its cdhash is not proven.
+- tccd's log: in both runs (19:40 and 19:51) every Accessibility check of the readback app, asked
+  by itself, by nhetrinh and by the Dock, ended `authValue=2` (allowed). The app logged
+  `NSAccessibility Request Received` at 19:51 but no `accessibilityPerformAction`, which it logged at 19:40.
+- So the signed rebuild did NOT lose the grant in TCC: the record, the requirement and the
+  decisions all match. Why the reads came back empty is not proven; the readback did not record
+  the read errors then. A re-grant (off and on, or remove and add) is the workaround to try.
+
+## Readback gap closed (P0-FIX-5)
+
+A window with no child or 0 Dock items read is a refused read: the step is NOT READ BACK
+`Accessibility reads are empty: re-grant nhetrinh-readback.app (…, read error <AXError>)`, never
+FAIL (`EmptyReads` in `_Steps/Step.swift`; tests in `Steps/EmptyReadsTests.swift`). R7 now reads
+the row count once more after the wait instead of reporting -1. The read error of the window's
+children is in the reason, so the next empty run says why. Not proven on the app (no run since).

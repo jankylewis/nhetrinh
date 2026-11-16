@@ -35,7 +35,9 @@ enum DockIcon {
     /// The one item of the launched app: running, and of its bundle. A pinned copy of the app has
     /// the same title but is not running; it shows its bundle icon on a tile (NT-GAT-005).
     /// None is NOT READ BACK; more than one is a FAIL. The reasons hold counts, never a path.
-    static func launchedItem(_ items: [DockItem], app: URL) throws -> DockItem {
+    /// 0 items read at all is a refused read (the Dock always has items): re-grant (NT-TG-003).
+    static func launchedItem(_ items: [DockItem], app: URL, grantee: String = Grant.grantee()) throws -> DockItem {
+        if items.isEmpty { throw StepError.cannotDrive(EmptyReads.reason("0 Dock items read", grantee: grantee)) }
         let ours = items.filter { $0.url.map { sameBundle($0, app) } ?? false }
         let running = ours.filter(\.isRunning)
         if running.count > 1 {

@@ -79,8 +79,13 @@ final class AppSession {
         return found
     }
 
+    /// A window with no child at all is a refused read, NOT READ BACK (`EmptyReads`, NT-TG-003).
     func element(_ id: String) throws -> AXNode {
-        guard let found = try window().find(id: id) else { throw StepError.fail("no element `\(id)` in the window") }
+        let window = try window()
+        guard let found = window.find(id: id) else {
+            throw EmptyReads.missing(id, children: window.children.count,
+                                     error: window.readError(kAXChildrenAttribute).rawValue)
+        }
         return found
     }
 
