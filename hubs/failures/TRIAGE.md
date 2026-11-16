@@ -25,7 +25,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-010 | `the confirm sheet's buttons are ["Cancel", "OK"]` | OBSERVED | A sheet's buttons from the probe are in view order: compare them as a set |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | FIXED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
-| NT-PRF-003 | `bundle 864 KB (max 1024)` | OBSERVED | Does the app export symbols (`nm -gU`)? `_build.sh` builds `-Osize -no_exported_symbols` and fails on any export |
+| NT-PRF-003 | `bundle 864 KB (max 1024)` | OBSERVED | Does the app export symbols (`nm -gU`)? `_build.sh` builds `-Osize -no_exported_symbols` and fails on any export; `make_icns.sh` checks the icon (`nearest.swift`) |
 | NT-TG-001 | `cannot see the Dock` | OPEN | No safe way to read back the Dock icon (see the tool gap) |
 | NT-TG-002 | `screenshot shows other windows` | OPEN | Capture one window by id, never a screen region |
 | NT-TG-003 | `has no Accessibility permission`, `Accessibility reads are empty`, `its tree was not read` | OPEN | R1, R3-R7: `answers no readback probe`? Is the installed app built before D23? Install it. R2: which app does the reason name? Run as the granted app: `readback_app.sh run`; after a rebuild grant again (R-2); reads empty with the grant kept (19:51): re-grant, cause not proven |

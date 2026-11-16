@@ -8,6 +8,6 @@ The Dock icon stays small: 1024 px cost 33 MB in the app process, 256 px nothing
 ```sh
 swiftc -O tools/lift.swift -o /tmp/lift && /tmp/lift src/_Hirono_photo.png src/Hirono_cutout.png
 swiftc -O tools/_pixelate.swift -o /tmp/pixelate && /tmp/pixelate src/Hirono_cutout.png _AppIcon.png 80
-tools/make_icns.sh   # _AppIcon.png -> bundle/AppIcon.icns
+tools/make_icns.sh   # _AppIcon.png -> bundle/AppIcon.icns: 128 px up nearest from the 80 px grid, checked
 swiftc -O tools/shrink.swift -o /tmp/shrink && /tmp/shrink _AppIcon.png bundle/_DockIcon.png 256
 ```
