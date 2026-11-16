@@ -5,7 +5,8 @@ name: release
 # with the tag; this file only adds the zip, its SHA-256 and the GitHub Release.
 # macOS runners are sometimes short: a failed or stuck run can be re-run ("Re-run failed jobs"), or started
 # again by hand for the same tag (workflow_dispatch). Publishing is repeatable: an existing Release gets its
-# files and notes replaced, never a second Release.
+# files and notes replaced, never a second Release. A 0.x tag is a prerelease, never "latest"; 1.0.0 and later
+# are full releases (D26; `release_notes.py <version> --kind`, tested).
 
 on:
   push:
@@ -90,10 +91,17 @@ jobs:
       - name: GitHub Release (created, or its files and notes replaced on a re-run)
         run: |
           FILES=("release/nhetrinh-$VERSION-arm64.zip" "release/nhetrinh-$VERSION-arm64.zip.sha256")
+          KIND=$(python3 _app/scripts/install/release_notes.py "$VERSION" --kind)
+          if [[ "$KIND" == prerelease ]]; then
+            MARK=(--prerelease --latest=false)
+          else
+            MARK=(--prerelease=false --latest)
+          fi
+          echo "$TAG: $KIND"
           if gh release view "$TAG" > /dev/null 2>&1; then
             gh release upload "$TAG" "${FILES[@]}" --clobber
-            gh release edit "$TAG" --title "nhetrinh $VERSION" --notes-file release/notes.md
+            gh release edit "$TAG" --title "nhetrinh $VERSION" --notes-file release/notes.md "${MARK[@]}"
           else
             gh release create "$TAG" "${FILES[@]}" --verify-tag --title "nhetrinh $VERSION" \
-              --notes-file release/notes.md
+              --notes-file release/notes.md "${MARK[@]}"
           fi

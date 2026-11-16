@@ -43,7 +43,8 @@ The matemaster merges and ships (`CLAUDE.md`). A mate never pushes, merges or to
 
 1. Self-merge the PR when CI is green and the readback is PASS.
 2. Tag the merge commit on `master` `v<version>` from `VERSION`, for example `v0.1.0`, and push the
-   tag. Every tag `v*` publishes a GitHub Release (see "Release" below): tag only what may be downloaded.
+   tag. Every tag `v*` publishes on GitHub (see "Release" below): a `v0.x` tag as a prerelease, never
+   "latest"; `v1.0.0` and later as the full release (D26). Tag only what may be downloaded.
 3. Entries whose fix is now on `master` with a cited proof move from OBSERVED to FIXED, in the
    entry, its `_INDEX.md` row and its TRIAGE row.
 
@@ -57,7 +58,8 @@ Only when the brief names the seat and the headmate asked for the release; a mat
 3. `.github/workflows/release.yml` runs: the tag check; `build.yml`'s own job on the tag (checker, its
    tests, `test.sh`, build, bundle and size checks, arm64 only), which uploads
    `nhetrinh-<version>-arm64.zip`; then the zip's SHA-256 (`.sha256`), the notes
-   (`_app/scripts/install/release_notes.py <version>`, from `hubs/product/features/`) and the Release.
+   (`_app/scripts/install/release_notes.py <version>`, from `hubs/product/features/`) and the Release:
+   a prerelease for 0.x, the full and "latest" release from 1.0.0 (`release_notes.py <version> --kind`).
    Watch it: `gh run watch` (or `gh run list --workflow release.yml`).
 4. A macOS runner that is short or stuck: "Re-run failed jobs", or
    `gh workflow run release.yml -f tag=v<version>`. A re-run replaces the Release's files and notes;

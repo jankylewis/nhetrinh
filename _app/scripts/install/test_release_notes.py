@@ -82,6 +82,22 @@ class ReleaseNotesTests(unittest.TestCase):
         self.assertIn("## Tab folders", out)
         self.assertIn("- A row with a | in its text\n", out)
 
+    def test_0x_is_a_prerelease_and_1_0_and_later_a_release(self):
+        cases = {"0.1.0": True, "0.8.0": True, "0.10.3": True, "1.0.0": False, "1.2.3": False, "2.0.0": False}
+        for version, expected in cases.items():
+            self.assertEqual(release_notes.prerelease(version), expected, version)
+
+    def test_a_version_that_is_not_x_y_z_is_an_error(self):
+        for version in ["", "v1.0.0", "1.0", "1.0.0-beta", "one.0.0"]:
+            with self.assertRaises(ValueError, msg=version):
+                release_notes.prerelease(version)
+
+    def test_the_command_line_says_the_kind(self):
+        for version, kind in [("0.8.0", "prerelease"), ("1.0.0", "release")]:
+            out = subprocess.run([sys.executable, release_notes.__file__, version, "--kind"],
+                                 capture_output=True, text=True, check=True).stdout
+            self.assertEqual(out, kind + "\n")
+
     def test_no_feature_row_is_an_error(self):
         with self.assertRaises(ValueError):
             release_notes.notes("1.0.0", [], {})

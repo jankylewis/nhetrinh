@@ -1,6 +1,7 @@
 """The release notes of nhetrinh (P8), made from the hubs/product/features rows.
 
     python3 _app/scripts/install/release_notes.py 1.0.0 [--root <repository>]   # markdown on stdout
+    python3 _app/scripts/install/release_notes.py 0.8.0 --kind                  # prerelease | release
 
 Rows are grouped by phase, in phase order, with the phase's name from hubs/product/plan/_PLAN.md; the
 rows of the R&D app (no phase) come first as "The basics". A phase note at the end of a row ("(P3; not
@@ -17,6 +18,7 @@ ROW = re.compile(r"^\| (NT-FEAT-\d+) \| (.*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \|
 PHASE = re.compile(r"\((P\d+)[-;)]")
 NOTE = re.compile(r"\s*\(P\d+[^()]*(\([^()]*\)[^()]*)*\)\s*$")
 REFS = re.compile(r",\s*(NT-[A-Z]+-\d+|D\d+|Q\d+)(?=[,)])")
+VERSION = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 PLAN_ROW = re.compile(r"^\| (P\d+) ([^|]+?) \| \d+\.\d+\.\d+ \|")
 
 
@@ -42,6 +44,14 @@ def phase_names(plan_text):
         if match:
             names[match.group(1)] = match.group(2).strip()
     return names
+
+
+def prerelease(version):
+    """0.x is a GitHub prerelease (not "latest"); 1.0.0 and later a full release (headmate ruling, D26)."""
+    match = VERSION.match(version)
+    if not match:
+        raise ValueError(f"version {version!r} is not <major>.<minor>.<patch>")
+    return int(match.group(1)) == 0
 
 
 def internal(row):
@@ -74,8 +84,12 @@ def install(version):
 def main(argv):
     parser = argparse.ArgumentParser(description="nhetrinh release notes from the feature rows")
     parser.add_argument("version")
+    parser.add_argument("--kind", action="store_true", help="print prerelease (0.x) or release, nothing else")
     parser.add_argument("--root", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
     args = parser.parse_args(argv)
+    if args.kind:
+        sys.stdout.write(("prerelease" if prerelease(args.version) else "release") + "\n")
+        return
     product = os.path.join(args.root, "hubs", "product")
     rows = []
     for shelf in sorted(glob.glob(os.path.join(product, "features", "S*.md"))):
