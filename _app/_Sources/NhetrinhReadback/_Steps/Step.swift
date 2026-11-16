@@ -74,9 +74,35 @@ enum EmptyReads {
         "Accessibility reads are empty: re-grant \(grantee) (\(seen)" + (error.map { ", read error \($0))" } ?? ")")
     }
 
-    /// What a step throws when no element `id` is in a window with `children` children.
-    static func missing(_ id: String, children: Int, error: Int32, grantee: String = Grant.grantee()) -> StepError {
-        guard children == 0 else { return .fail("no element `\(id)` in the window") }
-        return .cannotDrive(reason("no element `\(id)`, the window has 0 children", error: error, grantee: grantee))
+    /// The prefix of every identifier the app sets on its own views.
+    static let ownPrefix = "nhetrinh."
+
+    /// What a step throws when no element `id` is in the window. Other own identifiers read: the app
+    /// lost this one, FAIL. None read (20:01: children read, no `nhetrinh.*`): the tree was not read,
+    /// NOT READ BACK with what was read. 0 children: a refused read, NOT READ BACK with a re-grant.
+    static func missing(_ id: String, in read: WindowRead, grantee: String = Grant.grantee()) -> StepError {
+        guard !read.hasOwnID else { return .fail("no element `\(id)` in the window") }
+        guard read.children > 0 else {
+            return .cannotDrive(reason("no element `\(id)`, \(read.summary)", grantee: grantee))
+        }
+        return .cannotDrive("no element `\(id)`: none of the app's identifiers (\(ownPrefix)*) "
+            + "is in the window, its tree was not read (\(read.summary))")
+    }
+}
+
+/// What the readback read of a window in which an element was not found.
+struct WindowRead {
+    let title: String
+    let children: Int
+    /// The roles of the first children, in order; "" when a role read is empty.
+    let firstRoles: [String]
+    /// The accessibility error of reading the window's children, 0 when it reads.
+    let error: Int32
+    /// Whether any identifier starting with `EmptyReads.ownPrefix` is anywhere in the window's tree.
+    let hasOwnID: Bool
+
+    var summary: String {
+        let roles = firstRoles.map { $0.isEmpty ? "(empty)" : $0 }.joined(separator: ", ")
+        return "window \"\(title)\", \(children) children, first roles [\(roles)], read error \(error)"
     }
 }

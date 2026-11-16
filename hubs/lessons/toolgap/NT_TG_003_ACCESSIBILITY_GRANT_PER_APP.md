@@ -8,6 +8,7 @@ source: brief P0-RBK-3 (2026-11-16): `AXIsProcessTrusted` false in an agent sess
 source: `_app/_Sources/NhetrinhReadback/Driver/_AX.swift` (`AXNode.isTrusted`)
 source: brief P0-SIGN-1 (2026-11-16): grants dropped after a rebuild of the ad-hoc signed readback app, seen 19:09
 source: `hubs/failures/evidence/readback/_LATEST.md` (19:51, commit 4a745ed): R1, R3-R7 "no element", R2 0 Dock items
+source: `hubs/failures/evidence/readback/_LATEST.md` (20:01, commit 4b6a7c3): R1, R3-R7 still FAIL "no element", R2 empty
 observed: 2026-11-16 brief P0-FIX-5, read only: `codesign -d -r-`, TCC.db row, `csreq -t`, `log show` of tccd 19:39-19:41 and 19:51-19:53
 observed: `open -W -n <app>` returned 0 for a test app that exits 3 (2026-11-16, scratch app, not kept)
 links: fix=no lesson=no evidence=no toolgap=NT-TG-003
@@ -67,4 +68,13 @@ A window with no child or 0 Dock items read is a refused read: the step is NOT R
 `Accessibility reads are empty: re-grant nhetrinh-readback.app (…, read error <AXError>)`, never
 FAIL (`EmptyReads` in `_Steps/Step.swift`; tests in `Steps/EmptyReadsTests.swift`). R7 now reads
 the row count once more after the wait instead of reporting -1. The read error of the window's
-children is in the reason, so the next empty run says why. Not proven on the app (no run since).
+children is in the reason, so the next empty run says why.
+At 20:01 the window had children but no `nhetrinh.*` identifier, so R1, R3-R7 still said FAIL.
+
+## Readback gap closed (P0-FIX-6)
+
+An element is FAIL only when another `nhetrinh.*` identifier is in the window. None at all: NOT READ
+BACK `none of the app's identifiers (nhetrinh.*) is in the window, its tree was not read (window
+"<title>", <n> children, first roles [...], read error <AXError>)` (`WindowRead` in `_Steps/Step.swift`,
+tests `missingElement`, `notReadTreeSaysWhatWasRead`; red under the old rule, checked by mutation).
+Not proven on the app (no rebuild, no run since).

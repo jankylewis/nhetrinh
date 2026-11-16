@@ -105,3 +105,13 @@ struct AXNode {
         }
     }
 }
+
+extension WindowRead {
+    /// Read `window` once more, for the reason of a step that did not find an element in it.
+    init(_ window: AXNode, roles: Int = 3) {
+        let children = window.children
+        self.init(title: window.title, children: children.count, firstRoles: children.prefix(roles).map(\.role),
+                  error: window.readError(kAXChildrenAttribute).rawValue,
+                  hasOwnID: window.first { $0.identifier.hasPrefix(EmptyReads.ownPrefix) } != nil)
+    }
+}

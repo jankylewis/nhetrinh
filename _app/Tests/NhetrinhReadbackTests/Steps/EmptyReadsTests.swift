@@ -16,21 +16,38 @@ private func verdict(_ error: StepError) -> (Verdict, String) {
 
 struct MissingCase: CustomTestStringConvertible {
     let children: Int
+    let hasOwnID: Bool
     let verdict: Verdict
-    var testDescription: String { "an element missing from a window with \(children) child(ren)" }
+    var testDescription: String {
+        "an element missing from \(children) child(ren), \(hasOwnID ? "other" : "no") nhetrinh.* identifier"
+    }
 }
 
-@Test("an element missing from an empty tree is not read back", arguments: [
-    MissingCase(children: 0, verdict: .notReadBack),
-    MissingCase(children: 1, verdict: .fail),
-    MissingCase(children: 7, verdict: .fail),
+@Test("an element missing is FAIL only when other own identifiers were read", arguments: [
+    MissingCase(children: 0, hasOwnID: false, verdict: .notReadBack),
+    MissingCase(children: 4, hasOwnID: false, verdict: .notReadBack),
+    MissingCase(children: 1, hasOwnID: true, verdict: .fail),
+    MissingCase(children: 7, hasOwnID: true, verdict: .fail),
 ])
 func missingElement(_ missing: MissingCase) {
-    let error = EmptyReads.missing("nhetrinh.sidebar", children: missing.children, error: -25204, grantee: grantee)
-    let (seen, detail) = verdict(error)
+    let read = WindowRead(title: "Example Domain", children: missing.children,
+                          firstRoles: Array(["AXButton", "", "AXGroup"].prefix(missing.children)),
+                          error: -25204, hasOwnID: missing.hasOwnID)
+    let (seen, detail) = verdict(EmptyReads.missing("nhetrinh.sidebar", in: read, grantee: grantee))
     #expect(seen == missing.verdict)
-    #expect(detail.hasPrefix(regrant) == (missing.verdict == .notReadBack))
     #expect(detail.contains("nhetrinh.sidebar"))
+    #expect(detail.hasPrefix(regrant) == (missing.children == 0))
+    // NOT READ BACK says what was read; a FAIL keeps its short reason.
+    #expect(detail.contains("window \"Example Domain\", \(missing.children) children") == !missing.hasOwnID)
+    #expect(detail.contains("read error -25204") == !missing.hasOwnID)
+}
+
+@Test("a tree read without own identifiers lists the window's first roles") func notReadTreeSaysWhatWasRead() {
+    let read = WindowRead(title: "", children: 4, firstRoles: ["AXButton", "", "AXGroup"], error: 0, hasOwnID: false)
+    let (seen, detail) = verdict(EmptyReads.missing("nhetrinh.address", in: read, grantee: grantee))
+    #expect(seen == .notReadBack)
+    #expect(detail == "no element `nhetrinh.address`: none of the app's identifiers (nhetrinh.*) is in the window, "
+        + "its tree was not read (window \"\", 4 children, first roles [AXButton, (empty), AXGroup], read error 0)")
 }
 
 @Test("the reason names the read error and never a path") func emptyReadReason() {
