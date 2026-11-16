@@ -4,23 +4,41 @@ id: NT-GAT-004
 family: GAT
 status: OBSERVED
 date: 2026-11-16
-source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift (`borderColour` reads the 4 corners)
-source: _app/Tests/NhetrinhReadbackTests/_IconMatchTests.swift (6 captures x a light and a dark Dock)
+source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift (`ringPoints`, `captureRect(around:dock:)`, `capture`)
+source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift (`measure(capture:icon:item:)`, `ringColour`)
+source: _app/Tests/NhetrinhReadbackTests/_IconMatchTests.swift `dockCaptureVerdict` (6 captures x 2 Docks)
+source: _app/Tests/NhetrinhReadbackTests/DockRingTests.swift `dockCornerReviewGaps`, `ringNeverLeavesTheDock`, `ringIsSmallerAtTheDocksEdge`, `noRingIsNeverAPass`
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Fix that holds
 
-The Dock's colour is the median of 3 x 3 pixels at each of the 4 corners: a rounded tile never
-covers the very corners. Tests: bare icon (pass); small icon on an inset tile; icon on a tile to
-the edge; icon on a tile at 96 %; a bare icon at 40 %; blank. Each on a light (0.85) and a dark (0.25) Dock.
+R2 captures the item grown by 6 pt on each side, clamped to the frame of the Dock list that holds
+it: no pixel outside the Dock (NT-TG-002); at the Dock's edge the ring is smaller. The picture is
+a temporary file, read and deleted in the same step; the report keeps only numbers. The Dock's colour is
+the median of that ring, outside the item, where no tile of the item can reach. The grid is
+read inside the item only. No ring is never a pass. Cases: the 6 captures of
+`dockCaptureVerdict` on a 0.85 and a 0.25 Dock; a square tile to the edge; light below the item
+with a light tile and with the bare icon; the item at the Dock's bottom edge (no ring below)
+with a square tile and with the bare icon.
 
-## The wrong fix
+## Known limit
+
+`paleTileOnLightDock` (a 0.80 tile on a 0.85 Dock) still passes R2: the tile is 22 from the Dock
+colour, under `colourDistance` (30). The case is kept under `withKnownIssue`, so the test says so
+when it starts to fail correctly. A smaller distance tells it apart in the drawn captures. No real
+Dock capture exists to show that the Dock's blurred material stays within a smaller distance, so the
+distance is not lowered.
+
+## The wrong fixes
 
 Raise the agreement threshold: the tile-to-edge capture scored 0.96, as high as a bare icon can.
+Read the item's corners (commit 4ee85bf): a square tile covers them (instance 2).
 
 ## Proof
 
-Red first: tile to the edge passed R2 on both Docks (2 issues). Green after the fix, 12 of 12.
-Not proven: R2 on the real Dock. A real icon that reaches the capture's corners would make the
-corners icon-coloured; nhetrinh's icon is clear there (`_DockIcon.png`: alpha 0 in each corner
-patch of 4/128 of the side, read 2026-11-16).
+Red first: commit 90b8cab, `_app/scripts/test.sh`, 4 issues in `dockCornerReviewGaps`. Green after,
+`paleTileOnLightDock` as the one known issue. Mutation: the ring read from inside the item instead
+fails `squareTileToTheEdge`, `squareTileAtDockEdge`, `lightTileLightCornersBelow`, both
+`iconOnTileToTheEdge` cases and `noRingIsNeverAPass`.
+Not proven: R2 on the real Dock; that the ring holds only Dock colour (neighbour items, the
+running dot); that the Dock list's Accessibility frame holds only Dock pixels.

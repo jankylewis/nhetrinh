@@ -4,5 +4,7 @@ build/
 *.app
 hubs/product/rnd/_bench/measure/memsum
 hubs/product/rnd/_bench/results/events.jsonl
+# R2's Dock capture is a temporary file, never kept (NT-TG-002)
+hubs/failures/evidence/readback/*.png
 __pycache__/
 .DS_Store

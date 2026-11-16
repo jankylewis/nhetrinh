@@ -2,9 +2,11 @@ import AppKit
 
 /// Decides from pixels if a Dock item shows our icon as it is: no tile behind it, and large.
 ///
-/// The Dock item is sampled on a grid. A cell is "occupied" when its colour is far from the
-/// Dock's own background (taken from the item's corners). The icon's transparency says which
-/// cells should be occupied for a given size and offset. The best size and offset are searched;
+/// The capture is the Dock item grown by a ring on each side (`DockIcon.ringPoints`). The item is
+/// sampled on a grid. A cell is "occupied" when its colour is far from the Dock's own background,
+/// taken from the ring, outside the item: a tile inside the item never reaches it (NT-GAT-004).
+/// The icon's transparency says which cells should be occupied for a given size and offset.
+/// The best size and offset are searched;
 /// `agreement` is the share of cells that match there, `scale` the icon size relative to the item.
 /// A tile makes many cells occupied where the icon is transparent, or makes the icon small.
 struct IconMatch {
@@ -17,8 +19,13 @@ struct IconMatch {
     /// R2 passes only here: the shape matches the icon, and the icon fills most of the Dock item.
     var showsBareIcon: Bool { agreement >= 0.90 && scale >= 0.60 }
 
-    static func measure(capture: NSBitmapImageRep, icon: NSBitmapImageRep) -> IconMatch {
-        let occupied = occupiedCells(of: capture)
+    /// `item`: the Dock item inside the capture, in pixels, origin top left. The rest is the ring.
+    /// No ring (no pixel outside the item) is never a pass: the Dock colour is then unknown.
+    static func measure(capture: NSBitmapImageRep, icon: NSBitmapImageRep, item: CGRect) -> IconMatch {
+        guard let background = ringColour(of: capture, item: item), item.width >= 1, item.height >= 1 else {
+            return IconMatch(agreement: 0, scale: 0)
+        }
+        let occupied = occupiedCells(of: capture, item: item, background: background)
         let opaque = opaqueTable(of: icon)
         var best = IconMatch(agreement: 0, scale: 0)
         for scale in stride(from: 0.40, through: 1.0, by: 0.02) {
@@ -32,12 +39,11 @@ struct IconMatch {
         return best
     }
 
-    /// Which grid cells of the capture differ from the Dock background.
-    private static func occupiedCells(of capture: NSBitmapImageRep) -> [Bool] {
-        let background = borderColour(of: capture)
-        return (0..<grid * grid).map { index in
-            let x = (index % grid * 2 + 1) * capture.pixelsWide / (grid * 2)
-            let y = (index / grid * 2 + 1) * capture.pixelsHigh / (grid * 2)
+    /// Which grid cells of the item differ from the Dock background.
+    private static func occupiedCells(of capture: NSBitmapImageRep, item: CGRect, background: [Double]) -> [Bool] {
+        (0..<grid * grid).map { index in
+            let x = Int(item.minX + (Double(index % grid) + 0.5) * item.width / Double(grid))
+            let y = Int(item.minY + (Double(index / grid) + 0.5) * item.height / Double(grid))
             return distance(rgb(capture, x, y), background) > colourDistance
         }
     }
@@ -62,19 +68,18 @@ struct IconMatch {
         return Double(matches) / Double(grid * grid)
     }
 
-    /// The median colour of the capture's four corners: the Dock's own background. Not the whole
-    /// border: a tile as large as the item covers the border, and was then taken for the Dock, so
-    /// an icon on that tile passed (NT-GAT-004). A rounded tile never covers the very corners.
-    private static func borderColour(of capture: NSBitmapImageRep) -> [Double] {
-        let wide = capture.pixelsWide, high = capture.pixelsHigh
-        var corners: [[Double]] = []
-        for dx in 1...3 {
-            for dy in 1...3 {
-                corners += [rgb(capture, dx, dy), rgb(capture, wide - 1 - dx, dy),
-                            rgb(capture, dx, high - 1 - dy), rgb(capture, wide - 1 - dx, high - 1 - dy)]
+    /// The median colour of the ring: every pixel of the capture outside the item. Not the item's
+    /// border or corners: a tile as large as the item covers its border, and a square tile its
+    /// corners, and was then taken for the Dock (NT-GAT-004). Nil when there is no ring.
+    private static func ringColour(of capture: NSBitmapImageRep, item: CGRect) -> [Double]? {
+        var ring: [[Double]] = []
+        for y in 0..<capture.pixelsHigh {
+            for x in 0..<capture.pixelsWide where !item.contains(CGPoint(x: Double(x) + 0.5, y: Double(y) + 0.5)) {
+                ring.append(rgb(capture, x, y))
             }
         }
-        return (0..<3).map { channel in corners.map { $0[channel] }.sorted()[corners.count / 2] }
+        guard !ring.isEmpty else { return nil }
+        return (0..<3).map { channel in ring.map { $0[channel] }.sorted()[ring.count / 2] }
     }
 
     private static func rgb(_ image: NSBitmapImageRep, _ x: Int, _ y: Int) -> [Double] {

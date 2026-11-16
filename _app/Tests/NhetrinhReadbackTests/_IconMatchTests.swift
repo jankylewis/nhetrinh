@@ -2,9 +2,10 @@ import AppKit
 import Testing
 @testable import NhetrinhReadback
 
-/// R2 decides from a capture of the Dock item. These captures are drawn here, so the verdict is
-/// known: the bare icon passes; an icon on a dark tile, a small icon, or an empty item fails.
-/// Each criterion has more than one case, on a light and on a dark Dock (NT-GAT-004).
+/// R2 decides from a capture of the Dock item and a ring around it (`DockIcon.ringPoints`, 12 px
+/// at 2x). These captures are drawn here, so the verdict is known: the bare icon passes; an icon
+/// on a dark tile, a small icon, or an empty item fails. Each criterion has more than one case,
+/// on a light and on a dark Dock (NT-GAT-004).
 enum DockCapture: String, CaseIterable {
     case bareIconOnDock = "the icon alone on a plain Dock colour"
     case smallIconOnDarkTile = "the same icon smaller on a dark rounded tile"
@@ -15,10 +16,8 @@ enum DockCapture: String, CaseIterable {
 
     var showsBareIcon: Bool { self == .bareIconOnDock }
 
-    func draw(dock: CGFloat) -> NSBitmapImageRep {
-        bitmap(side: 128) { rect in
-            NSColor(white: dock, alpha: 1).setFill()
-            rect.fill()
+    func draw(dock: CGFloat) -> Capture {
+        capture(dock: dock) { rect in
             switch self {
             case .bareIconOnDock: drawIcon(in: rect.insetBy(dx: rect.width * 0.05, dy: rect.height * 0.05))
             case .smallIconOnDarkTile: drawTile(rect, tile: 0.08, icon: 0.22)
@@ -48,16 +47,36 @@ func drawIcon(in rect: NSRect) {
     NSRect(x: rect.minX + 2 * unit, y: rect.minY, width: 6 * unit, height: 5 * unit).fill()
 }
 
-/// A square RGBA bitmap, transparent at first, drawn into by `body`.
-func bitmap(side: Int, _ body: (NSRect) -> Void) -> NSBitmapImageRep {
+struct Capture {
+    let image: NSBitmapImageRep
+    let item: CGRect
+}
+
+/// A 128 px Dock item on a `dock` colour, with a 12 px ring; `below` is the ring under the item
+/// (0 at the Dock's bottom edge), `outside` the colour of that strip (not the Dock).
+func capture(dock: CGFloat, below: Int = 12, outside: CGFloat? = nil, _ item: (NSRect) -> Void) -> Capture {
+    let image = bitmap(wide: 152, high: 140 + below) { rect in
+        NSColor(white: dock, alpha: 1).setFill()
+        rect.fill()
+        NSColor(white: outside ?? dock, alpha: 1).setFill()
+        NSRect(x: 0, y: 0, width: rect.width, height: CGFloat(below)).fill()
+        item(NSRect(x: 12, y: below, width: 128, height: 128))
+    }
+    return Capture(image: image, item: CGRect(x: 12, y: 12, width: 128, height: 128))
+}
+
+/// An RGBA bitmap, transparent at first, drawn into by `body`.
+func bitmap(side: Int, _ body: (NSRect) -> Void) -> NSBitmapImageRep { bitmap(wide: side, high: side, body) }
+
+func bitmap(wide: Int, high: Int, _ body: (NSRect) -> Void) -> NSBitmapImageRep {
     guard let image = NSBitmapImageRep(
-        bitmapDataPlanes: nil, pixelsWide: side, pixelsHigh: side, bitsPerSample: 8, samplesPerPixel: 4,
+        bitmapDataPlanes: nil, pixelsWide: wide, pixelsHigh: high, bitsPerSample: 8, samplesPerPixel: 4,
         hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
         let context = NSGraphicsContext(bitmapImageRep: image)
-    else { fatalError("cannot make a \(side) px bitmap") }
+    else { fatalError("cannot make a \(wide) x \(high) px bitmap") }
     NSGraphicsContext.saveGraphicsState()
     NSGraphicsContext.current = context
-    body(NSRect(x: 0, y: 0, width: side, height: side))
+    body(NSRect(x: 0, y: 0, width: wide, height: high))
     NSGraphicsContext.restoreGraphicsState()
     return image
 }
@@ -65,46 +84,8 @@ func bitmap(side: Int, _ body: (NSRect) -> Void) -> NSBitmapImageRep {
 /// A light Dock and a dark Dock (the dark one is still far enough from the tile's colour).
 @Test(arguments: DockCapture.allCases, [0.85, 0.25])
 func dockCaptureVerdict(capture: DockCapture, dock: CGFloat) {
-    let icon = bitmap(side: 256) { drawIcon(in: $0) }
-    let match = IconMatch.measure(capture: capture.draw(dock: dock), icon: icon)
+    let drawn = capture.draw(dock: dock)
+    let match = IconMatch.measure(capture: drawn.image, icon: bitmap(side: 256) { drawIcon(in: $0) }, item: drawn.item)
     #expect(match.showsBareIcon == capture.showsBareIcon,
             "\(capture.rawValue), Dock \(dock): agreement \(match.agreement), scale \(match.scale)")
-}
-
-/// P0-REV-1 gaps in the corner rule (NT-GAT-004). Each capture is 128 px; the icon is at 76 %.
-enum CornerCase: String, CaseIterable {
-    case squareTileToTheEdge = "a dark tile with square corners as large as the item"
-    case paleTileOnLightDock = "a rounded tile 0.80 on a 0.85 Dock (within the colour distance)"
-    case lightTileLightCornersBelow = "a light rounded tile on a dark Dock, 2 bottom corners light (outside the Dock)"
-    case bareIconLightCornersBelow = "the bare icon on a dark Dock, 2 bottom corners light (outside the Dock)"
-
-    var showsBareIcon: Bool { self == .bareIconLightCornersBelow }
-
-    func draw() -> NSBitmapImageRep {
-        bitmap(side: 128) { rect in
-            let dock: CGFloat = self == .paleTileOnLightDock ? 0.85 : 0.25
-            NSColor(white: dock, alpha: 1).setFill()
-            rect.fill()
-            let tile: CGFloat = self == .squareTileToTheEdge ? 0.08 : (self == .paleTileOnLightDock ? 0.80 : 0.92)
-            NSColor(white: tile, alpha: 1).setFill()
-            let radius = self == .squareTileToTheEdge ? 0 : rect.width * 0.22
-            if self != .bareIconLightCornersBelow {
-                NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius).fill()
-            }
-            if self == .lightTileLightCornersBelow || self == .bareIconLightCornersBelow {
-                NSColor(white: 0.92, alpha: 1).setFill()
-                NSRect(x: 0, y: 0, width: 6, height: 6).fill()
-                NSRect(x: rect.width - 6, y: 0, width: 6, height: 6).fill()
-            }
-            drawIcon(in: rect.insetBy(dx: rect.width * 0.12, dy: rect.height * 0.12))
-        }
-    }
-}
-
-@Test(arguments: CornerCase.allCases)
-func dockCornerReviewGaps(capture: CornerCase) {
-    let icon = bitmap(side: 256) { drawIcon(in: $0) }
-    let match = IconMatch.measure(capture: capture.draw(), icon: icon)
-    #expect(match.showsBareIcon == capture.showsBareIcon,
-            "\(capture.rawValue): agreement \(match.agreement), scale \(match.scale)")
 }

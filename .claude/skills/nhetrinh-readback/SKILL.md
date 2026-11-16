@@ -68,7 +68,9 @@ row shows that tab; R7 unopened tabs cost no page process; R8 the lightness budg
    `main.swift` adds it to `steps`. `_Steps/` holds at most 5 entries, one `_` entry.
 4. Give every view the step reads an accessibility identifier (`nhetrinh.<name>`).
 5. Machine rules: one app instance, at most 3 tabs loading, pages one after another.
-   Capture only the app's own window or the Dock item's own rectangle, never the screen.
+   Capture only the app's own window, or the Dock item and a ring clamped to the Dock's own frame;
+   never the screen. A capture goes to a temporary file, is read and deleted in the same step:
+   no picture is kept in the repository, the report keeps only the numbers.
 6. Run the checker, then `--steps R<n>` on the readback seat, then a full run.
 
 ## Report

@@ -20,11 +20,14 @@ struct Options {
     var app = AppSession.installed
     var steps: Set<String> = []
 
-    /// `known`: the step ids that exist. Every flag needs a value.
+    /// `known`: the step ids that exist. Every flag needs a value and is given at most once: a
+    /// repeated flag would keep only its last value (`--steps R1 --steps R2` ran R2 only).
     init(_ arguments: [String], known: Set<String>) throws {
         var rest = arguments.dropFirst()
+        var seen: Set<String> = []
         while let flag = rest.popFirst() {
             guard flag == "--app" || flag == "--steps" else { throw UsageError(message: "unknown argument `\(flag)`") }
+            guard seen.insert(flag).inserted else { throw UsageError(message: "`\(flag)` is given more than once") }
             guard let value = rest.popFirst(), !value.isEmpty, !value.hasPrefix("--") else {
                 throw UsageError(message: "`\(flag)` needs a value")
             }
@@ -75,7 +78,6 @@ guard FileManager.default.fileExists(atPath: options.app.path) else {
 let kept = options.keepsEvidence ? evidenceFolder() : nil
 if let kept {
     try FileManager.default.createDirectory(at: kept, withIntermediateDirectories: true)
-    SystemSteps.evidenceFolder = kept
 }
 let session = AppSession(appURL: options.app)
 let steps = BaseSteps.all.filter { options.steps.isEmpty || options.steps.contains($0.id) }

@@ -31,3 +31,4 @@ with the budget. Over these 8 runs, the worst 5-sample median after 6 s was 97.5
 (budget 110): no 5-sample window after 6 s held more than 2 burst samples. Bursts closer
 together could still move a median of 5: not seen, not excluded.
 Keep the highest sample in the R8 line as information, so a real growth is still seen.
+Built differently: 9 samples, a rise rule and the app on its highest sample (see the failfix).

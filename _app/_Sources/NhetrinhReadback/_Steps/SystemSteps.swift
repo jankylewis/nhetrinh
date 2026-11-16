@@ -2,29 +2,30 @@ import AppKit
 
 /// Steps that look at the system around the app: the Dock, its processes, its size.
 enum SystemSteps {
-    static var evidenceFolder = FileManager.default.temporaryDirectory
     static let seedKey = "NHT_BENCH_URLS"
 
     static func dockIconHasNoTile(_ app: AppSession) throws -> String {
         try app.requireAccessibility()
         try app.ensureRunning()
-        var frames: [CGRect] = []
+        var items: [DockItem] = []
         waitUntil(5) {
-            frames = (try? DockIcon.itemFrames(title: "nhetrinh")) ?? []
-            return !frames.isEmpty
+            items = (try? DockIcon.items(title: "nhetrinh")) ?? []
+            return !items.isEmpty
         }
-        if frames.isEmpty { frames = try DockIcon.itemFrames(title: "nhetrinh") }
-        guard let frame = frames.last else { throw StepError.fail("no Dock item named nhetrinh") }
+        if items.isEmpty { items = try DockIcon.items(title: "nhetrinh") }
+        guard let item = items.last else { throw StepError.fail("no Dock item named nhetrinh") }
         let iconFile = app.appURL.appendingPathComponent("Contents/Resources/AppIcon.png")
         guard let icon = NSBitmapImageRep(data: (try? Data(contentsOf: iconFile)) ?? Data()) else {
             throw StepError.fail("the app bundle has no AppIcon.png")
         }
-        let capture = try DockIcon.capture(frame, to: evidenceFolder.appendingPathComponent("dock_icon.png"))
-        let match = IconMatch.measure(capture: capture, icon: icon)
+        let capture = try DockIcon.capture(item)
+        let match = IconMatch.measure(capture: capture.image, icon: icon, item: capture.item)
         let seen = String(format: "silhouette agreement %.0f %%, icon at %.0f %% of the Dock item",
                           match.agreement * 100, match.scale * 100)
         try expect(match.showsBareIcon, "the Dock item does not show the bare icon: \(seen)")
-        return "captured only the Dock item (\(Int(frame.width)) x \(Int(frame.height)) pt): \(seen)"
+        let size = "\(Int(item.frame.width)) x \(Int(item.frame.height)) pt"
+        return "captured the Dock item (\(size)) and a ring inside the Dock, "
+            + "not kept: \(seen)"
     }
 
     static func unopenedTabsCostNothing(_ app: AppSession) throws -> String {
@@ -41,8 +42,9 @@ enum SystemSteps {
             + "3 rows, 1 page process"
     }
 
-    /// R8: 6 s after the page process starts, 5 memory samples 1 s apart; the median is judged
-    /// (NT-PRF-002), the highest sample is shown. Then idle CPU over 5 s, and the bundle size.
+    /// R8: 6 s after the page process starts, 9 memory samples 1 s apart, judged by `Budget.Reading`
+    /// (NT-PRF-002): the app on its highest sample, the total on its median and the last-4 rule.
+    /// Then idle CPU over 5 s, and the bundle size.
     static func budgetHolds(_ app: AppSession) throws -> String {
         try app.launch(env: [seedKey: "https://example.com"])
         let started = waitUntil(15) { !Footprint.pageProcesses(of: app.pid).isEmpty }
@@ -51,13 +53,11 @@ enum SystemSteps {
         let (memory, helpers) = memorySamples(of: app.pid)
         let cpu = Footprint.cpuPercent(of: app.pid, over: 5)
         let kilobytes = bundleKilobytes(app.appURL)
-        let seen = String(format: "median of %d samples 1 s apart: app %.1f MB (max %.0f); app + %d helpers %.1f MB "
-                          + "(max %.0f); highest sample: app %.1f MB, total %.1f MB; idle CPU %.1f %% (max %.0f); "
-                          + "bundle %d KB (max %d)", memory.count, memory.app, Budget.appMegabytes, helpers,
-                          memory.total, Budget.totalMegabytes, memory.highestApp, memory.highestTotal, cpu,
-                          Budget.idleCpuPercent, kilobytes, Budget.bundleKilobytes)
+        let rest = String(format: "; idle CPU %.1f %% (max %.0f); bundle %d KB (max %d)",
+                          cpu, Budget.idleCpuPercent, kilobytes, Budget.bundleKilobytes)
+        let seen = memory.line(helpers: helpers) + rest
         let holds = memory.holds && cpu <= Budget.idleCpuPercent && kilobytes <= Budget.bundleKilobytes
-        try expect(memory.app > 0 && holds, "one simple tab (example.com): \(seen)")
+        try expect(memory.highestApp > 0 && holds, "one simple tab (example.com): \(seen)")
         return "one simple tab (example.com), 6 s after load: \(seen)"
     }
 

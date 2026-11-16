@@ -14,6 +14,10 @@ links: fix=no lesson=no evidence=no toolgap=NT-TG-002
 ## Workaround
 
 Do not capture screen regions. Delete any capture that shows another app at once.
+R2 (readback) still captures a region: the Dock item and a ring clamped to the Dock list's own
+frame (`DockIcon.captureRect(around:dock:)`, test `ringNeverLeavesTheDock`), to a temporary file
+deleted in the same step; `.gitignore` holds `hubs/failures/evidence/readback/*.png` as a guard.
+Not proven: that the Dock's Accessibility frame holds only Dock pixels on the real screen.
 
 ## Wanted
 
