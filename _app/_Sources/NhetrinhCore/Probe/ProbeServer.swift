@@ -9,7 +9,8 @@ public final class ProbeServer {
     private let listener: Int32
     private let source: DispatchSourceRead
     private let handle: (ProbeRequest) -> ProbeResponse
-    /// A peer gets this long to send its line; the queue is the app's main queue.
+    /// A peer gets this long to send its whole line, a deadline, not a limit per read (P0-REV-PROBE);
+    /// the queue is the app's main queue.
     static let peerTimeout: TimeInterval = 1
 
     public init(folder: String, queue: DispatchQueue,
@@ -65,7 +66,8 @@ public final class ProbeServer {
         setsockopt(peer, SOL_SOCKET, SO_NOSIGPIPE, &on, socklen_t(MemoryLayout<Int32>.size))
         guard Self.isOwnUser(peer) else { return }
         ProbeSocket.setTimeout(peer, Self.peerTimeout)
-        guard let line = try? ProbeSocket.readLine(peer) else { return }
+        let deadline = Date(timeIntervalSinceNow: Self.peerTimeout)
+        guard let line = try? ProbeSocket.readLine(peer, by: deadline) else { return }
         let response = (try? ProbeCodec.decodeRequest(line)).map(handle) ?? .failed("malformed request")
         guard let reply = try? ProbeCodec.encode(response) else { return }
         try? ProbeSocket.writeLine(peer, reply)

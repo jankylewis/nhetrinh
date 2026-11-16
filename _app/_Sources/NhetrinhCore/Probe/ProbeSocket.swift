@@ -54,10 +54,13 @@ enum ProbeSocket {
     }
 
     /// Read up to the first newline (not included). Throws on a timeout or an error; nil at once on EOF.
-    static func readLine(_ socket: Int32) throws -> String? {
+    /// With a `deadline`, the whole line must arrive before it: `SO_RCVTIMEO` alone bounds one `read`,
+    /// so a peer sending a byte at a time would hold the reader for as long as it likes (P0-REV-PROBE).
+    static func readLine(_ socket: Int32, by deadline: Date? = nil) throws -> String? {
         var line: [UInt8] = []
         var byte: UInt8 = 0
         while line.count < maxLine {
+            if let deadline { try receiveTimeout(socket, until: deadline) }
             let count = read(socket, &byte, 1)
             if count < 0 { throw ProbeError.system("read", errno) }
             if count == 0 { return line.isEmpty ? nil : String(decoding: line, as: UTF8.self) }
@@ -65,6 +68,16 @@ enum ProbeSocket {
             line.append(byte)
         }
         return String(decoding: line, as: UTF8.self)
+    }
+
+    /// Bound the next `read` by the time left before `deadline`; none left is a timeout.
+    /// A zero `timeval` would mean "no limit", so the least is 1 ms.
+    static func receiveTimeout(_ socket: Int32, until deadline: Date) throws {
+        let left = deadline.timeIntervalSinceNow
+        guard left > 0 else { throw ProbeError.system("read", ETIMEDOUT) }
+        let bounded = max(left, 0.001)
+        var limit = timeval(tv_sec: Int(bounded), tv_usec: Int32((bounded - floor(bounded)) * 1_000_000))
+        setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &limit, socklen_t(MemoryLayout<timeval>.size))
     }
 
     static func writeLine(_ socket: Int32, _ text: String) throws {

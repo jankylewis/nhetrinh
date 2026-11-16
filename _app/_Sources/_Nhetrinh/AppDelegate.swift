@@ -4,7 +4,7 @@ import NhetrinhCore
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var browser: BrowserWindowController?
     /// Exists only when started with `NHT_READBACK=1` (D23); a normal launch makes no socket.
-    private var probe: ProbeServer?
+    private(set) var probe: ProbeServer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setDockIcon()
@@ -13,14 +13,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.mainMenu = AppMenu.build(browser: browser)
         browser.showWindow(nil)
         browser.openInitialTabs()
-        if ProbePath.isOn(ProcessInfo.processInfo.environment) { startProbe(browser) }
+        startProbe(if: ProcessInfo.processInfo.environment, browser)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 
     func applicationWillTerminate(_ notification: Notification) { probe?.stop() }
 
-    private func startProbe(_ browser: BrowserWindowController) {
+    /// The only way the probe starts: `env` (the launch environment) holds `NHT_READBACK=1` (D23).
+    func startProbe(if env: [String: String], _ browser: BrowserWindowController) {
+        guard ProbePath.isOn(env) else { return }
         do {
             probe = try ProbeServer(folder: ProbePath.folder(pid: getpid()), queue: .main) { [weak browser] in
                 browser?.probeAnswer($0) ?? .failed("the browser window is gone")

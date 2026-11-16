@@ -80,7 +80,7 @@ tests `missingElement`, `notReadTreeSaysWhatWasRead`; red under the old rule, ch
 Not proven on the app (no rebuild, no run since).
 At 20:07 the "window" read was not a window (children AXApplication, AXMenuBar): NT-GAT-008.
 
-## Remedy: the readback probe (P0-PROBE-1, D23; written, not run on the app)
+## Remedy: the readback probe (P0-PROBE-1, D23; run on the app in P0-REV-PROBE)
 
 source: brief P0-PROBE-1 (2026-11-16): the fleet waited 75 min for re-grants after rebuilds
 R1, R3-R7 no longer use Accessibility. The readback starts nhetrinh with `NHT_READBACK=1`; only then
@@ -92,5 +92,8 @@ answered `failed` with the server still up (`ProbeSocketTests`); the menu item, 
 (`ProbeAnswerTests`); refused action FAIL, unreachable probe NOT READ BACK (`ProbeReplyTests`).
 Each was red under a mutation (P0-PROBE-1 state file). The AX window reads (`WindowRole`,
 `EmptyReads.missing`, `Fresh` retry; NT-GAT-006, NT-GAT-008) are removed with their tests.
-Not proven: the refusal of another user's peer (`getpeereid`, no test); that the installed app answers it (needs install and a launch on the app seat); that R2
+Run on the app (P0-REV-PROBE, 2026-11-16 21:50, commit d56bf81, terminal, no grant): R1, R3-R7 PASS 6 of 6, R8 PASS,
+exit 0; a normal launch made no `nhetrinh-probe-*` folder (`lsof -U`: no probe socket). Fixed in P0-PROBE-FIX: 1 s per
+`read` became 1 s for the whole line (`ProbeDeadlineTests`); the gate is tested (`AppDelegateProbeTests`); report header.
+Not proven: the refusal of another user's peer (`getpeereid`, no test, needs a second user); that R2
 still reads the Dock when run as `nhetrinh-readback.app` (unchanged code, not re-run).
