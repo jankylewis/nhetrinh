@@ -1,0 +1,24 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build MVP A (WebKit)
+        run: rnd/a_webkit/build.sh
+      - name: Check bundle
+        run: |
+          plutil -lint rnd/a_webkit/build/nhetrinh-a.app/Contents/Info.plist
+          codesign --verify --strict rnd/a_webkit/build/nhetrinh-a.app
+          test -f rnd/a_webkit/build/nhetrinh-a.app/Contents/Resources/AppIcon.icns
+      - name: Build bench tool
+        run: clang -O2 -Wall -Werror -o rnd/bench/memsum rnd/bench/memsum.c
+      - name: Lint bench scripts
+        run: python3 -m py_compile rnd/bench/bench.py rnd/bench/summarize.py

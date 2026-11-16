@@ -1,0 +1,9 @@
+# build output
+build/
+*.app
+rnd/bench/memsum
+# Chromium (CEF) download for MVP B: ~135 MB tarball / 340 MB unpacked, fetched by script
+rnd/b_cef/vendor/
+rnd/bench/results/events.jsonl
+.DS_Store
+rnd/bench/results_run.log
