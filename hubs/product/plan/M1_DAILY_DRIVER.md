@@ -8,33 +8,33 @@ like a real one, and background music is not cut. The gate is in `_PLAN.md`.
 Goal: every later phase is built, checked and read back in the same way.
 
 Build:
-1. `check_conventions.py` replaces `check_tree.py`. It checks: one `_` entry per folder, 5 entries
+1. `_app/scripts/conventions/_check.py` replaces `check_tree.py`. It checks: one `_` entry per folder, 5 entries
    per folder, `.md` 100 lines, `.swift` / `.py` / `.c` / `.sh` 150 lines, function 30 lines,
    line 120 characters, 5 parameters, no package dependencies. It has its own tests: one broken
    tree per rule.
 2. Fix today's violations: split `_BrowserWindowController.swift` (209 lines) into `_Window/`
    (controller and its extensions) and `Tab/`; split `_bench.py` (186 lines).
-3. Harness: `AGENTS.md` at the root, `.claude/CLAUDE.md`, and skills `nhetrinh-develop`,
-   `nhetrinh-readback`, `nhetrinh-hubs`, `nhetrinh-ship` (each 100 lines or less).
+3. Harness: `CLAUDE.md` at the root (D16), and skills `nhetrinh-develop`, `nhetrinh-readback`,
+   `nhetrinh-hubs`, `nhetrinh-ship` under `.claude/skills/` (each 100 lines or less).
    `rnd/` moves to `hubs/product/rnd/` to free the root slot (`DECISIONS.md` A2).
 4. Readback tool: target `NhetrinhReadback`, run with `swift run nhetrinh-readback`. It starts
    the installed app the way the Dock does and drives it through the macOS Accessibility API:
-   real clicks and real keys. The views get accessibility identifiers. It writes a verdict file
+   press, set value, confirm; no mouse or key events (D18). The views get accessibility identifiers. It writes a verdict file
    (one PASS / FAIL line per step) and its path goes to `hubs/failures/evidence/_INDEX.md`.
 5. Safe benchmark: `_bench.py` loads tabs one at a time, 10 at most. The 30-tab scenario is removed.
 6. Code hygiene from the conventions: `os.Logger` on every failure path, no force unwraps.
 
 Readback steps (the base set, run again in every later phase):
-- R1 the window opens with the sidebar and the address bar.
-- R2 the Dock icon has no tile. Only the Dock item's own rectangle is captured.
-- R3 type `example.com`, Return: the title is "Example Domain".
-- R4 type `rock & roll`, Return: the URL holds `q=rock%20%26%20roll`.
-- R5 ⌘T, then ⌘W: sidebar rows +1, then -1.
-- R6 click another sidebar row: the page changes.
-- R7 start with 3 tabs: 1 page process runs.
-- R8 the lightness budget.
+- R1 the window opens: a sidebar 100 pt wide or more, with 1 row or more, and the address bar.
+- R2 the Dock icon has no tile. Only the Dock item's own rectangle is captured, then matched to the icon.
+- R3 set the address bar to `example.com`, confirm: title "Example Domain", bar `https://example.com/`.
+- R4 set the address bar to `rock & roll`, confirm: the bar holds `q=rock%20%26%20roll`.
+- R5 press File > New Tab (shortcut ⌘T), then File > Close Tab (shortcut ⌘W): rows +1, then -1.
+- R6 two tabs (example.com, example.org): select the row above, then the last row: the bar follows.
+- R7 launch with 3 tabs (seeded by the launch environment until P1): 3 rows, 1 page process.
+- R8 one simple tab (example.com), 6 s after load: app, app + helpers, idle CPU, bundle within budget.
 
-Exit: checker 0 violations; `swift test` green; R1-R8 PASS on `~/Applications/nhetrinh.app`;
+Exit: checker 0 violations; `_app/scripts/test.sh` green; R1-R8 PASS on `~/Applications/nhetrinh.app`;
 CI green; NT-BUG-001, NT-BUG-002, NT-ENV-001, NT-BLD-002 are FIXED with proof; NT-TG-001 and
 NT-TG-002 are closed by the tool.
 
@@ -64,11 +64,11 @@ Tests: session round trip; corrupt JSON; unknown version; empty session gives a 
 100 tabs; the `UnloadPolicy` table (idle time x selected x playing).
 
 Readback adds:
-- R9 open 3 tabs, select the 2nd, ⌘Q, launch: the same 3 rows, the 2nd selected, 1 page process.
+- R9 open 3 tabs, select the 2nd, nhetrinh > Quit nhetrinh, launch: same 3 rows, 2nd selected, 1 page process.
 - R10 kill the app (signal 9), launch: the state of the last save is back.
 - R11 a background tab plays audio past the idle limit (limit set to 5 s for the run): it stays
   loaded. A silent tab in the same run is unloaded.
-- R12 click an unloaded tab: the same URL loads and ⌘[ goes back in its history.
+- R12 select an unloaded tab's row: the same URL loads and Tabs > Back goes back in its history.
 
 Exit: the gate, R1-R12 PASS.
 
@@ -77,10 +77,10 @@ Exit: the gate, R1-R12 PASS.
 Goal: the sidebar feels finished.
 
 Build:
-- Row: favicon (16 pt), title, close button on hover. Middle-click closes.
-- Drag a row to reorder. ⌃Tab and ⌃⇧Tab: next and previous tab.
-- ⌘⇧T reopens the last closed tab (Core `ClosedTabs`: the last 20, this run only).
-- ⌘-click a link: a new tab in the background.
+- Row: favicon (16 pt), title, close button on hover. Middle-click closes. Row menu: Close Tab (today).
+- Drag a row to reorder, or Tabs > Move Tab Up / Move Tab Down. ⌃Tab and ⌃⇧Tab: next and previous tab.
+- File > Reopen Closed Tab (⌘⇧T) reopens the last closed tab (Core `ClosedTabs`: the last 20, this run only).
+- ⌘-click a link, or its context-menu item Open Link in New Tab: a new tab in the background.
 - Toolbar: reload becomes stop while a page loads; a thin progress line under the toolbar.
 - Favicons: the page's `<link rel="icon">`, else `/favicon.ico`; a memory cache of 200 icons at most.
 
@@ -88,11 +88,12 @@ Tests: `ClosedTabs` (push, pop, cap); `TabOrder.move(from:to:)` index math; favi
 resolution (relative, absolute, missing).
 
 Readback adds:
-- R13 hover a row: a close button appears; press it: rows -1.
-- R14 drag row 3 above row 1: the new order shows, and stays after a relaunch.
-- R15 ⌘⇧T: the row is back with the same URL.
+- R13 show a row's menu (`AXShowMenu`), press Close Tab: rows -1. Hover stays the user's way.
+- R14 select row 3, Tabs > Move Tab Up twice: it is row 1, and stays after a relaunch. Drag stays the user's way.
+- R15 File > Reopen Closed Tab: the row is back with the same URL.
 - R16 a site that has an icon shows it in its row.
-- R17 ⌘-click a link on a local test page: rows +1, the selected tab does not change.
+- R17 a local test page: show the link's menu (`AXShowMenu`), press Open Link in New Tab: rows +1,
+  the selected tab does not change. The link's menu out of reach: NOT READ BACK, never PASS.
 - R18 stop a slow local page: loading ends and the button is reload again.
 
 Exit: the gate, R1-R18 PASS; favicons add 2 MB or less to the app process.

@@ -11,7 +11,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 
 ## Where we are (2026-11-16)
 
-- Engine chosen by measurement: WebKit. Numbers: `rnd/_bench/results/_RESULTS.md`.
+- Engine chosen by measurement: WebKit. Numbers: `hubs/product/rnd/_bench/results/_RESULTS.md`.
 - On `master` (`b07f437`): the two R&D MVPs, the benchmark and the icon.
 - Features of the WebKit MVP, NT-FEAT-001 to 008: `../features/S01.md`.
 - Local, not committed: the `_app/` scaffold, `hubs/`, the folder checker.
@@ -23,7 +23,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 
 | Phase | Version | Size | What the headmate gets | Status | Detail |
 |---|---|---|---|---|---|
-| P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | TODO | `M1_DAILY_DRIVER.md` |
+| P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | DONE (readback 8/8, 2026-11-16 21:24, `hubs/failures/evidence/readback/_LATEST.md`) | `M1_DAILY_DRIVER.md` |
 | P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | TODO | `M1_DAILY_DRIVER.md` |
 | P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | TODO | `M1_DAILY_DRIVER.md` |
 | P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
@@ -41,9 +41,9 @@ Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it
 1. Read `hubs/bugs/TRIAGE.md` and `hubs/failures/TRIAGE.md`. Write the phase's foreseen risks.
 2. Write the failing tests first, in `NhetrinhCore`, parameterized.
 3. Build the phase.
-4. `check_conventions.py`: 0 violations.
-5. `swift test`: all green. The report quotes the count.
-6. `_build.sh`, then `install.sh` (the readback runs on the installed app, never on the build folder).
+4. `python3 _app/scripts/conventions/_check.py`: 0 violations.
+5. `nice -n 10 _app/scripts/test.sh`: all green (never plain `swift test`, NT-GAT-001). The report quotes the count.
+6. `_build.sh`, then `install/_install.sh` (the readback runs on the installed app, never on the build folder).
 7. Readback: every step of this phase and of all earlier phases is PASS.
 8. Lightness budget, measured inside the readback (table below).
 9. Hubs in the same PR: feature rows, bug / failure / lesson / tool-gap entries, evidence paths.
@@ -76,7 +76,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 | Id | Risk | Answer |
 |---|---|---|
 | R-1 | Accessibility permission is not granted, so the readback tool cannot drive the app | P0 asks once. Without it: weaker in-app checks, reported as such |
-| R-2 | macOS may forget permission grants when an ad-hoc signed app is rebuilt (not proven here) | Check in P3. If seen: sign with one stable local identity |
+| R-2 | macOS forgets permission grants when an ad-hoc signed app is rebuilt (seen 2026-11-16, NT-TG-003) | Sign with one stable local identity: `signing.sh` (written; not run, not proven) |
 | R-3 | WebKit limits: no find match count; some sites refuse non-Safari WebKit apps | Listed as known limits; the user agent already ends like Safari's |
 | R-4 | P7 (tab folders) is the largest phase | It can move after 1.0 without blocking it (`DECISIONS.md` Q2) |
 | R-5 | A feature costs memory | The budget gate stops the phase |

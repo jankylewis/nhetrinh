@@ -6,3 +6,4 @@ Index of this folder; `_SCHEMA.md` has the rules.
 |---|---|
 | `NT_BUG_001_SEARCH_CUT_OFF_AT_AMPERSAND.md` | OBSERVED |
 | `NT_BUG_002_DOCK_ICON_ON_A_BLACK_TILE.md` | OBSERVED |
+| `NT_BUG_003_NEW_TAB_FROM_THE_MENU_DOES_NOTHING.md` | OBSERVED |
