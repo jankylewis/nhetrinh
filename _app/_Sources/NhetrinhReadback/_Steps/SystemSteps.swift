@@ -18,10 +18,23 @@ enum SystemSteps {
         let match = IconMatch.measure(capture: capture.image, icon: icon, item: capture.item)
         let seen = String(format: "silhouette agreement %.0f %%, icon at %.0f %% of the Dock item",
                           match.agreement * 100, match.scale * 100)
+            + kept(capture.png, DockIcon.note(match, item: item), in: app)
         try expect(match.showsBareIcon, "the Dock item does not show the bare icon: \(seen)")
         let size = "\(Int(item.frame.width)) x \(Int(item.frame.height)) pt"
         return "captured the Dock item (\(size)) and a ring inside the Dock, "
-            + "not kept: \(seen)"
+            + (app.keepCapture == nil ? "not kept: " : "") + seen
+    }
+
+    /// With `--keep-capture`, write R2's capture and its numbers there and say so, never the path.
+    private static func kept(_ png: Data, _ note: String, in app: AppSession) -> String {
+        guard let folder = app.keepCapture else { return "" }
+        do {
+            try DockIcon.keepFile(png, as: "r2-capture.png", in: folder)
+            try DockIcon.keepFile(Data(note.utf8), as: "r2-capture.txt", in: folder)
+            return "; capture and numbers kept (--keep-capture)"
+        } catch {
+            return "; the capture could not be kept (--keep-capture): " + Report.tilde(error.localizedDescription)
+        }
     }
 
     static func unopenedTabsCostNothing(_ app: AppSession) throws -> String {

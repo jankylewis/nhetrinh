@@ -12,6 +12,8 @@ import AppKit
 struct IconMatch {
     let agreement: Double
     let scale: Double
+    /// The Dock's colour read from the ring, sRGB 0-255; empty when there is no ring.
+    var background: [Double] = []
 
     static let grid = 48
     static let colourDistance = 30.0
@@ -32,7 +34,8 @@ struct IconMatch {
             for dx in stride(from: -0.08, through: 0.08, by: 0.02) {
                 for dy in stride(from: -0.08, through: 0.08, by: 0.02) {
                     let share = agreement(occupied, opaque, scale: scale, offset: CGPoint(x: dx, y: dy))
-                    if share > best.agreement { best = IconMatch(agreement: share, scale: scale) }
+                    guard share > best.agreement else { continue }
+                    best = IconMatch(agreement: share, scale: scale, background: background)
                 }
             }
         }

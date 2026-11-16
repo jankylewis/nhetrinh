@@ -77,8 +77,9 @@ enum DockIcon {
     }
 
     /// Capture the item and its ring to a temporary PNG, read it, delete it. Returns the bitmap
-    /// and the item inside it, in pixels, origin top left. Nothing is kept on disk.
-    static func capture(_ item: DockItem) throws -> (image: NSBitmapImageRep, item: CGRect) {
+    /// and the item inside it, in pixels, origin top left, and the PNG's bytes, which R2 writes
+    /// out only with `--keep-capture` (never into a repository). Nothing else is kept on disk.
+    static func capture(_ item: DockItem) throws -> (image: NSBitmapImageRep, item: CGRect, png: Data) {
         guard let frame = captureRect(around: item.frame, dock: item.dock) else {
             throw StepError.cannotDrive("the Dock item is outside the Dock's frame")
         }
@@ -97,6 +98,21 @@ enum DockIcon {
         let scale = Double(image.pixelsWide) / frame.width, inner = item.frame.intersection(frame)
         let inside = CGRect(x: (inner.minX - frame.minX) * scale, y: (inner.minY - frame.minY) * scale,
                             width: inner.width * scale, height: inner.height * scale)
-        return (image, inside)
+        return (image, inside, data)
+    }
+
+    /// The numbers R2 judged, for `r2-capture.txt` beside the kept PNG: points, origin top left.
+    static func note(_ match: IconMatch, item: DockItem) -> String {
+        let rect = { (r: CGRect) in String(format: "x %.1f y %.1f w %.1f h %.1f", r.minX, r.minY, r.width, r.height) }
+        let colour = match.background.map { String(Int($0.rounded())) }.joined(separator: " ")
+        let captured = captureRect(around: item.frame, dock: item.dock).map(rect) ?? "none"
+        return String(format: "agreement: %.3f\nscale: %.2f\n", match.agreement, match.scale)
+            + "background (sRGB 0-255): \(colour.isEmpty ? "none" : colour)\n"
+            + "item: \(rect(item.frame))\ndock: \(rect(item.dock))\ncapture: \(captured)\n"
+    }
+
+    static func keepFile(_ data: Data, as name: String, in folder: URL) throws {
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        try data.write(to: folder.appendingPathComponent(name))
     }
 }

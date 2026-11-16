@@ -11,3 +11,5 @@ One row per kept evidence path (a file per id only past 3 paths).
 | NT-PRF-001 | `prf/_NT_PRF_001_RUNS.jsonl`, `prf/measure.py` | 32 runs: icon, icon size, profile, page, build; per-process MB | R8 on the installed app after the fix |
 | NT-PRF-002 | `prf/NT_PRF_002_GPU_SAMPLES.jsonl`, `prf/gpu_samples.py` | 8 runs x 30 s: GPU bursts of ~100 MB for 1-3 s | the work that makes a burst (not known) |
 | NT-UIX-001 | `hubs/failures/evidence/readback/_LATEST.md` (branch `p0/harness-docs`, run 18:57) | R5, R6 FAIL: New Tab from the menu added no row | R5 and R6 after the fix (P0-FIX-1) |
+| NT-GAT-006 | `hubs/failures/evidence/readback/_LATEST.md` (branch `p0/harness-docs`, run 19:27) | R6 NOT READ BACK: -25202 on `AXSelected` | R6 after the fix, on the next rebuild |
+| R2 (19:28) | none kept: the capture was deleted | R2 FAIL on the running app's item, agreement 77 %, scale 84 %; the headmate sees no tile; cause not proven | rerun R2 with `--keep-capture <dir outside the repo>`: PNG + numbers |

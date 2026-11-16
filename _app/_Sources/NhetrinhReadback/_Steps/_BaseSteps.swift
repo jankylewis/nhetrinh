@@ -71,12 +71,11 @@ enum BaseSteps {
         try app.navigate("example.org")
         let second = waitUntil(20) { (try? app.addressText()) == "https://example.org/" }
         try expect(second, "the new tab did not reach example.org; address \"\((try? app.addressText()) ?? "")\"")
-        let rows = try app.element("nhetrinh.sidebar").rows
-        try expect(rows.count >= 2, "the sidebar has \(rows.count) row(s); 2 are needed")
-        try rows[rows.count - 2].set(kAXSelectedAttribute, to: kCFBooleanTrue)
+        // Each selection reads the rows again: the sidebar reloads them on every change (NT-GAT-006).
+        try app.selectRow(fromEnd: 1)
         let first = waitUntil(5) { (try? app.addressText())?.contains("example.com") == true }
         try expect(first, "selected the row above; the address bar still shows \"\((try? app.addressText()) ?? "")\"")
-        try rows[rows.count - 1].set(kAXSelectedAttribute, to: kCFBooleanTrue)
+        try app.selectRow(fromEnd: 0)
         let back = waitUntil(5) { (try? app.addressText()) == "https://example.org/" }
         try expect(back, "selected the last row; the address bar shows \"\((try? app.addressText()) ?? "")\"")
         return "two tabs; selecting the row above showed example.com, selecting the last row showed example.org"

@@ -8,6 +8,8 @@ import Foundation
 //   swift run nhetrinh-readback --app <path>        another copy of the app (nothing is kept)
 //   --evidence <repo>   keep the verdict in this repository (for nhetrinh-readback.app, which runs in /)
 //   --log <file>        stdout and stderr go to this file, its last line `exit: <code>` (NT-TG-003)
+//   --keep-capture <dir>  R2 keeps its capture and its numbers in <dir>, never inside a repository;
+//                         without it the capture is deleted at once and nothing is kept
 //
 // Exit code: 0 every step passed, 1 a step failed, 2 a step could not run (NOT READ BACK), no step
 // ran, or the command line is wrong (nothing runs then).
@@ -39,6 +41,7 @@ guard FileManager.default.fileExists(atPath: options.app.path) else {
 }
 let kept = options.keepsEvidence ? options.evidence ?? evidenceFolder() : nil
 let session = AppSession(appURL: options.app)
+session.keepCapture = options.keepCapture
 let steps = BaseSteps.all.filter { options.steps.isEmpty || options.steps.contains($0.id) }
 let results = Runner.run(steps, in: session)
 session.quit()

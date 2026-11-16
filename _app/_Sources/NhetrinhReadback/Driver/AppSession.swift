@@ -9,6 +9,8 @@ final class AppSession {
 
     let appURL: URL
     private(set) var pid: pid_t = 0
+    /// R2 keeps its capture here (`--keep-capture`); nil: the capture is deleted at once.
+    var keepCapture: URL?
 
     init(appURL: URL) { self.appURL = appURL }
 
@@ -91,6 +93,18 @@ final class AppSession {
 
     func rowCount() throws -> Int { try element("nhetrinh.sidebar").rows.count }
     func addressText() throws -> String { try element("nhetrinh.address").value }
+
+    /// Select the sidebar row `fromEnd` places above the last, as a click does. The rows are read
+    /// fresh right before acting and again for the one retry, never kept (NT-GAT-006).
+    func selectRow(fromEnd offset: Int) throws {
+        try Fresh.retryingOnce {
+            let rows = try element("nhetrinh.sidebar").rows
+            guard let index = Fresh.rowIndex(fromEnd: offset, count: rows.count) else {
+                throw StepError.fail("the sidebar has \(rows.count) row(s); \(offset + 1) are needed")
+            }
+            try rows[index].set(kAXSelectedAttribute, to: kCFBooleanTrue)
+        }
+    }
 
     /// Put `text` in the address field and confirm it, as Return does.
     func navigate(_ text: String) throws {

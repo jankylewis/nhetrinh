@@ -6,7 +6,7 @@ status: OPEN
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/_Steps/Budget.swift (`Budget.Reading`: median, rise, highest sample)
 source: _app/_Sources/NhetrinhReadback/_Steps/SystemSteps.swift `budgetHolds`, `memorySamples`
-source: _app/Tests/NhetrinhReadbackTests/BudgetTests.swift `memoryBudgetJudgesTheSamples`, `memoryBudgetReviewGaps`
+source: _app/Tests/NhetrinhReadbackTests/Steps/_BudgetTests.swift `memoryBudgetJudgesTheSamples`, `memoryBudgetReviewGaps`
 links: fix=yes lesson=no evidence=yes toolgap=none
 
 ## Fix that holds
