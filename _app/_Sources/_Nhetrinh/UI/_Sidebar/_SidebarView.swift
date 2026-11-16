@@ -101,14 +101,6 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         return true
     }
 
-    /// The probe's R13: the row's menu, built as a right click on the row builds it, and `item` pressed.
-    func pressRowMenu(_ row: Int, item: String) -> Bool {
-        guard row >= 0, row < table.numberOfRows, let menu = table.menu(forRow: row),
-              let index = menu.items.firstIndex(where: { $0.title == item }) else { return false }
-        menu.performActionForItem(at: index)
-        return true
-    }
-
     // MARK: - Table
 
     func numberOfRows(in tableView: NSTableView) -> Int { rows.count }

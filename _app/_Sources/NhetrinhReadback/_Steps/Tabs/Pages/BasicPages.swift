@@ -15,6 +15,8 @@ enum BasicPages {
     static let password = "readback-pass"  // a test page's password, not a secret
     static let dialogsTitle = "dialog test"
     static let uploadTitle = "upload test"
+    /// The upload page's title after its input heard `cancel` (R22).
+    static let uploadCancelTitle = "file: cancel"
     static let signedInTitle = "auth test: signed in"
     static let mailtoTitle = "mailto test"
     static let mailto = "mailto:nobody@example.invalid"
@@ -59,7 +61,7 @@ enum BasicPages {
         <label id="pick" for="file">choose a file</label><input type="file" id="file">
         <script>
         file.onchange = () => { document.title = 'file: ' + (file.files[0] ? file.files[0].name : 'none') }
-        file.addEventListener('cancel', () => { document.title = 'file: cancel' })
+        file.addEventListener('cancel', () => { document.title = '\(uploadCancelTitle)' })
         </script>
         """
 

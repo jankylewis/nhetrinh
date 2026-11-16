@@ -13,22 +13,49 @@ final class Sheets {
     var permissions = SitePermissions()
     /// Links handed to another app through macOS since launch.
     var handedOff = 0
+    /// The sheets a page waits on, with that page's web view: they end with the page (S1).
+    var waiting: [(sheet: NSWindow, page: ObjectIdentifier)] = []
 }
 
 /// JavaScript `alert`, `confirm` and `prompt`: before P3 WebKit answered them alone (`confirm` said no).
 extension BrowserWindowController {
     /// Show `alert` as a sheet on the window, the asking tab selected first. `done` gets the index of
-    /// the button pressed, 0 for the first; -1 when there is no window to show it on.
+    /// the button pressed, 0 for the first; -1 when nothing was pressed: no window to show it on, or the
+    /// page's tab was closed or left first (S1).
     func ask(_ alert: NSAlert, for webView: WKWebView?, done: @escaping (Int) -> Void) {
         guard let window else { return done(-1) }
         if let index = tabs.firstIndex(where: { $0.webView === webView && webView != nil }), index != selected {
             select(index)
         }
         sheets.shown += 1
-        alert.beginSheetModal(for: window) { response in
-            done(response.rawValue - NSApplication.ModalResponse.alertFirstButtonReturn.rawValue)
+        let sheet = alert.window
+        keep(sheet, for: webView)
+        alert.beginSheetModal(for: window) { [weak self] response in
+            self?.forget(sheet)
+            let first = NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
+            done(response == .abort ? -1 : response.rawValue - first)
         }
     }
+
+    /// A page's sheets end with the page: its tab closes or is left (S1). Nothing is pressed, so the page
+    /// hears "no answer": `alert` goes on, `confirm` false, `prompt` nil, the sign-in and the open panel
+    /// are cancelled, a site is not remembered as refused. The menu items stay on: ⌘W and ⌃⇥ work.
+    func endSheets(of webView: WKWebView?) {
+        guard let webView, let window else { return }
+        let page = ObjectIdentifier(webView)
+        for entry in sheets.waiting where entry.page == page {
+            if let panel = entry.sheet as? NSSavePanel { panel.cancel(nil) } else {
+                window.endSheet(entry.sheet, returnCode: .abort)
+            }
+        }
+    }
+
+    func keep(_ sheet: NSWindow, for webView: WKWebView?) {
+        guard let webView else { return }
+        sheets.waiting.append((sheet, ObjectIdentifier(webView)))
+    }
+
+    func forget(_ sheet: NSWindow) { sheets.waiting.removeAll { $0.sheet === sheet } }
 
     /// A sheet with the page's text, the site it comes from and these buttons.
     static func pageAlert(_ text: String, from frame: WKFrameInfo, buttons: [String]) -> NSAlert {

@@ -22,7 +22,7 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
         }
         if action.shouldPerformDownload { return decisionHandler(.download) }  // `<a download>` (P5)
         if action.navigationType == .linkActivated, action.modifierFlags.contains(.command),
-           let url = action.request.url {
+           let url = action.request.url, Self.opensInBackground(url) {
             decisionHandler(.cancel)
             openInBackground(url)
             return
@@ -49,7 +49,8 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
                  for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         if let url = action.request.url, leaves(url, from: webView, asked: true) { return nil }
         let menuAsked = (webView as? BrowserWebView)?.takesBackgroundOpen() ?? false
-        if menuAsked || action.modifierFlags.contains(.command), let url = action.request.url {
+        if menuAsked || action.modifierFlags.contains(.command), let url = action.request.url,
+           Self.opensInBackground(url) {
             openInBackground(url)
             return nil
         }

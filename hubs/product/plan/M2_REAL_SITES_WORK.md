@@ -30,7 +30,7 @@ Readback adds:
 - R19 `alert`: the sheet shows the text; OK closes it.
 - R20 `confirm`: Cancel makes the page show "false"; OK makes it show "true".
 - R21 `prompt`: the typed text reaches the page.
-- R22 file input: the panel opens; pick a fixture file; the page shows its name.
+- R22 file input: the open panel shows; Cancel: nothing chosen; `file choice: unit test only` (NT-TG-006).
 - R23 a closed port: the error page with Retry. Start the server, press Retry: the page loads.
 - R24 a Basic sign-in page: the sheet; the right password loads the page, a wrong one asks again.
 - R25 File > Print…: the print panel opens; cancel.

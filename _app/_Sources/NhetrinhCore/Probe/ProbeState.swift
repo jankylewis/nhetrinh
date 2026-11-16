@@ -17,10 +17,12 @@ public struct ProbeState: Equatable, Sendable {
     public var addressShown = false
     /// Menu item path ("File > New Tab") to its shortcut as the menu shows it ("⌘T").
     public var shortcuts: [String: String] = [:]
-    /// Per row: whether it shows its site's icon (P2).
+    /// Per row: whether its row view shows its site's icon, not the globe (P2).
     public var icons: [Bool] = []
     /// Whether the selected tab's page is loading (P2).
     public var loading = false
+    /// Whether the progress line under the toolbar is shown (P2).
+    public var progressShown = false
     /// The toolbar's reload button as its label reads: "Reload", or "Stop" while a page loads (P2).
     public var reloadButton = ""
     /// The items of the page's last context menu, as it was shown (P2).
@@ -58,12 +60,13 @@ extension ProbeState {
         var object: [String: Any] = ["title": title, "rows": rows, "loaded": loaded, "address": address,
                                      "windowShown": windowShown, "sidebarWidth": sidebarWidth,
                                      "addressShown": addressShown, "shortcuts": shortcuts, "icons": icons,
-                                     "loading": loading, "reloadButton": reloadButton, "webMenu": webMenu,
-                                     "sheet": sheet, "sheetKind": sheetKind, "sheetButtons": sheetButtons,
-                                     "sheetsShown": sheetsShown, "handedOff": handedOff, "fullscreen": fullscreen,
-                                     "active": active, "findShown": findShown, "findResult": findResult,
-                                     "zoomBadge": zoomBadge, "appearance": appearance, "hubShown": hubShown,
-                                     "downloads": downloads, "downloadStates": downloadStates, "revealed": revealed]
+                                     "loading": loading, "progressShown": progressShown, "reloadButton": reloadButton,
+                                     "webMenu": webMenu, "sheet": sheet, "sheetKind": sheetKind,
+                                     "sheetButtons": sheetButtons, "sheetsShown": sheetsShown, "handedOff": handedOff,
+                                     "fullscreen": fullscreen, "active": active, "findShown": findShown,
+                                     "findResult": findResult, "zoomBadge": zoomBadge, "appearance": appearance,
+                                     "hubShown": hubShown, "downloads": downloads,
+                                     "downloadStates": downloadStates, "revealed": revealed]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -81,6 +84,7 @@ extension ProbeState {
         shortcuts = object["shortcuts"] as? [String: String] ?? [:]
         icons = object["icons"] as? [Bool] ?? []
         loading = object["loading"] as? Bool ?? false
+        progressShown = object["progressShown"] as? Bool ?? false
         reloadButton = object["reloadButton"] as? String ?? ""
         webMenu = object["webMenu"] as? [String] ?? []
         sheet = object["sheet"] as? String ?? ""
@@ -95,6 +99,10 @@ extension ProbeState {
         zoomBadge = object["zoomBadge"] as? String ?? ""
         appearance = object["appearance"] as? String ?? ""
         hubShown = object["hubShown"] as? Bool ?? false
+        readDownloads(object)
+    }
+
+    private mutating func readDownloads(_ object: [String: Any]) {
         downloads = object["downloads"] as? [String] ?? []
         downloadStates = object["downloadStates"] as? [String] ?? []
         revealed = object["revealed"] as? [String] ?? []

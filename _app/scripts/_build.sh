@@ -5,7 +5,7 @@ cd "${0:A:h}/.."
 VERSION=$(cat scripts/VERSION)
 # The commit this build comes from; "+" marks files changed since that commit (the readback reports it).
 COMMIT="$(git rev-parse --short HEAD)$(git diff --quiet HEAD -- . || echo +)"
-# Size (NT-PRF-003): -Osize, and no exported symbols (an app has no plugins: NhetrinhCore's `public`
+# Size (NT-PRF-005): -Osize, and no exported symbols (an app has no plugins: NhetrinhCore's `public`
 # API need not be exported). SwiftPM's release link already passes -dead_strip. NHT_OPT=-O compares.
 OPT=${NHT_OPT:--Osize}
 [[ "$OPT" == "-Osize" || "$OPT" == "-O" ]] || { echo "error: NHT_OPT is -Osize or -O, not $OPT" >&2; exit 1; }
@@ -17,7 +17,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/Nhetrinh" "$APP/Contents/MacOS/nhetrinh"
 strip -x "$APP/Contents/MacOS/nhetrinh"
 EXPORTS=$(nm -gU "$APP/Contents/MacOS/nhetrinh" | wc -l | tr -d ' ')
-(( EXPORTS == 0 )) || { echo "error: the app exports $EXPORTS symbols; 0 expected (NT-PRF-003)" >&2; exit 1; }
+(( EXPORTS == 0 )) || { echo "error: the app exports $EXPORTS symbols; 0 expected (NT-PRF-005)" >&2; exit 1; }
 cp assets/_icon/bundle/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 # The app decodes this PNG for the Dock at launch: 1024 px cost 33 MB, 256 px nothing (NT-PRF-001).
 DOCK=assets/_icon/bundle/_DockIcon.png

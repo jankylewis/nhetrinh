@@ -6,17 +6,36 @@ import Testing
 
 @Test(arguments: [MediaKind.camera, .microphone, .cameraAndMicrophone])
 func nothingIsDecidedBeforeTheSiteAsks(kind: MediaKind) {
-    #expect(SitePermissions().decision(host: "a.test", kind: kind) == nil)
+    #expect(SitePermissions().decision(site: "https://a.test:443", kind: kind) == nil)
 }
 
-/// The answer is kept for that site and that kind only; the host's case does not matter.
+/// The answer is kept for that site and that kind only.
 @Test(arguments: [true, false])
 func answerIsKeptPerSiteAndKind(allowed: Bool) {
     var permissions = SitePermissions()
-    permissions.record(allowed, host: "A.test", kind: .microphone)
-    #expect(permissions.decision(host: "a.TEST", kind: .microphone) == allowed)
-    #expect(permissions.decision(host: "b.test", kind: .microphone) == nil, "another site is asked again")
-    #expect(permissions.decision(host: "a.test", kind: .camera) == nil, "another kind is asked again")
+    let site = SitePermissions.site(scheme: "https", host: "a.test", port: 0)
+    permissions.record(allowed, site: site, kind: .microphone)
+    #expect(permissions.decision(site: site, kind: .microphone) == allowed)
+    #expect(permissions.decision(site: "https://b.test:443", kind: .microphone) == nil, "another site is asked")
+    #expect(permissions.decision(site: site, kind: .camera) == nil, "another kind is asked again")
+}
+
+/// P3-REVIEW P1: a site is an origin. Another scheme or port of the same host is another site; the case
+/// and a default port written out are the same site. Every `file:` page is one site ("file://:0").
+@Test(arguments: [
+    (("https", "a.test", 0), ("HTTPS", "A.Test", 443), true),
+    (("http", "127.0.0.1", 8000), ("http", "127.0.0.1", 8000), true),
+    (("http", "127.0.0.1", 8000), ("http", "127.0.0.1", 9000), false),
+    (("http", "a.test", 0), ("https", "a.test", 0), false),
+    (("https", "a.test", 0), ("https", "a.test", 8443), false),
+    (("http", "a.test", 0), ("http", "a.test", 80), true),
+] as [((String, String, Int), (String, String, Int), Bool)])
+func aSiteIsAnOrigin(first: (String, String, Int), second: (String, String, Int), same: Bool) {
+    let one = SitePermissions.site(scheme: first.0, host: first.1, port: first.2)
+    let other = SitePermissions.site(scheme: second.0, host: second.1, port: second.2)
+    var permissions = SitePermissions()
+    permissions.record(true, site: one, kind: .camera)
+    #expect((permissions.decision(site: other, kind: .camera) == true) == same, "\(one) then \(other)")
 }
 
 /// The question names the site and what it wants, in the user's words.
