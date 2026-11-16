@@ -12,6 +12,11 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`IdleUnload.swift`); R11 PASS 22:09, red on P0 not run |
 | NT-UIX-001 | `after New Tab the sidebar has 1 rows, not 2` | FIXED | Nil-target menu item and no key window (app not active)? Browser items target the controller |
 | NT-UIX-002 | `the selected tab stays` | OBSERVED | Did a close of a row that is not selected select another tab? `close(at:)` selects only when the selected tab closes |
+| NT-UIX-004 | `the sheet is still shown, the answer none` | OBSERVED | Tab closed or left with a page's sheet up? `endSheets(of:)` ends it unanswered |
+| NT-NAV-002 | `link → "javascript:void(0)"` | OBSERVED | Is `javascript` in `ExternalScheme.staying`? It runs in its own page |
+| NT-NAV-003 | `aSiteIsAnOrigin` | OBSERVED | Camera answer for another port or scheme? Keys are `SitePermissions.site(scheme:host:port:)` |
+| NT-NAV-004 | `isMainFrame != false` | OBSERVED | A page asking to open another app in a loop? Ruling pending: ask only for a click |
+| NT-TAB-002 | `ask selects the asking tab` | OBSERVED | A background tab pulling the user to it? Ruling pending: hold its question |
 | NT-UIX-003 | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
@@ -33,3 +38,4 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TG-003 | `has no Accessibility permission`, `Accessibility reads are empty`, `its tree was not read` | OPEN | R1, R3-R7: `answers no readback probe`? Is the installed app built before D23? Install it. R2: which app does the reason name? Run as the granted app: `readback_app.sh run`; after a rebuild grant again (R-2); reads empty with the grant kept (19:51): re-grant, cause not proven |
 | NT-TG-004 | `end: the app still runs`, a nhetrinh with `NHT_PROFILE=readback` after the run | OPEN | Read the report's `end:` line; `pgrep -fl 'Applications/nhetrinh.app'`; end only a `readback` profile instance, by pid |
 | NT-TG-005 | `Cannot request fullscreen in a hidden document`, `media: asking (hidden)` | OPEN | R26a, R26b NOT READ BACK: the app runs without the focus (D18), WebKit counts the page as hidden; run with `--allow-focus` (D25) |
+| NT-TG-006 | `picking a file in the panel: not read back` | OPEN | R22 PASS without the pick; ruling pending (unit test, as R17) |

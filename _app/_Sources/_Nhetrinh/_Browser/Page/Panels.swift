@@ -14,7 +14,9 @@ extension BrowserWindowController {
         panel.canChooseFiles = true
         sheets.openPanel = panel
         sheets.shown += 1
+        keep(panel, for: webView)
         panel.beginSheetModal(for: window) { [weak self] response in
+            self?.forget(panel)
             if self?.sheets.openPanel === panel { self?.sheets.openPanel = nil }
             completionHandler(response == .OK ? panel.urls : nil)
         }
@@ -35,14 +37,15 @@ extension BrowserWindowController {
         sheets.printing = false
     }
 
-    /// Camera and microphone: asked once per site and kind until the app quits. macOS then asks for
-    /// the app itself, once (Info.plist carries the two usage texts).
+    /// Camera and microphone: asked once per site (scheme, host, port) and kind until the app quits.
+    /// macOS then asks for the app itself, once (Info.plist carries the two usage texts).
     @objc func webView(_ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin,
                        initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType,
                        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
         let kind: MediaKind = type == .camera ? .camera : type == .microphone ? .microphone : .cameraAndMicrophone
         let host = origin.host
-        if let kept = sheets.permissions.decision(host: host, kind: kind) {
+        let site = SitePermissions.site(scheme: origin.protocol, host: host, port: origin.port)
+        if let kept = sheets.permissions.decision(site: site, kind: kind) {
             return decisionHandler(kept ? .grant : .deny)
         }
         let alert = NSAlert()
@@ -51,7 +54,7 @@ extension BrowserWindowController {
         alert.addButton(withTitle: "Allow")
         alert.addButton(withTitle: "Don't Allow")
         ask(alert, for: webView) { [weak self] pressed in
-            self?.sheets.permissions.record(pressed == 0, host: host, kind: kind)
+            if pressed >= 0 { self?.sheets.permissions.record(pressed == 0, site: site, kind: kind) }  // S1
             decisionHandler(pressed == 0 ? .grant : .deny)
         }
     }
