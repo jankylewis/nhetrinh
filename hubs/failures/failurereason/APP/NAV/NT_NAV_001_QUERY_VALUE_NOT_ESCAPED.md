@@ -5,7 +5,7 @@ family: NAV
 status: FIXED
 date: 2026-11-16
 signature: search cut off at &
-source: _app/_Sources/NhetrinhCore/_AddressParser.swift
+source: _app/_Sources/NhetrinhCore/_Navigation/_AddressParser.swift
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Mechanism

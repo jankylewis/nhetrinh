@@ -5,8 +5,8 @@ family: NAV
 status: FIXED
 date: 2026-11-16
 signature: search cut off at &
-source: _app/_Sources/NhetrinhCore/_AddressParser.swift (query encoding)
-source: _app/Tests/_NhetrinhCoreTests/_AddressParserTests.swift `textBecomesOneSearchQuery`
+source: _app/_Sources/NhetrinhCore/_Navigation/_AddressParser.swift (query encoding)
+source: _app/Tests/_NhetrinhCoreTests/_Navigation/_AddressParserTests.swift `textBecomesOneSearchQuery`
 observed: found while moving the address parser into NhetrinhCore (scaffold, not reported by a user)
 links: fix=yes lesson=no evidence=no toolgap=none
 cause: NT-NAV-001
