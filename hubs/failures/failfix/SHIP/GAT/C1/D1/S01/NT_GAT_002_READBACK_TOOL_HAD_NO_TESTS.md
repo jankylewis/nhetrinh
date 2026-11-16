@@ -2,7 +2,7 @@
 
 id: NT-GAT-002
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: commit 237332d (`_app/Package.swift`, `_app/Tests/NhetrinhReadbackTests/`)
 links: fix=yes lesson=yes evidence=no toolgap=none
@@ -28,4 +28,8 @@ The R2 rule moved into `IconMatch.showsBareIcon`, so R2 and the test use one rul
 P0-HAR-3 seat, 2026-11-16: `nice -n 10 _app/scripts/test.sh` ended with
 `✔ Test run with 5 tests in 0 suites passed after 0.848 seconds.` With the R2 rule set to
 `agreement >= 0.0` for one run, the icon test failed: `with 3 test cases failed ... with 2 issues`
-(dark tile, blank). Not on `master`.
+(dark tile, blank).
+
+## Proof on master (0f99aee)
+
+CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee): the readback tests ran in `test.sh`, `Test run with 56 tests passed ... with 1 known issue`.

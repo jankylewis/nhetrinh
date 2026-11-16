@@ -2,7 +2,7 @@
 
 id: NT-GAT-002
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: no testTarget depends on NhetrinhReadback
 source: P0 brief P0-HAR-3, 2026-11-16 ("The readback tool has no tests; a test that cannot fail is a defect")

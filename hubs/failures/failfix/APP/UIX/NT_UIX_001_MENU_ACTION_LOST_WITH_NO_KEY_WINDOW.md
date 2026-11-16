@@ -2,7 +2,7 @@
 
 id: NT-UIX-001
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/_Nhetrinh/UI/AppMenu.swift (`build(browser:)`, browser items get `target`)
 source: _app/_Sources/_Nhetrinh/AppDelegate.swift (menu built after the window controller)
@@ -31,3 +31,7 @@ tests: each browser item keeps its ⌘ shortcut, each Edit item keeps a nil targ
 Not proven: a readback run with the fix (this seat may not start the app; another seat holds it).
 When one browser window has company (a future settings window), ⌘W still closes a tab: not
 decided, revisit with D19.
+
+## Proof on master (0f99aee)
+
+`hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R5: `File > New Tab (⌘T): rows 1 to 2; File > Close Tab (⌘W): back to 1`; red-first test green in CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee).

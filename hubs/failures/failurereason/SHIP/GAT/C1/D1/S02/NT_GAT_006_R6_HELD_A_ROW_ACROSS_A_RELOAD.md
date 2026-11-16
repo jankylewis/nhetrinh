@@ -2,7 +2,7 @@
 
 id: NT-GAT-006
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: R6 NOT READ BACK: cannot set AXSelected (accessibility error -25202)
 source: _app/_Sources/NhetrinhReadback/_Steps/_BaseSteps.swift `selectingRowShowsTab` (commit 4d3902f: rows read once, then set twice)

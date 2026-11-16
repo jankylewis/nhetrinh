@@ -2,7 +2,7 @@
 
 id: NT-GAT-001
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: error: plugin for module 'TestingMacros' not found
 source: _app/scripts/test.sh (header comment, the `-external-plugin-path` line)

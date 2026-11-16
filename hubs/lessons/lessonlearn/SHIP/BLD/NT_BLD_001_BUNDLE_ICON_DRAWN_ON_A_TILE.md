@@ -2,7 +2,7 @@
 
 id: NT-BLD-001
 family: BLD
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 links: fix=yes lesson=yes evidence=yes toolgap=NT-TG-001
 

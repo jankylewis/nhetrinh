@@ -2,7 +2,7 @@
 
 id: NT-GAT-006
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/_Steps/Fresh.swift (`Fresh.rowIndex(fromEnd:count:)`, `Fresh.retryingOnce`)
 source: _app/_Sources/NhetrinhReadback/Driver/AppSession.swift `selectRow(fromEnd:)`
@@ -32,3 +32,7 @@ on a stale element, none on a FAIL, the second error says it came after a fresh 
 Not proven: red first. The stale element needs the running app; no unit test reproduces -25202.
 Not proven: R6 on the installed app. Not rebuilt or read back yet: the matemaster batches one
 rebuild (signing identity set up by the headmate, R-2).
+
+## Proof on master (0f99aee)
+
+`hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R6: `two tabs; selecting the row above showed example.com, selecting the last row showed example.org`. Red first stays not proven.
