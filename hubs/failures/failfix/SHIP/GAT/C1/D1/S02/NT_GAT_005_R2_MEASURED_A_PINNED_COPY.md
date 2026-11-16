@@ -2,7 +2,7 @@
 
 id: NT-GAT-005
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift (`DockItem`, `items()`, `launchedItem(_:app:)`)
 source: _app/_Sources/NhetrinhReadback/Driver/_AX.swift (`flag`, `url`)
@@ -35,3 +35,7 @@ running filter replaced by the last item fails the same 5 cases.
 Not proven: the values of `AXIsApplicationRunning` and `AXURL` on the real Dock, and R2 on the
 real Dock. The readback app is not rebuilt yet: a rebuild costs the headmate a new grant (R-2),
 so the matemaster batches one rebuild.
+
+## Proof on master (0f99aee)
+
+Red-first tests green in CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee); `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R2: `captured the Dock item (34 x 22 pt)`. Not proven: a pinned copy in the Dock at 21:24.

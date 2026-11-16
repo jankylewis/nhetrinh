@@ -80,9 +80,13 @@ tests `missingElement`, `notReadTreeSaysWhatWasRead`; red under the old rule, ch
 Not proven on the app (no rebuild, no run since).
 At 20:07 the "window" read was not a window (children AXApplication, AXMenuBar): NT-GAT-008.
 
-## Remedy: the readback probe (P0-PROBE-1, D23; written, not run on the app)
+## Master 0f99aee: stays OPEN
 
-source: brief P0-PROBE-1 (2026-11-16): the fleet waited 75 min for re-grants after rebuilds
+After the headmate toggled Accessibility for the readback app (21:23:41), the installed app (source
+hash `6563a6e1db6acadb`, equal to master's readback sources) ran in full: `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8).
+So a full run through the app is now proven. Why reads were empty with the grant kept stays not proven.
+## Remedy: the readback probe (P0-PROBE-1, D23; written, not run on the app)
+source: brief P0-PROBE-1 (2026-11-16): the fleet waited 75 min for re-grants after rebuilds.
 R1, R3-R7 no longer use Accessibility. The readback starts nhetrinh with `NHT_READBACK=1`; only then
 the app opens a Unix socket in a 0700 folder of its own (`ProbeServer`, `NhetrinhCore/Probe/`) and
 answers state and actions through the user's own paths (`BrowserWindowController+Probe.swift`).

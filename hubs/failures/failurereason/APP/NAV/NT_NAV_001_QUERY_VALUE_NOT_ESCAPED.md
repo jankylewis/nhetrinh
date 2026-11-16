@@ -2,7 +2,7 @@
 
 id: NT-NAV-001
 family: NAV
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: search cut off at &
 source: _app/_Sources/NhetrinhCore/_AddressParser.swift

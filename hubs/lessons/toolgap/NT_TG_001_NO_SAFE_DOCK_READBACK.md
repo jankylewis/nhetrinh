@@ -19,3 +19,8 @@ Ask the headmate to look at the Dock, or read `NSApp.applicationIconImage` back 
 ## Wanted
 
 A bench hook that writes the current Dock icon image to a file, compared with `AppIcon.png`.
+
+## Master 0f99aee: stays OPEN
+
+R2 now reads the Dock icon: `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8), `silhouette agreement 98 %`. It still captures a region
+of the screen, and that the Dock frame holds only Dock pixels is not proven (NT-TG-002): not safe yet.

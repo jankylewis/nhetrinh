@@ -2,7 +2,7 @@
 
 id: NT-GAT-005
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: R2 FAIL: the Dock item does not show the bare icon: silhouette agreement 90 %, icon at 82 % of the Dock item
 source: _app/_Sources/NhetrinhReadback/_Steps/System/_SystemSteps.swift `dockIconHasNoTile` (commit 0d00e08: `items.last`)

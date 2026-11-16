@@ -2,7 +2,7 @@
 
 id: NT-BLD-002
 family: BLD
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/scripts/_build.sh:8-13
 links: fix=yes lesson=no evidence=no toolgap=none
@@ -20,4 +20,8 @@ the same flags plus `--show-bin-path`, and copy `$BIN/Nhetrinh`. Never hard-code
 
 2026-11-16, P0-HAR-1 seat, branch `p0/harness-docs`: `nice -n 10 _app/scripts/_build.sh` ended
 with `build/nhetrinh.app 540K`; the CI bundle checks (`plutil -lint`, `codesign --verify --strict`,
-both icon files) passed. Not proven on CI yet. Not on `master`.
+both icon files) passed. CI: below.
+
+## Proof on master (0f99aee)
+
+CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee): `_build.sh` printed `build/nhetrinh.app 540K`, the bundle checks passed.

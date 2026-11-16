@@ -2,7 +2,7 @@
 
 id: NT-GAT-007
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift (`DockAxis`, `scoredSquare`, `lineColours`, `measure(...axis:)`)
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift `capture` (the item no longer clamped)
@@ -41,3 +41,7 @@ Headmate ruling (NT-TG-002 stands): no pixel outside the Dock frame. `narrowLeft
 (4 items on the 19:40 left Dock) and `cutSquareIsScoredInsideTheCapture` (square cut 7 of 44 px:
 bare passes, tile fails) are green. The 5 pt strip is inside the Dock's Accessibility frame.
 Not proven: R2 on the installed app. Not rebuilt or read back yet (one batched rebuild).
+
+## Proof on master (0f99aee)
+
+Red-first tests green in CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee); `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R2 on a left Dock (kept capture: dock x 10 w 34 h 748): `silhouette agreement 98 %, icon at 92 % of the Dock item`.
