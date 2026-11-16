@@ -73,7 +73,13 @@ final class TestPages {
         let reply = TestPageContent.reply(path: path(head), range: header("Range", in: head),
                                           authorization: header("Authorization", in: head))
         if reply.delay > 0 { Thread.sleep(forTimeInterval: reply.delay) }
-        write(peer, bytes(reply))
+        let data = bytes(reply)
+        guard reply.pace > 0 else { return _ = write(peer, data) }
+        let part = 65_536
+        for start in stride(from: 0, to: data.count, by: part) {  // ends when the app closes the connection
+            guard write(peer, data.subdata(in: start..<min(start + part, data.count))) else { return }
+            Thread.sleep(forTimeInterval: reply.pace)
+        }
     }
 
     static func path(_ head: String) -> String {
@@ -94,14 +100,17 @@ final class TestPages {
         return Data((lines.joined(separator: "\r\n") + "\r\n\r\n").utf8) + reply.body
     }
 
-    private static func write(_ peer: Int32, _ data: Data) {
+    /// Whether every byte went out.
+    @discardableResult
+    private static func write(_ peer: Int32, _ data: Data) -> Bool {
         data.withUnsafeBytes { raw in
             var sent = 0
             while sent < raw.count, let base = raw.baseAddress {
                 let written = Darwin.write(peer, base + sent, raw.count - sent)
-                if written <= 0 { return }
+                if written <= 0 { return false }
                 sent += written
             }
+            return true
         }
     }
 }

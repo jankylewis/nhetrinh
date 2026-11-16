@@ -1,7 +1,7 @@
 import Foundation
 
 // nhetrinh-readback: use the installed app as its end user and say what happened, step by step.
-// R1, R3-R7 and R9-R30a go through the app's readback probe (D23) and need no permission: they run from any
+// R1, R3-R7 and R9-R43 go through the app's readback probe (D23) and need no permission: they run from any
 // terminal. R2 reads the Dock: it needs Accessibility and Screen Recording (NT-TG-003).
 //
 //   swift run nhetrinh-readback                     every step, on ~/Applications/nhetrinh.app;
@@ -32,6 +32,7 @@ if let log = Options.logPath(CommandLine.arguments) {
     setvbuf(stdout, nil, _IOLBF, 0)
 }
 let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicSteps.all + ToolSteps.all
+    + DownloadSteps.all  // P5: R31-R35
     + PressureSteps.all  // P6: R36-R38
     + FolderSteps.all  // P7: R39-R43
 let options: Options
@@ -56,6 +57,8 @@ session.allowFocus = options.allowFocus
 let steps = allSteps.filter { options.steps.isEmpty || options.steps.contains($0.id) }
 let results = Runner.run(steps, in: session)
 let ending = session.quit()
+let removed = DownloadFiles.cleanUp()  // P5: the readback's own files in ~/Downloads, never another
+if !removed.isEmpty { FileHandle.standardError.write(Data("removed from ~/Downloads: \(removed)\n".utf8)) }
 FileHandle.standardError.write(Data((ending.line + "\n").utf8))
 let text = Report.text(results, app: options.app, ending: ending, allowFocus: options.allowFocus)
 print(text)

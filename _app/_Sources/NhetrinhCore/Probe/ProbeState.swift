@@ -46,6 +46,11 @@ public struct ProbeState: Equatable, Sendable {
     public var zoomBadge = ""
     public var appearance = ""
     public var hubShown = false
+    /// P5: the sidebar footer's download rows, top to bottom: names and second lines ("42 %", "done",
+    /// "failed: …", "cancelled"), and the files Finder was asked to show, by name.
+    public var downloads: [String] = []
+    public var downloadStates: [String] = []
+    public var revealed: [String] = []
     /// P7: every folder, root first: its name, its tabs' titles, whether it is collapsed.
     public var folders: [String] = []
     public var folderTabs: [[String]] = []
@@ -64,8 +69,9 @@ extension ProbeState {
                                      "sheetButtons": sheetButtons, "sheetsShown": sheetsShown, "handedOff": handedOff,
                                      "fullscreen": fullscreen, "active": active, "findShown": findShown,
                                      "findResult": findResult, "zoomBadge": zoomBadge, "appearance": appearance,
-                                     "hubShown": hubShown, "folders": folders, "folderTabs": folderTabs,
-                                     "collapsedFolders": collapsedFolders]
+                                     "hubShown": hubShown, "downloads": downloads,
+                                     "downloadStates": downloadStates, "revealed": revealed, "folders": folders,
+                                     "folderTabs": folderTabs, "collapsedFolders": collapsedFolders]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -98,7 +104,14 @@ extension ProbeState {
         zoomBadge = object["zoomBadge"] as? String ?? ""
         appearance = object["appearance"] as? String ?? ""
         hubShown = object["hubShown"] as? Bool ?? false
+        readDownloads(object)
         readFolders(object)
+    }
+
+    private mutating func readDownloads(_ object: [String: Any]) {
+        downloads = object["downloads"] as? [String] ?? []
+        downloadStates = object["downloadStates"] as? [String] ?? []
+        revealed = object["revealed"] as? [String] ?? []
     }
 
     /// P7's fields.

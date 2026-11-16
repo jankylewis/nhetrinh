@@ -28,7 +28,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | DOING (readback 22:34: R1, R3-R18 PASS in `_LATEST.md`, R2 PASS from the readback app; build eac0ce9+, not committed) | `M1_DAILY_DRIVER.md` |
 | P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
 | P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
-| P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | TODO | `M2_REAL_SITES_WORK.md` |
+| P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | DOING (P5-BUILD-1 on p5/downloads: readback 00:08 35 PASS, R2, R26a, R26b not read back) | `M2_REAL_SITES_WORK.md` |
 | P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DOING (P6-BUILD-1 on p6/memory: built, tests green, not read back) | `M3_V1_RELEASE.md` |
 | P7 Tab folders | 0.8.0 | L | collapsible tab groups in the sidebar | DOING (P7-BUILD-1 on p7/prep: built, tests green, not read back) | `M3_V1_RELEASE.md` |
 | P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | TODO | `M3_V1_RELEASE.md` |

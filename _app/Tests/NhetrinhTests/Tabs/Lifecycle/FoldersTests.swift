@@ -110,4 +110,13 @@ struct FoldersTests {
         #expect(state(restored).rows == state(browser(collapsed: collapsed)).rows)
         #expect(restored.tabs[restored.selected].title == "t3" && state(restored).collapsedFolders == [collapsed])
     }
+
+    /// A link from another app (P5) opens a new tab at the root's end; the folders stay (P7-MERGE-1: an
+    /// append to the flat `tabs` rebuilt the tree without them).
+    @Test func aLinkFromAnotherAppKeepsTheFolders() throws {
+        let browser = browser()
+        browser.openIncoming([try #require(URL(string: "https://example.com/"))])
+        #expect(state(browser).folders == ["work"] && state(browser).folderTabs == [["t2", "t3"]])
+        #expect(browser.tabs.count == 5 && browser.selected == 4)
+    }
 }

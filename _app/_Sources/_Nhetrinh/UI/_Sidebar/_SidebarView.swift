@@ -20,6 +20,8 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     var onAction: ((SidebarAction) -> Void)?
 
     let table = TabTable()
+    /// P5: the footer's download rows (`../Bars/DownloadsBar.swift`), below the tabs.
+    let downloads = DownloadsBar()
     private var rows: [Row] = []
     private(set) var updating = false
 
@@ -66,7 +68,7 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     }
 
     private func layOut(newTab: NSButton, scroll: NSScrollView) {
-        for view in [newTab, scroll] as [NSView] {
+        for view in [newTab, scroll, downloads] as [NSView] {
             view.translatesAutoresizingMaskIntoConstraints = false
             addSubview(view)
         }
@@ -77,7 +79,10 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
             scroll.topAnchor.constraint(equalTo: newTab.bottomAnchor, constant: 6),
             scroll.leadingAnchor.constraint(equalTo: leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: bottomAnchor),
+            scroll.bottomAnchor.constraint(equalTo: downloads.topAnchor),
+            downloads.leadingAnchor.constraint(equalTo: leadingAnchor),
+            downloads.trailingAnchor.constraint(equalTo: trailingAnchor),
+            downloads.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
 

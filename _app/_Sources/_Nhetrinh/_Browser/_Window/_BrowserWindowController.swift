@@ -14,7 +14,7 @@ final class BrowserWindowController: NSWindowController {
     private var flatTabs: [Tab] = []
     var tabs: [Tab] {
         get { flatTabs }
-        set { tree = Tree(tabs: newValue) }  // every tab at the root (a seeded launch, a test)
+        set { tree = Tree(tabs: newValue) }  // every tab at the root, folders gone: never append through it
     }
     var selected = -1
     let sidebar = SidebarView()
@@ -40,6 +40,8 @@ final class BrowserWindowController: NSWindowController {
     let findBar = FindBar()
     var findBarHeight: NSLayoutConstraint?
     var hub: SettingsHub?
+    /// P5 (`../Page/Outside/`): this launch's downloads, shown in the sidebar footer.
+    let downloads = Downloads()
 
     init() {
         let window = NSWindow(
@@ -118,6 +120,7 @@ final class BrowserWindowController: NSWindowController {
         toolbar.onZoomBadge = { [weak self] in self?.actualSize(nil) }
         findBar.onFind = { [weak self] text, backwards in self?.find(text, backwards: backwards) }
         findBar.onClose = { [weak self] in self?.closeFind() }
+        wireDownloads()
     }
 
     // MARK: - Chrome

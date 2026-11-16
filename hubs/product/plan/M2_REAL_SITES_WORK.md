@@ -71,7 +71,7 @@ Readback adds:
 
 Exit: the gate, R1-R30 and R30a PASS.
 
-## P5 — Downloads and links from other apps (0.6.0, size M, status TODO)
+## P5 — Downloads and links from other apps (0.6.0, size M, status WIP: P5-BUILD-1, not read back)
 
 Goal: files download to ~/Downloads. A link clicked in another app opens in nhetrinh.
 

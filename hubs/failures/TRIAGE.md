@@ -17,10 +17,12 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-NAV-003 | `aSiteIsAnOrigin` | OBSERVED | Camera answer for another port or scheme? Keys are `SitePermissions.site(scheme:host:port:)` |
 | NT-NAV-004 | `isMainFrame != false` | OBSERVED | A page asking to open another app in a loop? Ruling pending: ask only for a click |
 | NT-TAB-002 | `ask selects the asking tab` | OBSERVED | A background tab pulling the user to it? Ruling pending: hold its question |
+| NT-TAB-003 | `aLinkFromAnotherAppKeepsTheFolders` | OBSERVED | Folders gone after a new tab? A mutation of the flat `tabs` rebuilds the tree: insert through `tree` |
 | NT-UIX-003 | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
 | NT-ENV-003 | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |
+| NT-ENV-004 | `no download row (downloads []`, `the app did not quit within 5 s` | FIXED | A download with the screen locked? `sample` the app: main thread in `_sandbox_extension_issue` means macOS asks for ~/Downloads; the first write must be off the main thread (`DownloadNamer.canWrite`) |
 | NT-GAT-003 | `verdict: PASS (0 of 0)` | FIXED | Did a typo in `--steps` or a flag run every step? It must exit 2 with a usage error |
 | NT-GAT-004 | `R2 ... PASS` with a tile as large as the Dock item | FIXED | Is the Dock colour read from a ring outside the item? Pale tile on a light Dock: known limit |
 | NT-GAT-005 | `R2 FAIL` with two Dock items titled nhetrinh | FIXED | Is a copy of nhetrinh pinned in the Dock? R2 must take the running item of the launched bundle |
