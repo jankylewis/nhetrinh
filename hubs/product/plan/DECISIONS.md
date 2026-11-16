@@ -29,6 +29,7 @@ row stays and is marked "replaced by".
 | D20 | The bundle icon on a tile while the app is not running (pinned Dock item, Finder, Launchpad) is accepted, like the headmate's other apps: no Xcode, no Icon Composer. Closes the known limit of NT-BUG-002 | headmate | 2026-11-16 |
 | D21 | The fleet tool's onboarding row 8 (needs an ADO epic) is ignored for this personal project | headmate | 2026-11-16 |
 | D22 | P1 preparation may start before P0 closes: failing tests only, in `NhetrinhCore` only, no change to the app's behaviour. Narrows D14 for this one case | headmate | 2026-11-16 |
+| D24 | The next phase's failing tests (`NhetrinhCore` only, stub types, no change to the app) may be written while the current phase is built. Widens D22 to every phase; first used by P2-PREP-1 | agent, as owner | 2026-11-16 |
 
 ## Assumed, then accepted with the plan (D15)
 
