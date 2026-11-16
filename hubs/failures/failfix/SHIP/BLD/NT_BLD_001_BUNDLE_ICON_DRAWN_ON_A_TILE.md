@@ -2,7 +2,7 @@
 
 id: NT-BLD-001
 family: BLD
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/_Nhetrinh/AppDelegate.swift
 links: fix=yes lesson=yes evidence=yes toolgap=NT-TG-001
@@ -19,3 +19,7 @@ Keep the `.icns` (Finder, Launchpad) and set `NSApp.applicationIconImage` from `
 ## Proof
 
 Not proven: Dock readback pending (NT-TG-001).
+
+## Proof on master (0f99aee)
+
+`hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R2: `silhouette agreement 98 %, icon at 92 % of the Dock item`.

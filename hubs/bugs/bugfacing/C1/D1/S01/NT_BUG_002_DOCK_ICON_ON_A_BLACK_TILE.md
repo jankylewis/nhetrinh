@@ -2,7 +2,7 @@
 
 id: NT-BUG-002
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: Dock icon on a black tile
 source: headmate report 2026-11-16 ("bigger plz, and no black background", Dock screenshot)

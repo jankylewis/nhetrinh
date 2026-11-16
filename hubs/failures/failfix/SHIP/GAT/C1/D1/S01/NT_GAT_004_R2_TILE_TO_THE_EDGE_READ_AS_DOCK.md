@@ -2,7 +2,7 @@
 
 id: NT-GAT-004
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift (`ringPoints`, `captureRect(around:dock:)`, `capture`)
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift (`measure(capture:icon:item:)`, `ringColour`)
@@ -50,3 +50,7 @@ frame on a half point grew up to 1 pt past the Dock's edge. `DockIcon.captureRec
 inward to whole points, inside the Dock frame; `capture` only converts it.
 Red first: commit 7181133, 2 issues in `ringIsWholePointsInsideTheDock`. Green after.
 Not proven: that the Dock's Accessibility frames are ever fractional on a real display.
+
+## Proof on master (0f99aee)
+
+Red-first tests green in CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee); `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R2 on the real Dock: `silhouette agreement 98 %`. The pale tile on a light Dock stays a known limit.

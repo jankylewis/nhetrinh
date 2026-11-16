@@ -2,7 +2,7 @@
 
 id: NT-UIX-001
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: after New Tab the sidebar has 1 rows, not 2
 source: readback 2026-11-16 18:57, app 0.1.0 from commit 0d00e08 (`hubs/failures/evidence/readback/_LATEST.md` on branch `p0/harness-docs`)

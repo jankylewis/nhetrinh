@@ -2,7 +2,7 @@
 
 id: NT-BLD-001
 family: BLD
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: icon on a tile
 source: headmate report 2026-11-16 (Dock screenshot, NT-BUG-002)

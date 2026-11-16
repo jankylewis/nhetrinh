@@ -2,7 +2,7 @@
 
 id: NT-GAT-003
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/_Sources/NhetrinhReadback/main.swift (`Options.init(_:known:)` throws `UsageError`; exit 2)
 source: _app/_Sources/NhetrinhReadback/Report.swift (`INCOMPLETE (no step ran)`, exit 2; `tilde(_:home:)`)
@@ -33,3 +33,7 @@ Repeated flags: red at commit 90b8cab (2 issues in `repeatedFlagIsAUsageError`),
 Home path in a usage error: red at commit 88a9953 (`usageErrorNamesNoPersonalPath`), green with P0-RBK-5.
 
 Not proven: a readback run with the new code (this seat may not start the app).
+
+## Proof on master (0f99aee)
+
+Red-first tests green in CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee); `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee) reports `verdict: PASS (8 of 8)` for 8 steps that each wrote their line.
