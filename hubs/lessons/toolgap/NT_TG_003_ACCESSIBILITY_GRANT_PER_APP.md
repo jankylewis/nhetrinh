@@ -79,3 +79,9 @@ BACK `none of the app's identifiers (nhetrinh.*) is in the window, its tree was 
 tests `missingElement`, `notReadTreeSaysWhatWasRead`; red under the old rule, checked by mutation).
 Not proven on the app (no rebuild, no run since).
 At 20:07 the "window" read was not a window (children AXApplication, AXMenuBar): NT-GAT-008.
+
+## Master 0f99aee: stays OPEN
+
+After the headmate toggled Accessibility for the readback app (21:23:41), the installed app (source
+hash `6563a6e1db6acadb`, equal to master's readback sources) ran in full: `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8).
+So a full run through the app is now proven. Why reads were empty with the grant kept stays not proven.

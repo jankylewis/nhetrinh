@@ -5,7 +5,7 @@ family: ENV
 status: OBSERVED
 date: 2026-11-16
 signature: whole machine at ~80% CPU during the bench
-source: hubs/product/rnd/_bench/_bench.py scenario `tabs30` (`NHT_BENCH_LOADALL=1` with 30 URLs)
+source: hubs/product/rnd/_bench/_bench.py scenario `tabs30` (`NHT_BENCH_LOADALL=1` with 30 URLs; removed since P0)
 source: headmate report 2026-11-16 ("dont make my machine peak!", Activity Monitor screenshot)
 observed: ~17 WebKit content processes at ~55% CPU each, system ~80% user CPU
 links: fix=no lesson=yes evidence=yes toolgap=none
@@ -19,4 +19,7 @@ Fine on a lab machine, wrong on the headmate's working machine.
 
 Activity Monitor during `tabs30`: many `https://...` WebKit processes, each near half a core.
 
-Status OBSERVED: the run was stopped and the rule recorded; `bench.py` still loads all tabs at once (no fix yet).
+Status OBSERVED: the fix is on master (0f99aee), not run since (no proof run).
+- The app loads tabs one after another: `_app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift`
+  `loadRemainingTabs`, gap `Bench.loadGap` (`_app/_Sources/_Nhetrinh/Support/Bench.swift`, `NHT_BENCH_LOAD_GAP_S`, default 3 s).
+- `hubs/product/rnd/_bench/_bench.py` caps a scenario at `MAX_TABS = 10` (raises past it); the 30-tab scenario is removed.

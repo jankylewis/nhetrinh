@@ -2,7 +2,7 @@
 
 id: NT-PRF-001
 family: PRF
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/assets/_icon/bundle/_DockIcon.png (256 x 256, made by `tools/shrink.swift`)
 source: _app/scripts/_build.sh (ships `_DockIcon.png` as `AppIcon.png`; stops on a Dock icon over 256 px)
@@ -29,3 +29,7 @@ Before: app 59.2-61.0 MB, total 117.4-151.6 MB.
 
 Not proven yet: the readback R8 on the installed app (not run by this seat), and that the
 Dock still shows the icon without a tile at 256 px (R2).
+
+## Proof on master (0f99aee)
+
+`hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R8: `app judged on the highest of 9 samples 1 s apart: 29.0 MB (max 40)`; R2 PASS with the 256 px icon.

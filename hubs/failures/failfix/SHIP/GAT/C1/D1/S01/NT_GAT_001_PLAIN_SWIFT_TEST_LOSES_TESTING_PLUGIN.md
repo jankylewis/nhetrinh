@@ -2,7 +2,7 @@
 
 id: NT-GAT-001
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 source: _app/scripts/test.sh
 source: .github/workflows/build.yml (step "Unit tests")
@@ -21,4 +21,8 @@ plain `swift test`. Extra arguments go to `swift test`. CI and every skill call 
 ## Proof
 
 Matemaster brief P0-HAR-1: `test.sh` passed 8 of 8 runs on the machine where plain
-`swift test` failed 2 of 4. Not proven on CI yet: no CI run of `test.sh` is cited. Not on `master`.
+`swift test` failed 2 of 4. CI: below.
+
+## Proof on master (0f99aee)
+
+CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee): `test.sh` printed `Test run with 56 tests passed after 8.034 seconds with 1 known issue` (the known issue is `paleTileOnLightDock`, NT-GAT-004).

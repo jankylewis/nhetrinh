@@ -2,7 +2,7 @@
 
 id: NT-PRF-001
 family: PRF
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: R8 the lightness budget holds | FAIL | one simple tab (example.com): app 60.0 MB (max 40)
 source: hubs/failures/evidence/readback/_LATEST.md (R8 row)

@@ -45,3 +45,8 @@ pulled the median down and passed. Now any sample without the app is no reading:
 (`_app/_Sources/NhetrinhReadback/_Steps/Budget.swift`, `SystemSteps.swift`).
 Red first: commit 7181133, 2 issues in `memoryBudgetNeedsTheAppInEverySample`. Green after.
 Not proven: R8 with this code on the installed app.
+
+## Master 0f99aee: stays OPEN
+
+`hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8) R8 ran this measure on the installed app: `app + 5 helpers judged on the median of 9:
+86.6 MB (max 110), highest 86.8 MB`. The cause of a GPU burst stays not proven, so the status stays OPEN.

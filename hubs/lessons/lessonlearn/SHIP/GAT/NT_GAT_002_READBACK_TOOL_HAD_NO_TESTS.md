@@ -2,7 +2,7 @@
 
 id: NT-GAT-002
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 links: fix=yes lesson=yes evidence=no toolgap=none
 

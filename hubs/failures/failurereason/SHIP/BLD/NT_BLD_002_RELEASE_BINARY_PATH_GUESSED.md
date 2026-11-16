@@ -2,7 +2,7 @@
 
 id: NT-BLD-002
 family: BLD
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: cp: .build/arm64-apple-macosx/release/Nhetrinh: No such file or directory
 source: _app/scripts/_build.sh:9 (`BIN=$(swift build -c release --arch arm64 --show-bin-path)`)

@@ -2,7 +2,7 @@
 
 id: NT-GAT-003
 family: GAT
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 signature: verdict: PASS (0 of 0)
 source: _app/_Sources/NhetrinhReadback/main.swift `Options` and the step filter (commit 2e05899)

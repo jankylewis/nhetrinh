@@ -22,3 +22,9 @@ Looking for the cause in the readback's code: the diff 5f2592e..d76fce8 holds no
 taking an AXWindow from `AXChildren` instead would hide a tree that is read wrong.
 
 Not proven on the app: no rebuild, no run since. The cause of the wrong read stays open (NT-TG-003).
+
+## Master 0f99aee: stays OPEN
+
+The fix is on master and `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8) R1 reads `window "www.google.com"; sidebar 182 pt wide`.
+That run came after the headmate re-granted Accessibility (21:23:41, NT-TG-003): not proven whether
+the role pick or the re-grant made the window readable. What `AXWindows` gave at 20:07 stays not proven.
