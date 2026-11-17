@@ -119,7 +119,8 @@ public enum TreeSessionStore {
         }
     }
 
-    private static func version(of bytes: Data) -> Int? {
+    /// The `version` a session file says it is; nil when it says none.
+    public static func version(of bytes: Data) -> Int? {
         struct Head: Decodable { let version: Int }
         return (try? JSONDecoder().decode(Head.self, from: bytes))?.version
     }

@@ -3,7 +3,7 @@ import NhetrinhCore
 
 /// R43 (P7): a session file of version 1, as every build before P7 wrote it (`SessionStore.save`), in the
 /// readback profile's folder. The launch shows its tabs; its bytes are kept once as `session.v1.json`;
-/// the next save is version 2.
+/// the next save is the version the app writes, `TreeSession.version` (3 since P8-GROUPS-1; NT-GAT-014).
 enum VersionOneStep {
     static func run(_ app: AppSession) throws -> String {
         app.quit()
@@ -28,11 +28,17 @@ enum VersionOneStep {
         try expect((try? Data(contentsOf: backup)) == written, "\(TreeSessionStore.backupFileName) is not the v1 file")
         try app.act(.menu(["nhetrinh", "Quit nhetrinh"]), "nhetrinh > Quit nhetrinh")
         try expect(app.waitForEnd(10), "nhetrinh > Quit nhetrinh: the app still runs after 10 s")
-        let saved = (try? Data(contentsOf: file)).flatMap(TreeSessionStore.decode)
-        let text = String(decoding: (try? Data(contentsOf: file)) ?? Data(), as: UTF8.self)
-        try expect(saved?.tree.allTabs == tabs && text.contains("\"version\":2"), "the save at quit is not version 2")
+        let saved = (try? Data(contentsOf: file)) ?? Data()
+        try expect(isCurrentSave(saved, tabs: tabs), "the save at quit is not version \(TreeSession.version)")
         return "a version 1 session.json (3 test pages, row 2 selected): launch shows rows \(state.rows), row 2 "
-            + "selected; \(TreeSessionStore.backupFileName) holds the v1 bytes; quit saved version 2"
+            + "selected; \(TreeSessionStore.backupFileName) holds the v1 bytes; "
+            + "quit saved version \(TreeSession.version)"
+    }
+
+    /// The save at quit holds `tabs` and is the version the app writes: `TreeSession.version`, never a literal.
+    static func isCurrentSave(_ bytes: Data, tabs: [SessionTab]) -> Bool {
+        TreeSessionStore.version(of: bytes) == TreeSession.version
+            && TreeSessionStore.decode(bytes)?.tree.allTabs == tabs
     }
 
     private static func folder() -> URL? {
