@@ -21,6 +21,7 @@ final class FindBar: NSView, NSSearchFieldDelegate {
         field.action = #selector(tapNext)
         field.delegate = self
         answer.textColor = .secondaryLabelColor
+        AppFont.apply(to: textControls)
         let row = NSStackView(views: [field, previous, next, answer, NSView(), close])
         row.spacing = 6
         row.translatesAutoresizingMaskIntoConstraints = false
@@ -34,6 +35,9 @@ final class FindBar: NSView, NSSearchFieldDelegate {
     }
 
     required init?(coder: NSCoder) { return nil }
+
+    /// The field, the answer and the buttons, in the app's font (P8-FONT-1).
+    var textControls: [NSControl] { [field, answer, previous, next, close] }
 
     /// The last answer as the readback reads it: "found", "not found", or "" before any search.
     private(set) var result = ""

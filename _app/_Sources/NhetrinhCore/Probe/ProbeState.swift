@@ -57,6 +57,9 @@ public struct ProbeState: Equatable, Sendable {
     public var collapsedFolders: [Bool] = []
     /// P8-MIN-1: whether the browser window is minimized to the Dock.
     public var minimized = false
+    /// P8-FONT-1: per main control ("address bar", "sidebar row", …) the font family it shows; "mixed: …"
+    /// when its parts differ. A control that is not there (no folder row, no Settings Hub yet) is missing.
+    public var fonts: [String: String] = [:]
 
     public init() {}
 }
@@ -74,7 +77,7 @@ extension ProbeState {
                                      "hubShown": hubShown, "downloads": downloads,
                                      "downloadStates": downloadStates, "revealed": revealed, "folders": folders,
                                      "folderTabs": folderTabs, "collapsedFolders": collapsedFolders,
-                                     "minimized": minimized]
+                                     "minimized": minimized, "fonts": fonts]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -112,6 +115,7 @@ extension ProbeState {
     private mutating func readWindow(_ object: [String: Any]) {
         windowShown = object["windowShown"] as? Bool ?? false
         minimized = object["minimized"] as? Bool ?? false
+        fonts = object["fonts"] as? [String: String] ?? [:]
         sidebarWidth = object["sidebarWidth"] as? Double ?? 0
         addressShown = object["addressShown"] as? Bool ?? false
     }

@@ -16,7 +16,7 @@ final class FolderRowView: NSTableCellView {
         icon.image = Self.folderIcon
         title.lineBreakMode = .byTruncatingTail
         mark.textColor = .controlAccentColor
-        mark.font = .systemFont(ofSize: 8)
+        mark.font = AppFont.font(size: 8)
         mark.setAccessibilityLabel("holds the selected tab")
         imageView = icon
         textField = title
@@ -40,11 +40,13 @@ final class FolderRowView: NSTableCellView {
 
     func shown(_ node: SidebarNode) -> FolderRowView {
         title.stringValue = node.row.title
-        let size = NSFont.systemFontSize
-        title.font = node.marked ? .boldSystemFont(ofSize: size) : .systemFont(ofSize: size)
+        title.font = AppFont.font(size: NSFont.systemFontSize, bold: node.marked)
         mark.isHidden = !node.marked
         return self
     }
+
+    /// The row's text in the app's font (P8-FONT-1).
+    var textControls: [NSControl] { [title, mark] }
 
     /// Whether the row shows the mark (read by the tests).
     var isMarked: Bool { !mark.isHidden }

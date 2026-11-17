@@ -31,7 +31,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | DOING (P5-BUILD-1 on p5/downloads: readback 00:08 35 PASS, R2, R26a, R26b not read back) | `M2_REAL_SITES_WORK.md` |
 | P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DOING (P6-BUILD-1 on p6/memory: built, tests green, not read back) | `M3_V1_RELEASE.md` |
 | P7 Tab folders | 0.8.0 | L | collapsible tab groups in the sidebar | DOING (P7-BUILD-1 on p7/prep: built, tests green, not read back) | `M3_V1_RELEASE.md` |
-| P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
+| P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; P8-FONT-1: the interface in Menlo, R47, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
 
 Size is relative effort (S, M, L). No dates: a phase ends when its gate passes, not on a day.
 Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it.

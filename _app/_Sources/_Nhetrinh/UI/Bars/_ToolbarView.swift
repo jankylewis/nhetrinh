@@ -34,6 +34,7 @@ final class ToolbarView: NSView {
         address.target = self
         address.action = #selector(submit)
         address.setAccessibilityIdentifier("nhetrinh.address")
+        AppFont.apply(to: textControls)
 
         let row = NSStackView(views: [back, forward, reload, address, zoomBadge])
         row.spacing = 6
@@ -66,6 +67,9 @@ final class ToolbarView: NSView {
         zoomBadge.title = badge ?? ""
         zoomBadge.isHidden = badge == nil
     }
+
+    /// The address field and the zoom badge, in the app's font (P8-FONT-1).
+    var textControls: [NSControl] { [address, zoomBadge] }
 
     /// The badge as it reads; "" when hidden.
     var zoomText: String { zoomBadge.isHidden ? "" : zoomBadge.title }

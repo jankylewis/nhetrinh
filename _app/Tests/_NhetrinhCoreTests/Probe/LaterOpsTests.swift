@@ -49,3 +49,12 @@ func minimizedRoundTrips(minimized: Bool) throws {
     state.minimized = minimized
     #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
 }
+
+// P8-FONT-1: the font family per control comes back as it was sent; an older app's answer has none.
+@Test(arguments: [[:], ["address bar": "Menlo", "find bar": "mixed: Menlo, Helvetica"]])
+func fontsRoundTrip(fonts: [String: String]) throws {
+    var state = ProbeState()
+    state.fonts = fonts
+    #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
+    #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
+}

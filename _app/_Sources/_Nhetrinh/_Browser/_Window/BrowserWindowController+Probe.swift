@@ -64,6 +64,7 @@ extension BrowserWindowController {
         state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
         readSheet(into: &state)
         readDownloads(into: &state)
+        readFonts(into: &state)
         return state
     }
 
@@ -79,6 +80,14 @@ extension BrowserWindowController {
         guard let entry = menu?.item(withTitle: "Window")?.submenu?.item(withTitle: item), let action = entry.action
         else { return .failed("no menu item Window > \(item)") }
         return NSApp.sendAction(action, to: window, from: entry) ? .done : .failed("Window > \(item) reached no window")
+    }
+
+    /// P8-FONT-1: the font family of the main controls; the Settings Hub's once it was opened.
+    private func readFonts(into state: inout ProbeState) {
+        state.fonts = sidebar.fonts
+        state.fonts["address bar"] = AppFont.family(of: toolbar.textControls)
+        state.fonts["find bar"] = AppFont.family(of: findBar.textControls)
+        if let hub { state.fonts["Settings Hub"] = AppFont.family(of: hub.textControls) }
     }
 
     /// Perform a menu item as a click does: its own action, sent to its own target. `afterAnswer`

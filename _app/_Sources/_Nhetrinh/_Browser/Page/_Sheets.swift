@@ -84,6 +84,7 @@ extension BrowserWindowController {
         let alert = Self.pageAlert(prompt, from: frame, buttons: ["OK", "Cancel"])
         let field = NSTextField(string: defaultText ?? "")
         field.frame = NSRect(x: 0, y: 0, width: 280, height: 24)
+        AppFont.apply(to: [field])
         alert.accessoryView = field
         alert.window.initialFirstResponder = field
         ask(alert, for: webView) { completionHandler($0 == 0 ? field.stringValue : nil) }

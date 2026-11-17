@@ -77,19 +77,19 @@ Note: this is the largest phase. It can move after 1.0 without blocking it (`DEC
 Goal: anyone can download and run nhetrinh. The headmate's installed app is the released build.
 
 Build:
-- `release.yml`: on a tag `v*` run the checker, the tests and the build; zip the app; compute
-  the SHA-256; make a GitHub Release. The notes are built from the `product/features` rows.
+- `release.yml`: on a tag `v*` run the checker, the tests and the build; zip the app; compute the SHA-256; make a GitHub Release. The notes are built from the `product/features` rows.
 - README: install, shortcuts, known limits, and how to open an app that is not notarized.
 - Apple silicon only; an Intel build only when asked. Not notarized (no Apple Developer ID): the first open shows the macOS warning; notarization is a new phase if an ID comes.
 - Final lightness report: the budget table against the measured numbers and the R&D baseline.
-- P8-MIN-1 (headmate request): a Window menu (Minimize ⌘M, Zoom), the app's `NSApp.windowsMenu` (NT-FEAT-045).
+- Headmate requests: P8-MIN-1 a Window menu (Minimize ⌘M, Zoom), `NSApp.windowsMenu` (NT-FEAT-045); P8-FONT-1 the app's own interface in Menlo, one helper `AppFont`, web pages keep their fonts (NT-FEAT-046).
 - P8-FIX-1 (review): notes from the Release note column (NT-BLD-003, 004); build.yml only reads; a tag not on master
   is refused; upload `overwrite`. Notes: R44 passes only from the granted readback app (NT-TG-003); actions pinned by major tag, not SHA (low, open).
 
 Readback adds:
 - R44 download the zip from the Release page, check the SHA-256, unzip to a temporary folder, launch: R1-R8 PASS on that copy.
-- R45 the full run R1-R43 and R46 on the installed 1.0.0.
+- R45 the full run R1-R43, R46 and R47 on the installed 1.0.0.
 - R46 (P8-MIN-1) Window > Minimize (⌘M) through the probe: minimized true; restored: false, the window shown.
+  R47 (P8-FONT-1) a folder and the Settings Hub shown: the probe's font family of each main control is Menlo.
 
 Exit: every R step PASS; every hub item is FIXED or listed in the README as a known limit;
 CI and the release run are green.

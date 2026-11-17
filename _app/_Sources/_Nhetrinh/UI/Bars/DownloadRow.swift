@@ -12,8 +12,8 @@ final class DownloadRow: NSView {
     init() {
         super.init(frame: .zero)
         name.lineBreakMode = .byTruncatingMiddle
-        name.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
-        state.font = .systemFont(ofSize: NSFont.smallSystemFontSize - 1)
+        name.font = AppFont.font(size: NSFont.smallSystemFontSize)
+        state.font = AppFont.font(size: NSFont.smallSystemFontSize - 1)
         state.textColor = .secondaryLabelColor
         state.lineBreakMode = .byTruncatingTail
         bar.style = .bar
@@ -49,6 +49,9 @@ final class DownloadRow: NSView {
             cancel.widthAnchor.constraint(equalToConstant: 16),
         ])
     }
+
+    /// The name and the state, in the app's font (P8-FONT-1).
+    var textControls: [NSControl] { [name, state] }
 
     func show(_ item: DownloadItem) {
         name.stringValue = item.name

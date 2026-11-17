@@ -55,8 +55,12 @@ final class SettingsHub: NSWindowController {
             grid.centerXAnchor.constraint(equalTo: content.centerXAnchor),
             grid.centerYAnchor.constraint(equalTo: content.centerYAnchor),
         ])
+        AppFont.apply(to: AppFont.controls(in: content))
         window.contentView = content
     }
+
+    /// Every label, menu, field and button of the hub, in the app's font (P8-FONT-1).
+    var textControls: [NSControl] { window?.contentView.map(AppFont.controls(in:)) ?? [] }
 
     private func label(_ text: String) -> NSTextField { NSTextField(labelWithString: text + ":") }
 

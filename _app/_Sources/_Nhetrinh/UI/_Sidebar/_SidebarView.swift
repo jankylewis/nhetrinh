@@ -24,6 +24,7 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     let downloads = DownloadsBar()
     private var rows: [Row] = []
     private(set) var updating = false
+    private lazy var newTab = makeNewTabButton()
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -32,7 +33,7 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
         scroll.documentView = table
         scroll.drawsBackground = false
         scroll.hasVerticalScroller = true
-        layOut(newTab: makeNewTabButton(), scroll: scroll)
+        layOut(newTab: newTab, scroll: scroll)
     }
 
     required init?(coder: NSCoder) { return nil }
@@ -64,6 +65,7 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
         button.alignment = .left
         button.contentTintColor = .secondaryLabelColor
         button.setAccessibilityIdentifier("nhetrinh.newTab")
+        AppFont.apply(to: [button])
         return button
     }
 
@@ -126,6 +128,9 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     func closeRow(_ row: Int) {
         if let flat = node(atRow: row)?.flat { onClose?(flat) }
     }
+
+    /// The New Tab button's text (P8-FONT-1): the controls above the rows.
+    var textControls: [NSControl] { [newTab] }
 
     @objc private func newClicked() { onNewTab?() }
 }

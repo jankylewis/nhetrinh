@@ -65,3 +65,53 @@ struct PageChromeTests {
         #expect(stops == 1 && reloads == 1)
     }
 }
+
+/// P8-FONT-1 (headmate request): the app's own labels and fields are in Menlo, each at its own point size;
+/// with no Menlo, the system monospaced font. One helper (`AppFont`) makes the font. Red first.
+@MainActor
+struct ChromeFontTests {
+    static func chrome() -> [String: [NSControl]] {
+        _ = NSApplication.shared
+        let folder = SidebarNode.nodes([.folder(name: "work", collapsed: true, marked: true, tabs: [])])[0]
+        return [
+            "sidebar row": TabRowView().textControls, "folder row": FolderRowView().shown(folder).textControls,
+            "New Tab": SidebarView().textControls, "address bar": ToolbarView().textControls,
+            "find bar": FindBar().textControls, "Settings Hub": SettingsHub(store: .nonPersistent()).textControls,
+            "downloads": DownloadRow().textControls,
+        ]
+    }
+
+    @Test(arguments: ["sidebar row", "folder row", "New Tab", "address bar", "find bar", "Settings Hub", "downloads"])
+    func everyTextControlIsMenlo(name: String) throws {
+        let controls = try #require(Self.chrome()[name])
+        #expect(!controls.isEmpty)
+        #expect(controls.map { $0.font?.familyName } == controls.map { _ in "Menlo" }, "\(name)")
+        #expect(AppFont.family(of: controls) == "Menlo")
+    }
+
+    @Test(arguments: [9.0, 11.0, 13.0, 17.0])
+    func applyKeepsThePointSize(size: Double) {
+        let field = NSTextField(labelWithString: "a")
+        field.font = .systemFont(ofSize: size)
+        AppFont.apply(to: [field])
+        #expect(field.font?.familyName == "Menlo" && field.font?.pointSize == CGFloat(size))
+    }
+
+    @Test(arguments: [false, true])
+    func aMissingFamilyFallsBackToTheSystemMonospacedFont(bold: Bool) {
+        let font = AppFont.font(size: 12, bold: bold, family: "No Such Family nhetrinh")
+        let system = NSFont.monospacedSystemFont(ofSize: 12, weight: bold ? .bold : .regular)
+        #expect(font.familyName == system.familyName && font.pointSize == 12)
+    }
+
+    /// A marked folder's name is bold Menlo; two families read as "mixed", none as "".
+    @Test func boldIsMenloAndMixedFamiliesAreNamed() {
+        #expect(NSFontManager.shared.traits(of: AppFont.font(size: 13, bold: true)).contains(.boldFontMask))
+        let other = NSTextField(labelWithString: "b")
+        other.font = .systemFont(ofSize: 13)
+        let menlo = NSTextField(labelWithString: "a")
+        AppFont.apply(to: [menlo])
+        #expect(AppFont.family(of: [menlo, other]).hasPrefix("mixed: "))
+        #expect(AppFont.family(of: []) == "")
+    }
+}

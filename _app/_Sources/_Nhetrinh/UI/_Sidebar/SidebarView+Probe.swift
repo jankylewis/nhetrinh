@@ -25,6 +25,17 @@ extension SidebarView {
         return true
     }
 
+    /// P8-FONT-1: the font family of the New Tab button, the first tab row and the first folder row shown.
+    var fonts: [String: String] {
+        let views = (0..<table.numberOfRows).compactMap { table.view(atColumn: 0, row: $0, makeIfNecessary: false) }
+        var fonts = ["New Tab": AppFont.family(of: textControls)]
+        let tabRow = views.lazy.compactMap { ($0 as? TabRowView)?.textControls }.first
+        let folderRow = views.lazy.compactMap { ($0 as? FolderRowView)?.textControls }.first
+        fonts["sidebar row"] = tabRow.map { AppFont.family(of: $0) }
+        fonts["folder row"] = folderRow.map { AppFont.family(of: $0) }
+        return fonts
+    }
+
     /// Per row: whether its view shows the site's icon, not the globe (read by the probe, R16).
     var shownIcons: [Bool] {
         (0..<table.numberOfRows).map { row in

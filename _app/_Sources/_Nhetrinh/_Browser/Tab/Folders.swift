@@ -72,6 +72,7 @@ extension BrowserWindowController {
         alert.addButton(withTitle: "Cancel")
         let field = NSTextField(string: name)
         field.frame = NSRect(x: 0, y: 0, width: 240, height: 24)
+        AppFont.apply(to: [field])
         alert.accessoryView = field
         alert.window.initialFirstResponder = field
         ask(alert, for: nil) { pressed in if pressed == 0 { done(field.stringValue) } }

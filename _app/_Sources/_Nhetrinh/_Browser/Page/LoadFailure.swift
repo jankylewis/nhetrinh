@@ -47,6 +47,7 @@ extension BrowserWindowController {
         let fields = NSView(frame: NSRect(x: 0, y: 0, width: 260, height: 56))
         fields.addSubview(user)
         fields.addSubview(password)
+        AppFont.apply(to: [user, password])
         alert.accessoryView = fields
         alert.window.initialFirstResponder = user
         alert.addButton(withTitle: "Sign In")

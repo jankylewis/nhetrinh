@@ -24,6 +24,7 @@ final class TabRowView: NSTableCellView {
         close.isHidden = true
         imageView = icon
         textField = title
+        AppFont.apply(to: textControls)
         layOut()
     }
 
@@ -55,6 +56,9 @@ final class TabRowView: NSTableCellView {
         icon.alphaValue = row.icon == nil || !row.loaded ? 0.5 : 1
         close.isHidden = !isPointerInside
     }
+
+    /// The row's text in the app's font (P8-FONT-1).
+    var textControls: [NSControl] { [title] }
 
     /// Whether the row shows a site icon, not the globe of a row with none.
     var showsSiteIcon: Bool { icon.image != nil && icon.image !== Self.noIcon }
