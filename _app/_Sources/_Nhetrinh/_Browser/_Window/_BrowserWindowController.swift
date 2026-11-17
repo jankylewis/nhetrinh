@@ -8,14 +8,16 @@ import WebKit
 final class BrowserWindowController: NSWindowController {
     static let homeURL = URL(string: "https://www.google.com")
 
-    /// P7 (`../Tab/Folders.swift`): the tabs as the sidebar holds them, folders included. `tabs` is its
-    /// flat list, top to bottom, folders opened: the index the selection and the menu items count.
+    /// P7 (`../Tab/Groups.swift`): the tabs as the sidebar holds them, groups included (nested since
+    /// P8-GROUPS-1). `tabs` is its flat list, top to bottom, groups opened: the index the selection and the
+    /// menu items count. `groupRefusal`: the reason of the last refused group operation (read by the probe).
     var tree = Tree<Tab>() { didSet { flatTabs = tree.allTabs } }
     private var flatTabs: [Tab] = []
     var tabs: [Tab] {
         get { flatTabs }
-        set { tree = Tree(tabs: newValue) }  // every tab at the root, folders gone: never append through it
+        set { tree = Tree(tabs: newValue) }  // every tab at the root, groups gone: never append through it
     }
+    var groupRefusal = ""
     var selected = -1
     let sidebar = SidebarView()
     let toolbar = ToolbarView()
@@ -112,6 +114,7 @@ final class BrowserWindowController: NSWindowController {
         sidebar.onClose = { [weak self] index in self?.close(at: index) }
         sidebar.onNewTab = { [weak self] in self?.newTab(nil) }
         sidebar.onAction = { [weak self] action in self?.sidebarAction(action) }
+        sidebar.moveRefusal = { [weak self] in self?.moveRefusal(from: $0, into: $1, at: $2) }
         toolbar.onToggleSidebar = { [weak self] in self?.toggleTabSidebar(nil) }
         toolbar.onBack = { [weak self] in self?.goBack(nil) }
         toolbar.onForward = { [weak self] in self?.goForward(nil) }

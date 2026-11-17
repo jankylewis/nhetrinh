@@ -10,7 +10,7 @@ private let all = Dictionary(uniqueKeysWithValues: FontStep.controls.map { ($0, 
     (all, []),
     (all.merging(["address bar": "Helvetica"]) { $1 }, ["address bar: Helvetica"]),
     (all.merging(["find bar": "mixed: .SF NS, Menlo"]) { $1 }, ["find bar: mixed: .SF NS, Menlo"]),
-    (all.filter { $0.key != "folder row" }, ["folder row: not read"]),
+    (all.filter { $0.key != "group row" }, ["group row: not read"]),
     ([:], FontStep.controls.map { "\($0): not read" }),
 ] as [([String: String], [String])])
 func fontStepNamesEveryControlNotInMenlo(fonts: [String: String], wrong: [String]) {
@@ -18,6 +18,6 @@ func fontStepNamesEveryControlNotInMenlo(fonts: [String: String], wrong: [String
 }
 
 @Test func fontStepReadsTheMainControls() {
-    #expect(FontStep.controls == ["sidebar row", "folder row", "New Tab", "address bar", "find bar", "Settings Hub"])
+    #expect(FontStep.controls == ["sidebar row", "group row", "New Tab", "address bar", "find bar", "Settings Hub"])
     #expect(FontStep.step.id == "R47")
 }

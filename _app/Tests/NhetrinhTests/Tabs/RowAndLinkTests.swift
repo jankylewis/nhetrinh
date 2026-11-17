@@ -73,7 +73,8 @@ struct RowAndLinkTests {
         #expect(browser.tabs.map(\.title) == ["t1", "t3"] && browser.selected == 0)
     }
 
-    @Test func aRightClickBelowTheRowsGivesNoMenu() throws {
+    /// P2: no row's menu below the rows; P8-GROUPS-1: the sidebar's own, New Group… only.
+    @Test func aRightClickBelowTheRowsGivesTheSidebarsMenu() throws {
         let browser = browser(2, selected: 0)
         let table = browser.sidebar.table
         let last = try #require(table.center(ofRow: 1))
@@ -81,7 +82,8 @@ struct RowAndLinkTests {
         let click = try #require(NSEvent.mouseEvent(with: .rightMouseDown, location: below, modifierFlags: [],
                                                     timestamp: 0, windowNumber: browser.window?.windowNumber ?? 0,
                                                     context: nil, eventNumber: 0, clickCount: 1, pressure: 1))
-        #expect(table.menu(for: click) == nil && table.menuRow == -1)
+        let menu = table.menu(for: click)
+        #expect(menu?.items.map(\.title) == [SidebarView.newGroup] && table.menuRow == -1)
     }
 
     @Test func theRowShowsTheTabsIcon() {

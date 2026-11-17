@@ -3,7 +3,8 @@ import Testing
 @testable import NhetrinhCore
 
 // P7 tests (hubs/product/plan/M3_V1_RELEASE.md), written red first on stubs (P7-PREP-1, DECISIONS.md D24).
-// Folders: add, rename, collapse, delete (its tabs stay), what the sidebar shows. Moves: TabTreeMoveTests.
+// Folders (groups since P8-GROUPS-1): add, rename, collapse, ungroup (its tabs stay), what the sidebar shows.
+// Moves: TabTreeMoveTests; nested groups: Groups/.
 
 /// A tab named `name`, at https://<name>.example/.
 func treeTab(_ name: String) -> SessionTab {
@@ -40,7 +41,7 @@ func collapsedFolderHidesItsTabs(collapsed: Bool, visible: [String]) {
 @Test(arguments: [(0, "work", 0), (1, "  work  ", 1), (2, "work", 2)])
 func addFolderPutsAnEmptyOpenFolderAt(index: Int, name: String, at place: Int) throws {
     var tree = TabTree(items: [treeRoot("a"), treeRoot("b")])
-    try tree.addFolder(named: name, at: index)
+    try tree.addGroup(named: name, at: index)
     var expected: [TabTree.Item] = [treeRoot("a"), treeRoot("b")]
     expected.insert(.folder(TabFolder(name: "work")), at: place)
     #expect(tree.items == expected)
@@ -49,35 +50,35 @@ func addFolderPutsAnEmptyOpenFolderAt(index: Int, name: String, at place: Int) t
 @Test(arguments: [(3, "work", TabTree.Failure.noSuchPlace), (-1, "work", .noSuchPlace), (0, "   ", .emptyName)])
 func addFolderRefuses(index: Int, name: String, failure: TabTree.Failure) {
     var tree = TabTree(items: [treeRoot("a"), treeRoot("b")])
-    #expect(throws: failure) { try tree.addFolder(named: name, at: index) }
+    #expect(throws: failure) { try tree.addGroup(named: name, at: index) }
     #expect(tree.items == [treeRoot("a"), treeRoot("b")])
 }
 
 @Test(arguments: [("home", "home"), ("  tên có dấu 🎵 ", "tên có dấu 🎵")])
 func renameKeepsTheTabs(name: String, kept: String) throws {
     var tree = sampleTree()
-    try tree.rename(folder: 1, to: name)
+    try tree.rename(group: TabPath(item: 1), to: name)
     #expect(tree.items == [treeRoot("a"), treeFolder(kept, ["b", "c"]), treeRoot("d")])
 }
 
 @Test(arguments: [(1, " ", TabTree.Failure.emptyName), (0, "x", .notAFolder), (3, "x", .noSuchPlace)])
 func renameRefuses(index: Int, name: String, failure: TabTree.Failure) {
     var tree = sampleTree()
-    #expect(throws: failure) { try tree.rename(folder: index, to: name) }
+    #expect(throws: failure) { try tree.rename(group: TabPath(item: index), to: name) }
     #expect(tree == sampleTree())
 }
 
 @Test(arguments: [true, false])
 func collapseAndOpen(collapsed: Bool) throws {
     var tree = sampleTree(collapsed: !collapsed)
-    try tree.setCollapsed(collapsed, folder: 1)
+    try tree.setCollapsed(collapsed, group: TabPath(item: 1))
     #expect(tree == sampleTree(collapsed: collapsed))
 }
 
 @Test(arguments: [(0, TabTree.Failure.notAFolder), (5, .noSuchPlace)])
 func collapseRefuses(index: Int, failure: TabTree.Failure) {
     var tree = sampleTree()
-    #expect(throws: failure) { try tree.setCollapsed(true, folder: index) }
+    #expect(throws: failure) { try tree.setCollapsed(true, group: TabPath(item: index)) }
     #expect(tree == sampleTree())
 }
 
@@ -85,20 +86,20 @@ func collapseRefuses(index: Int, failure: TabTree.Failure) {
 @Test(arguments: [false, true])
 func deleteFolderKeepsItsTabs(collapsed: Bool) throws {
     var tree = sampleTree(collapsed: collapsed)
-    try tree.deleteFolder(at: 1)
+    try tree.ungroup(at: TabPath(item: 1))
     #expect(tree.items == ["a", "b", "c", "d"].map(treeRoot))
     #expect(tree.allTabs == sampleTree().allTabs)
 }
 
 @Test func deleteAnEmptyFolder() throws {
     var tree = TabTree(items: [treeRoot("a"), treeFolder("empty", []), treeRoot("d")])
-    try tree.deleteFolder(at: 1)
+    try tree.ungroup(at: TabPath(item: 1))
     #expect(tree.items == [treeRoot("a"), treeRoot("d")])
 }
 
 @Test(arguments: [(0, TabTree.Failure.notAFolder), (3, .noSuchPlace), (-1, .noSuchPlace)])
 func deleteFolderRefuses(index: Int, failure: TabTree.Failure) {
     var tree = sampleTree()
-    #expect(throws: failure) { try tree.deleteFolder(at: index) }
+    #expect(throws: failure) { try tree.ungroup(at: TabPath(item: index)) }
     #expect(tree == sampleTree())
 }

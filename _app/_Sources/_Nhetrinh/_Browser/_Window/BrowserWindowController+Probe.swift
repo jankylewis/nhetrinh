@@ -47,8 +47,8 @@ extension BrowserWindowController {
         var state = ProbeState()
         state.title = window?.title ?? ""
         state.rows = sidebar.shownRows
-        state.loaded = sidebar.shownLoaded  // per row; a folder's row: false (P7)
-        readFolders(into: &state)
+        state.loaded = sidebar.shownLoaded  // per row; a group's row: false (P7)
+        readGroups(into: &state)
         state.selected = sidebar.selectedRow >= 0 ? sidebar.selectedRow : nil
         state.address = toolbar.address.stringValue
         state.windowShown = window?.isVisible ?? false

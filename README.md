@@ -27,8 +27,11 @@ Default web browser. nhetrinh never changes that setting itself.
 ## Use
 
 - **Sidebar**: one row per tab. Drag to reorder; hover for the close button; middle-click closes.
-  Right-click a row: New Folder…, Move to Folder, Close Tab; a folder's row: Rename, Collapse, Delete
-  (its tabs stay). A collapsed folder that holds the shown tab is bold with a dot.
+  Right-click a tab: New Group…, New Group from Selected Tab…, Move Tab to Group, Move Out of Group,
+  Close Tab. Groups nest 4 levels deep; a group's row shows its tab count and its menu has Rename Group…
+  (or double-click it), Collapse, New Group Inside…, Move Group to, Ungroup (its tabs and groups move up,
+  none closes) and Close Group… (Reopen Closed Tab brings it back). A collapsed group that holds the
+  shown tab is bold with a dot.
 - **Tabs** come back after a quit. A tab not used for a while gives its memory back and reloads
   when you click it, with its history; a tab that plays sound is kept. When macOS is short of memory,
   nhetrinh unloads background tabs at once.
@@ -49,7 +52,7 @@ Default web browser. nhetrinh never changes that setting itself.
 | ⌘S | Show or hide the sidebar | ⌘P | Print |
 | ⌘, | Settings Hub | ⌘Q | Quit |
 
-⌘1-⌘9 count the tabs you see: the tabs of a collapsed folder are skipped. Zoom is kept per site.
+⌘1-⌘9 count the tabs you see: a tab inside a collapsed group is skipped. Zoom is kept per site.
 
 ## Settings Hub (⌘,)
 

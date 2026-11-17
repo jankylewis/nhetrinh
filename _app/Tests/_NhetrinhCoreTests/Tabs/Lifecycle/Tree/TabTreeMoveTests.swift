@@ -39,7 +39,7 @@ func moveTab(run: MoveCase) throws {
     #expect(tree.allTabs.count == 4, "a move never closes or copies a tab")
 }
 
-/// The last tab moved out leaves the folder, empty: a folder goes only by Delete Folder.
+/// The last tab moved out leaves the group, empty: a group goes only by Ungroup or Close Group….
 @Test func movingTheLastTabOutKeepsAnEmptyFolder() throws {
     var tree = TabTree(items: [treeFolder("work", ["b"]), treeRoot("d")])
     try tree.move(from: at(0, 0), to: at(2))
@@ -60,10 +60,9 @@ struct RefusedMove: CustomTestStringConvertible {
     let failure: TabTree.Failure
 }
 
-/// One level only: a folder never goes inside a folder. A refused move leaves the tree as it was.
+/// A refused move leaves the tree as it was. A group inside a group: Groups/ (P8-GROUPS-1).
 let refusedMoves = [
-    RefusedMove(testDescription: "a folder into the next one", from: at(1), to: at(1, 0), failure: .folderInFolder),
-    RefusedMove(testDescription: "a folder into the one before", from: at(2), to: at(1, 0), failure: .folderInFolder),
+    RefusedMove(testDescription: "an empty path", from: at(1), to: TabPath([]), failure: .noSuchPlace),
     RefusedMove(testDescription: "no item there", from: at(5), to: at(0), failure: .noSuchPlace),
     RefusedMove(testDescription: "no tab there in the folder", from: at(1, 9), to: at(0), failure: .noSuchPlace),
     RefusedMove(testDescription: "a tab path inside a root tab", from: at(0, 0), to: at(1), failure: .notAFolder),

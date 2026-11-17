@@ -73,16 +73,17 @@ struct PageChromeTests {
 struct ChromeFontTests {
     static func chrome() -> [String: [NSControl]] {
         _ = NSApplication.shared
-        let folder = SidebarNode.nodes([.folder(name: "work", collapsed: true, marked: true, tabs: [])])[0]
+        let group = SidebarGroup(name: "work", collapsed: true, marked: true, count: 0, items: [])
+        let folder = SidebarNode.nodes([.group(group)])[0]
         return [
-            "sidebar row": TabRowView().textControls, "folder row": FolderRowView().shown(folder).textControls,
+            "sidebar row": TabRowView().textControls, "group row": FolderRowView().shown(folder).textControls,
             "New Tab": SidebarView().textControls, "address bar": ToolbarView().textControls,
             "find bar": FindBar().textControls, "Settings Hub": SettingsHub(store: .nonPersistent()).textControls,
             "downloads": DownloadRow().textControls,
         ]
     }
 
-    @Test(arguments: ["sidebar row", "folder row", "New Tab", "address bar", "find bar", "Settings Hub", "downloads"])
+    @Test(arguments: ["sidebar row", "group row", "New Tab", "address bar", "find bar", "Settings Hub", "downloads"])
     func everyTextControlIsMenlo(name: String) throws {
         let controls = try #require(Self.chrome()[name])
         #expect(!controls.isEmpty)

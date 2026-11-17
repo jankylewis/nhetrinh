@@ -4,9 +4,9 @@ import NhetrinhCore
 /// P2 tab handling (hubs/product/plan/M1_DAILY_DRIVER.md): reorder, next and previous tab, reopen a
 /// closed tab, a link in a background tab. The menu items target the window controller (AppMenu).
 extension BrowserWindowController: NSMenuItemValidation {
-    /// Tabs > Move Tab Up / Down: one row within its container; at a folder's edge the tab steps out to
-    /// the root; a root tab never enters a folder (P7-FIX-1, P4: `Tree.step`). The selection follows its
-    /// tab. A drag and Move to Folder are `Folders.swift`'s.
+    /// Tabs > Move Tab Up / Down: one row within its container; at a group's edge the tab steps out one
+    /// level; a tab passes a group whole, never into it (P7-FIX-1, P4: `Tree.step`). The selection follows
+    /// its tab. A drag and Move Tab to Group are `Groups.swift`'s.
     func moveSelectedTab(up: Bool) {
         guard let path = tree.path(ofFlat: selected) else { return }
         keepingSelection { tree.step(path, up: up) }
@@ -23,7 +23,7 @@ extension BrowserWindowController: NSMenuItemValidation {
     @objc func moveTabUp(_ sender: Any?) { moveSelectedTab(up: true) }
     @objc func moveTabDown(_ sender: Any?) { moveSelectedTab(up: false) }
 
-    /// ⌃⇥ and ⌃⇧⇥: the next and the previous visible tab, round the end; the tabs of a collapsed folder
+    /// ⌃⇥ and ⌃⇧⇥: the next and the previous visible tab, round the end; the tabs of a collapsed group
     /// are skipped (ruling after P7-FIX-1, `Tree.visibleStep`).
     @objc func selectNextTab(_ sender: Any?) { selectTab(by: 1) }
     @objc func selectPreviousTab(_ sender: Any?) { selectTab(by: -1) }
@@ -32,13 +32,18 @@ extension BrowserWindowController: NSMenuItemValidation {
         if let next = tree.visibleStep(from: selected, by: step), next != selected { select(next) }
     }
 
-    /// File > Reopen Closed Tab: the tab closed last comes back where it was, selected and loaded.
+    /// File > Reopen Closed Tab: the tab closed last comes back where it was, selected and loaded; a group
+    /// closed by Close Group… comes back whole (P8-GROUPS-1, `Groups+Close.swift`).
     @objc func reopenClosedTab(_ sender: Any?) {
-        guard let closed = closedTabs.pop() else { return }
+        guard let entry = closedTabs.pop() else { return }
+        guard case .tab(let closed) = entry else {
+            if case .group(let group) = entry { reopenGroup(group) }
+            return
+        }
         let tab = Tab(url: closed.url, title: closed.title)
         keepingSelection {  // where it was in the tree (P7-FIX-1, P1); a tab closed before P7: by flat index
             guard let path = closed.path else { return tree.insert(tab, atFlat: min(max(0, closed.index), tabs.count)) }
-            tree.reinsert(tab, at: path, folder: closed.folder)
+            tree.reinsert(tab, at: path, groups: closed.groups)
         }
         select(tabs.firstIndex { $0 === tab } ?? 0)
     }

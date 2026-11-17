@@ -1,9 +1,10 @@
 import AppKit
 import NhetrinhCore
 
-/// The vertical tab list, an outline (P7): root tabs and folders, a folder's tabs under it. One row per tab
-/// (`TabRowView`): icon, title, close button on hover; a tab that is not loaded is dimmed. A row's menu
-/// and a middle click close it (P2); a drag moves a tab or a folder (`+Drag`); folders: `+Folders`.
+/// The vertical tab list, an outline (P7): tabs and groups, a group's items under it, indented by level
+/// (P8-GROUPS-1). One row per tab (`TabRowView`): icon, title, close button on hover; a tab that is not
+/// loaded is dimmed. A row's menu and a middle click close it (P2); a drag moves a tab or a group
+/// (`+Outline`); the groups' menus: `+Groups`. A double click on a group's row renames it.
 final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate {
     struct Row {
         let title: String
@@ -16,14 +17,19 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     var onSelect: ((Int) -> Void)?
     var onClose: ((Int) -> Void)?
     var onNewTab: (() -> Void)?
-    /// A folder action or a drop (P7).
+    /// A group action or a drop (P7).
     var onAction: ((SidebarAction) -> Void)?
+    /// Why the item at a path cannot move into the group at a path at an index (nil: it can): the
+    /// controller's tree answers; a drop and a menu item check it first (P8-GROUPS-1).
+    var moveRefusal: ((TabPath, [Int], Int?) -> TreeFailure?)?
 
     let table = TabTable()
     /// P5: the footer's download rows (`../Bars/DownloadsBar.swift`), below the tabs.
     let downloads = DownloadsBar()
-    private var rows: [Row] = []
-    private(set) var updating = false
+    /// True while `update` sets the outline: its own expand and select calls are not the user's.
+    var updating = false
+    /// How many times the whole outline was reloaded (R-11: only when the tree's shape changed).
+    var reloads = 0
     private lazy var newTab = makeNewTabButton()
 
     override init(frame: NSRect) {
@@ -57,6 +63,8 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
         table.setDraggingSourceOperationMask(.move, forLocal: true)
         table.onMiddleClick = { [weak self] row in self?.closeRow(row) }
         table.menuForRow = { [weak self] row in self?.menu(forRow: row) }
+        table.target = self
+        table.doubleAction = #selector(doubleClicked)
     }
 
     private func makeNewTabButton() -> NSButton {
@@ -88,39 +96,23 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
         ])
     }
 
-    /// Show `items`; `selected` is the controller's flat tab index. A tab in a collapsed folder has no row
-    /// to select: then no row is selected, and its folder is marked.
-    func update(_ items: [SidebarItem], selected: Int) {
-        nodes = SidebarNode.nodes(items)
-        rows = nodes.flatMap { $0.isFolder ? $0.children.map(\.row) : [$0.row] }
-        updating = true
-        table.reloadData()
-        for node in nodes where node.isFolder {
-            node.collapsed ? table.collapseItem(node) : table.expandItem(node)
-        }
-        let row = tabNode(flat: selected).map { table.row(forItem: $0) } ?? -1
-        if row >= 0 { table.selectRowIndexes([row], byExtendingSelection: false) } else { table.deselectAll(nil) }
-        updating = false
-    }
-
-    /// The rows as the outline shows them (a folder row reads its name), and per row whether its tab is
-    /// loaded (a folder: no); the selected row (-1: none). Read by the probe (D23).
+    /// The rows as the outline shows them (a group row reads its name), and per row whether its tab is
+    /// loaded (a group: no) and its level; the selected row (-1: none). Read by the probe (D23).
     var shownRows: [String] { shownNodes.map(\.row.title) }
     var shownLoaded: [Bool] { shownNodes.map(\.row.loaded) }
+    var shownLevels: [Int] { shownNodes.map(\.level) }
     var selectedRow: Int { table.selectedRow }
 
     private var shownNodes: [SidebarNode] { (0..<table.numberOfRows).compactMap(node(atRow:)) }
 
     func node(atRow row: Int) -> SidebarNode? { table.item(atRow: row) as? SidebarNode }
 
-    func tabNode(flat: Int) -> SidebarNode? {
-        nodes.lazy.flatMap { $0.isFolder ? $0.children : [$0] }.first { $0.flat == flat }
-    }
+    func tabNode(flat: Int) -> SidebarNode? { SidebarNode.all(nodes).first { $0.flat == flat } }
 
     /// Select a tab's row as a click does: the outline reports the change, and `onSelect` shows that tab.
-    /// A folder's row is not selected by a click.
+    /// A group's row is not selected by a click.
     func selectAsClick(_ row: Int) -> Bool {
-        guard node(atRow: row)?.isFolder == false else { return false }
+        guard node(atRow: row)?.isGroup == false else { return false }
         table.selectRowIndexes([row], byExtendingSelection: false)
         return true
     }
@@ -133,4 +125,12 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     var textControls: [NSControl] { [newTab] }
 
     @objc private func newClicked() { onNewTab?() }
+
+    @objc private func doubleClicked() { doubleClick(row: table.clickedRow) }
+
+    /// A double click on a group's row: Rename Group… (P8-GROUPS-1); on a tab's row, nothing more.
+    func doubleClick(row: Int) {
+        guard let node = node(atRow: row), node.isGroup else { return }
+        onAction?(.rename(node.path))
+    }
 }

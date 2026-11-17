@@ -51,14 +51,21 @@ public struct ProbeState: Equatable, Sendable {
     public var downloads: [String] = []
     public var downloadStates: [String] = []
     public var revealed: [String] = []
-    /// P7: every folder, root first: its name, its tabs' titles, whether it is collapsed.
+    /// P7: every group, top to bottom (a group's groups after it): its name, its own tabs' titles, whether
+    /// it is collapsed. P8-GROUPS-1: its path ("MBing > FE"), its tab count at any depth; per shown row its
+    /// level (0: the top); every tab's title, hidden ones too; the reason of the last refusal shown.
     public var folders: [String] = []
     public var folderTabs: [[String]] = []
     public var collapsedFolders: [Bool] = []
+    public var groupPaths: [String] = []
+    public var groupCounts: [Int] = []
+    public var rowLevels: [Int] = []
+    public var tabTitles: [String] = []
+    public var groupRefusal = ""
     /// P8-MIN-1: whether the browser window is minimized to the Dock.
     public var minimized = false
     /// P8-FONT-1: per main control ("address bar", "sidebar row", …) the font family it shows; "mixed: …"
-    /// when its parts differ. A control that is not there (no folder row, no Settings Hub yet) is missing.
+    /// when its parts differ. A control that is not there (no group row, no Settings Hub yet) is missing.
     public var fonts: [String: String] = [:]
     /// P8-CHROME-1: the toolbar's left buttons ("Toggle Sidebar", "Back") as [x, y, width, height] in the
     /// window's points, and the zoom button's right edge in the same points; nil when it was not read.
@@ -79,12 +86,11 @@ extension ProbeState {
                                      "fullscreen": fullscreen, "active": active, "findShown": findShown,
                                      "findResult": findResult, "zoomBadge": zoomBadge, "appearance": appearance,
                                      "hubShown": hubShown, "downloads": downloads,
-                                     "downloadStates": downloadStates, "revealed": revealed, "folders": folders,
-                                     "folderTabs": folderTabs, "collapsedFolders": collapsedFolders,
+                                     "downloadStates": downloadStates, "revealed": revealed,
                                      "minimized": minimized, "fonts": fonts, "toolbarFrames": toolbarFrames]
         if let selected { object["selected"] = selected }
         if let zoomMaxX { object["zoomMaxX"] = zoomMaxX }
-        return object
+        return object.merging(groupObject) { first, _ in first }
     }
 
     /// A field that is missing or of another type keeps its default: the readback then sees it.
@@ -114,7 +120,7 @@ extension ProbeState {
         appearance = object["appearance"] as? String ?? ""
         hubShown = object["hubShown"] as? Bool ?? false
         readDownloads(object)
-        readFolders(object)
+        readGroups(object)
     }
 
     private mutating func readWindow(_ object: [String: Any]) {
@@ -131,12 +137,5 @@ extension ProbeState {
         downloads = object["downloads"] as? [String] ?? []
         downloadStates = object["downloadStates"] as? [String] ?? []
         revealed = object["revealed"] as? [String] ?? []
-    }
-
-    /// P7's fields.
-    private mutating func readFolders(_ object: [String: Any]) {
-        folders = object["folders"] as? [String] ?? []
-        folderTabs = object["folderTabs"] as? [[String]] ?? []
-        collapsedFolders = object["collapsedFolders"] as? [Bool] ?? []
     }
 }

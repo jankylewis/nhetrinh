@@ -1,57 +1,71 @@
 import Foundation
 
-// P7 tab folders (hubs/product/plan/M3_V1_RELEASE.md); red first in P7-PREP-1 (DECISIONS.md D24), built in
-// P7-BUILD-1. Tests: Tests/_NhetrinhCoreTests/Tabs/Lifecycle/Tree/. The session holds a `TabTree`; the app
-// holds a `Tree` of its own tabs, so both share every operation. Flat-index helpers: TreeFlat.swift.
+// P7 tab folders (hubs/product/plan/M3_V1_RELEASE.md), nested groups since P8-GROUPS-1: a group holds tabs
+// and groups in any order, `GroupDepth.max` levels at most. Tests: Tests/_NhetrinhCoreTests/Tabs/Lifecycle/
+// Tree/. The session holds a `TabTree`; the app holds a `Tree` of its own tabs, so both share every
+// operation. Group operations: TreeGroups.swift; flat-index helpers: TreeFlat.swift.
 
-/// Where an item is: a root item (`tab` nil), or tab `tab` inside the folder at root index `item`.
-/// For a move it is the place after the moved item has been taken out.
-public struct TabPath: Codable, Equatable, Hashable, Sendable {
-    public var item: Int
-    public var tab: Int?
+/// Where an item is: its index at the root, then its index inside each group on the way down. For a move
+/// it is the place after the moved item has been taken out.
+public struct TabPath: Hashable, Sendable {
+    public var indexes: [Int]
 
-    public init(item: Int, tab: Int? = nil) {
-        self.item = item
-        self.tab = tab
+    public init(_ indexes: [Int]) {
+        self.indexes = indexes
     }
+
+    /// P7's one-level path: the root item `item`, or the item `tab` of the group at root index `item`.
+    public init(item: Int, tab: Int? = nil) {
+        self.indexes = [item] + (tab.map { [$0] } ?? [])
+    }
+
+    /// The root index.
+    public var item: Int { indexes.first ?? 0 }
+    /// The index inside its group; nil for a root item.
+    public var tab: Int? { indexes.count > 1 ? indexes.last : nil }
+    /// The path of the group that holds it; empty for a root item.
+    public var parent: [Int] { Array(indexes.dropLast()) }
+    /// Its index inside its container.
+    public var last: Int { indexes.last ?? 0 }
 }
 
-/// A folder: a name, collapsed or not, and its tabs. It holds tabs only: one level, never a folder.
+/// A group: a name, collapsed or not, and its items, tabs and groups in any order.
 public struct TreeFolder<Element> {
     public var name: String
     public var collapsed: Bool
-    public var tabs: [Element]
+    public var items: [Tree<Element>.Item]
 
-    public init(name: String, collapsed: Bool = false, tabs: [Element] = []) {
+    public init(name: String, collapsed: Bool = false, items: [Tree<Element>.Item]) {
         self.name = name
         self.collapsed = collapsed
-        self.tabs = tabs
+        self.items = items
     }
+
+    /// A group of tabs only (P7's folder).
+    public init(name: String, collapsed: Bool = false, tabs: [Element] = []) {
+        self.init(name: name, collapsed: collapsed, items: tabs.map { .tab($0) })
+    }
+
+    /// Every tab inside, at any depth, top to bottom.
+    public var allTabs: [Element] { Tree(items: items).allTabs }
 }
 
 extension TreeFolder: Equatable where Element: Equatable {}
 extension TreeFolder: Sendable where Element: Sendable {}
-extension TreeFolder: Codable where Element: Codable {}
 
-/// Why an operation was refused; the tree is then left as it was.
-public enum TreeFailure: Error, Equatable, Sendable {
-    /// The path names no item, or no place to put one.
-    case noSuchPlace
-    /// The root index names a tab where a folder is needed.
-    case notAFolder
-    /// A folder would go inside a folder: one level only.
-    case folderInFolder
-    /// A folder name of nothing but spaces.
-    case emptyName
-}
-
-/// The sidebar's ordered items, each a tab or a folder (P7).
+/// The sidebar's ordered items, each a tab or a group (P7; nested since P8-GROUPS-1).
 public struct Tree<Element> {
     public typealias Failure = TreeFailure
 
     public enum Item {
         case tab(Element)
         case folder(TreeFolder<Element>)
+
+        /// How many group levels it holds: a tab 0, a group of tabs 1, a group in a group 2, …
+        public var height: Int {
+            guard case .folder(let group) = self else { return 0 }
+            return 1 + (group.items.map(\.height).max() ?? 0)
+        }
     }
 
     public var items: [Item]
@@ -65,74 +79,53 @@ public struct Tree<Element> {
         self.items = tabs.map { .tab($0) }
     }
 
-    /// A new empty, open folder named `name` (spaces trimmed) at root index `index`.
-    public mutating func addFolder(named name: String, at index: Int) throws {
-        let name = try Self.trimmed(name)
-        guard (0...items.count).contains(index) else { throw Failure.noSuchPlace }
-        items.insert(.folder(TreeFolder(name: name)), at: index)
+    /// The deepest group level in the tree: 0 with no group.
+    public var depth: Int { items.map(\.height).max() ?? 0 }
+
+    /// The item at `path`; nil when it names none.
+    public func item(at path: TabPath) -> Item? {
+        guard let index = path.indexes.last, let items = try? container(path.parent),
+              items.indices.contains(index) else { return nil }
+        return items[index]
     }
 
-    /// The folder at root index `index` gets the name `name` (spaces trimmed).
-    public mutating func rename(folder index: Int, to name: String) throws {
-        var folder = try self.folder(at: index)
-        folder.name = try Self.trimmed(name)
-        items[index] = .folder(folder)
+    /// The group at `path`.
+    public func group(at path: TabPath) throws -> TreeFolder<Element> {
+        guard !path.indexes.isEmpty else { throw Failure.noSuchPlace }
+        let items = try container(path.parent)
+        guard items.indices.contains(path.last) else { throw Failure.noSuchPlace }
+        guard case .folder(let group) = items[path.last] else { throw Failure.notAFolder }
+        return group
     }
 
-    /// Collapse or open the folder at root index `index`.
-    public mutating func setCollapsed(_ collapsed: Bool, folder index: Int) throws {
-        var folder = try self.folder(at: index)
-        folder.collapsed = collapsed
-        items[index] = .folder(folder)
+    /// The items of the group at `parent` (empty: the root).
+    func container(_ parent: [Int]) throws -> [Item] {
+        var copy = self
+        return try copy.edit(parent) { $0 }
     }
 
-    /// Delete the folder at root index `index`: its tabs go to the root in its place, in order. No tab closes.
-    public mutating func deleteFolder(at index: Int) throws {
-        let folder = try self.folder(at: index)
-        items.replaceSubrange(index...index, with: folder.tabs.map { .tab($0) })
+    /// Run `body` on the items of the group at `parent` (empty: the root), written back afterwards.
+    mutating func edit<T>(_ parent: [Int], _ body: (inout [Item]) throws -> T) throws -> T {
+        try Self.edit(&items, parent[...], body)
     }
 
-    /// Move the tab or folder at `from` to `to`: into a folder, out of one, inside one, or along the root.
-    public mutating func move(from: TabPath, to: TabPath) throws {
-        var rest = self
-        let moving = try rest.take(from)
-        if let tab = to.tab {
-            guard case .tab(let element) = moving else { throw Failure.folderInFolder }
-            var folder = try rest.folder(at: to.item)
-            guard (0...folder.tabs.count).contains(tab) else { throw Failure.noSuchPlace }
-            folder.tabs.insert(element, at: tab)
-            rest.items[to.item] = .folder(folder)
-        } else {
-            guard (0...rest.items.count).contains(to.item) else { throw Failure.noSuchPlace }
-            rest.items.insert(moving, at: to.item)
+    private static func edit<T>(_ items: inout [Item], _ path: ArraySlice<Int>,
+                                _ body: (inout [Item]) throws -> T) throws -> T {
+        guard let first = path.first else { return try body(&items) }
+        guard items.indices.contains(first) else { throw Failure.noSuchPlace }
+        guard case .folder(var group) = items[first] else { throw Failure.notAFolder }
+        let result = try edit(&group.items, path.dropFirst(), body)
+        items[first] = .folder(group)
+        return result
+    }
+
+    /// Take out the item at `path`.
+    mutating func take(_ path: TabPath) throws -> Item {
+        guard !path.indexes.isEmpty else { throw Failure.noSuchPlace }
+        return try edit(path.parent) { items in
+            guard items.indices.contains(path.last) else { throw Failure.noSuchPlace }
+            return items.remove(at: path.last)
         }
-        self = rest
-    }
-
-    /// The folder at root index `index`.
-    public func folder(at index: Int) throws -> TreeFolder<Element> {
-        guard items.indices.contains(index) else { throw Failure.noSuchPlace }
-        guard case .folder(let folder) = items[index] else { throw Failure.notAFolder }
-        return folder
-    }
-
-    /// Take out the item at `path`: a root item, or a tab of a folder.
-    private mutating func take(_ path: TabPath) throws -> Item {
-        guard let tab = path.tab else {
-            guard items.indices.contains(path.item) else { throw Failure.noSuchPlace }
-            return items.remove(at: path.item)
-        }
-        var folder = try self.folder(at: path.item)
-        guard folder.tabs.indices.contains(tab) else { throw Failure.noSuchPlace }
-        let element = folder.tabs.remove(at: tab)
-        items[path.item] = .folder(folder)
-        return .tab(element)
-    }
-
-    private static func trimmed(_ name: String) throws -> String {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { throw Failure.emptyName }
-        return trimmed
     }
 }
 

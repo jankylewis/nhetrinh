@@ -33,11 +33,11 @@ struct FoldersTests {
         #expect(shown.collapsedFolders == [collapsed] && shown.loaded.count == rows.count)
     }
 
-    /// New Folder… on a row asks a name in a sheet; Create puts the folder after that row's root item.
+    /// New Group… on a row asks a name in a sheet; Create puts the group after that row's top item.
     @Test(arguments: [("Create", ["work", "news"]), ("Cancel", ["work"])])
     func newFolderAsksItsName(button: String, folders: [String]) async {
         let browser = browser()
-        #expect(browser.probeAnswer(.rowMenu(row: 4, item: SidebarView.newFolder), menu: nil) == .done)
+        #expect(browser.probeAnswer(.rowMenu(row: 4, item: SidebarView.newGroup), menu: nil) == .done)
         #expect(browser.probeAnswer(.sheetField(index: 0, text: "  news "), menu: nil) == .done)
         #expect(browser.probeAnswer(.sheetButton(button), menu: nil) == .done)
         await pressed(browser)
@@ -45,33 +45,33 @@ struct FoldersTests {
         if button == "Create" { #expect(state(browser).rows.last == "news") }
     }
 
-    /// A folder's row menu: Rename Folder… (a sheet), Collapse Folder, Delete Folder (its tabs stay).
-    @Test(arguments: ["Rename Folder…", "Collapse Folder", "Delete Folder"])
+    /// A group's row menu: Rename Group… (a sheet), Collapse Group, Ungroup (its tabs stay).
+    @Test(arguments: ["Rename Group…", "Collapse Group", "Ungroup"])
     func aFolderRowsMenu(item: String) async {
         let browser = browser()
         #expect(browser.probeAnswer(.rowMenu(row: 1, item: item), menu: nil) == .done)
-        if item == "Rename Folder…" {
+        if item == "Rename Group…" {
             _ = browser.probeAnswer(.sheetField(index: 0, text: "home"), menu: nil)
             _ = browser.probeAnswer(.sheetButton("Rename"), menu: nil)
             await pressed(browser)
         }
         let shown = state(browser)
         switch item {
-        case "Rename Folder…": #expect(shown.folders == ["home"] && shown.folderTabs == [["t2", "t3"]])
-        case "Collapse Folder": #expect(shown.rows == ["t1", "work", "t4"] && shown.collapsedFolders == [true])
+        case "Rename Group…": #expect(shown.folders == ["home"] && shown.folderTabs == [["t2", "t3"]])
+        case "Collapse Group": #expect(shown.rows == ["t1", "work", "t4"] && shown.collapsedFolders == [true])
         default: #expect(shown.rows == ["t1", "t2", "t3", "t4"] && shown.folders.isEmpty)
         }
     }
 
-    /// Move to Folder, Move Out of Folder (a tab's row menu); the selection stays on its tab.
-    @Test(arguments: [(0, "Move to Folder > work", [["t2", "t3", "t1"]]), (2, "Move Out of Folder", [["t3"]])])
+    /// Move Tab to Group, Move Out of Group (a tab's row menu); the selection stays on its tab.
+    @Test(arguments: [(0, "Move Tab to Group > work", [["t2", "t3", "t1"]]), (2, "Move Out of Group", [["t3"]])])
     func aTabRowsMenuMovesIt(row: Int, item: String, folderTabs: [[String]]) {
         let browser = browser(selected: 0)
         #expect(browser.probeAnswer(.rowMenu(row: row, item: item), menu: nil) == .done)
         #expect(state(browser).folderTabs == folderTabs && browser.tabs[browser.selected].title == "t1")
     }
 
-    /// A drag: onto the folder's row (its end), between its tabs; a folder onto a folder is refused.
+    /// A drag: onto the group's row (its end), between its tabs; a drop onto a tab's row is refused.
     @Test func dropsIntoAFolder() throws {
         let browser = browser()
         let folder = try #require(browser.sidebar.node(atRow: 1))

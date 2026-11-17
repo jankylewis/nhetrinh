@@ -24,7 +24,7 @@ PLAN = """| Phase | Version | Size | What | Status | Detail |
 |---|---|---|---|---|---|
 | P1 Tab lifecycle | 0.2.0 | M | tabs come back | DONE | `M1.md` |
 | P3 Page basics | 0.4.0 | L | dialogs | DONE | `M2.md` |
-| P7 Tab folders | 0.8.0 | L | groups | DONE | `M3.md` |
+| P7 Tab groups | 0.8.0 | L | groups | DONE | `M3.md` |
 """
 HEAD = "| Id | Feature | Release note | Commit | Date | Closed bug |\n"
 
@@ -53,13 +53,13 @@ class ReleaseNotesTests(unittest.TestCase):
 
     def test_phase_names_come_from_the_plan(self):
         self.assertEqual(release_notes.phase_names(PLAN),
-                         {"P1": "Tab lifecycle", "P3": "Page basics", "P7": "Tab folders"})
+                         {"P1": "Tab lifecycle", "P3": "Page basics", "P7": "Tab groups"})
 
     def test_notes_group_by_phase_in_order_and_leave_out_the_readback_tools(self):
         text = release_notes.notes("1.0.0", release_notes.parse_rows(FEATURES), release_notes.phase_names(PLAN))
         self.assertTrue(text.startswith("# nhetrinh 1.0.0\n"))
         heads = [line for line in text.splitlines() if line.startswith("## ")]
-        self.assertEqual(heads[:4], ["## The basics", "## Tab lifecycle", "## Page basics", "## Tab folders"])
+        self.assertEqual(heads[:4], ["## The basics", "## Tab lifecycle", "## Page basics", "## Tab groups"])
         self.assertIn("- Window with a vertical tab sidebar (collapsible, ⌘S)\n", text)
         self.assertNotIn("Readback probe", text)
         self.assertNotIn("NT-", text.split("## Install")[0])
@@ -76,7 +76,7 @@ class ReleaseNotesTests(unittest.TestCase):
         pathlib.Path(root, "hubs", "product", "plan", "_PLAN.md").write_text(PLAN, encoding="utf-8")
         out = subprocess.run([sys.executable, release_notes.__file__, "1.0.0", "--root", root],
                              capture_output=True, text=True, check=True).stdout
-        self.assertIn("## Tab folders", out)
+        self.assertIn("## Tab groups", out)
         self.assertIn("- A row with a | in its text\n", out)
         for version, kind in [("0.8.0", "prerelease"), ("1.0.0", "release")]:
             out = subprocess.run([sys.executable, release_notes.__file__, version, "--kind"],

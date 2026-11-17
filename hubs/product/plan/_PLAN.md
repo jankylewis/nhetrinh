@@ -30,8 +30,8 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
 | P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | DOING (P5-BUILD-1 on p5/downloads: readback 00:08 35 PASS, R2, R26a, R26b not read back) | `M2_REAL_SITES_WORK.md` |
 | P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DOING (P6-BUILD-1 on p6/memory: built, tests green, not read back) | `M3_V1_RELEASE.md` |
-| P7 Tab folders | 0.8.0 | L | collapsible tab groups in the sidebar | DOING (P7-BUILD-1 on p7/prep: built, tests green, not read back) | `M3_V1_RELEASE.md` |
-| P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; P8-FONT-1: the interface in Menlo, R47, tests green, not read back; P8-CHROME-1: toolbar Toggle Sidebar, toolbar clears the traffic lights (NT-BUG-018), R48, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
+| P7 Tab groups | 0.8.0 | L | collapsible tab groups in the sidebar | DOING (P7-BUILD-1 on p7/prep: built, tests green, not read back) | `M3_V1_RELEASE.md` |
+| P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; P8-FONT-1: the interface in Menlo, R47, tests green, not read back; P8-CHROME-1: toolbar Toggle Sidebar, toolbar clears the traffic lights (NT-BUG-018), R48, tests green, not read back; P8-GROUPS-1: nested tab groups, 4 levels, full CRUD, session v3, R49, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
 
 Size is relative effort (S, M, L). No dates: a phase ends when its gate passes, not on a day.
 Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it.
@@ -86,7 +86,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 | R-8 | P2: ⌃⇥ / ⌃⇧⇥ may be taken by the web view before the menu; hover and drag are not read back (D18) | Tested on the menu items only; reported as not read back |
 | R-9 | P6: WebKit may keep the page process of an unloaded tab (a process cache), so R36 sees more than 1 | R36 counts the page processes before and after; a cache is not proven or ruled out until R36 runs |
 | R-10 | P6: a warning takes tabs idle past 1 min, so R36 and R37 wait 63 s each | Accepted: a warning sent at once proves nothing; R36 sends one at once too and expects no unload |
-| R-11 | P7: a drag is not read back (D18); R40 moves by the row menu (same tree move). The outline reloads at every chrome refresh: cost not measured | Drop unit tested (`FoldersTests`); R38 and R8 read the budget |
+| R-11 | P7: a drag is not read back (D18); R40 and R49 move by the row menu (same tree move). Since P8-GROUPS-1 the outline reloads only when the tree's shape changes (unit tested, `GroupsTests`); the cost of a reload: not measured. A build before P8-GROUPS-1 keeps a version 3 session as `session.bad.json` (no downgrade planned) | Drops unit tested (`FoldersTests`, `GroupMenuTests`); R38 and R8 read the budget |
 
 ## Not in v1 (only when the headmate asks)
 

@@ -1,15 +1,16 @@
 import Foundation
 
-// P7 session schema version 2 (hubs/product/plan/M3_V1_RELEASE.md); red first in P7-PREP-1 (D24).
-// `Session` stays the version 1 file: read only, to migrate it. The file shape is fixed by the tests'
-// SessionFixtures.swift: {"items":[{"tab":{…}} | {"folder":{"name","collapsed","tabs"}}], "selected":{…}, …}.
+// P7 session schema version 2 (hubs/product/plan/M3_V1_RELEASE.md), version 3 since P8-GROUPS-1 (nested
+// groups). `Session` stays the version 1 file: read only, to migrate it. The file shapes are fixed by the
+// tests' SessionFixtures.swift. Version 3: {"items":[{"tab":{…}} | {"folder":{"name","collapsed","items"}}],
+// "selected":[…], …}; version 2 (read only): a folder's "tabs" hold tabs, "selected" is {"item","tab"}.
 
 /// What survives a quit from P7 on: the tab tree, the selected tab, the sidebar.
 public struct TreeSession: Equatable, Sendable {
-    public static let version = 2
+    public static let version = 3
 
     public var tree: TabTree
-    /// The selected tab's path; a root tab has `tab` nil.
+    /// The selected tab's path.
     public var selected: TabPath
     public var sidebarWidth: Double
     public var collapsed: Bool
@@ -47,9 +48,10 @@ public struct TreeSession: Equatable, Sendable {
     public var selectedIndex: Int { tree.flatIndex(of: selected) ?? 0 }
 }
 
-/// Reads and writes `session.json` as version 2. A version 1 file is migrated, and its bytes are kept
-/// once as `session.v1.json`. A bad file (corrupt, newer, a folder inside a folder) is kept as
-/// `session.bad.json`, as `SessionStore` does: the app then starts with one home tab.
+/// Reads and writes `session.json` as version 3. A version 2 file is read as it is; a version 1 file is
+/// migrated, and its bytes are kept once as `session.v1.json`. A bad file (corrupt, newer, a version 2
+/// folder inside a folder, groups deeper than `GroupDepth.max`) is kept as `session.bad.json`, as
+/// `SessionStore` does: the app then starts with one home tab.
 public enum TreeSessionStore {
     public static let backupFileName = "session.v1.json"
 
@@ -61,7 +63,7 @@ public enum TreeSessionStore {
         let collapsed: Bool
     }
 
-    /// Version 2 JSON, keys sorted.
+    /// Version 3 JSON, keys sorted.
     public static func encode(_ session: TreeSession) throws -> Data {
         let file = File(version: TreeSession.version, items: session.tree.items, selected: session.selected,
                         sidebarWidth: session.sidebarWidth, collapsed: session.collapsed)
@@ -70,16 +72,16 @@ public enum TreeSessionStore {
         return try encoder.encode(file)
     }
 
-    /// A version 1 file (migrated) or a version 2 file; nil for anything else.
+    /// A version 1 file (migrated), a version 2 file (one level) or a version 3 file; nil for anything else.
     public static func decode(_ bytes: Data) -> TreeSession? {
-        switch version(of: bytes) {
-        case 1: return SessionStore.decode(bytes).map { TreeSession(migrating: $0) }
-        case TreeSession.version:
-            guard let file = try? JSONDecoder().decode(File.self, from: bytes) else { return nil }
-            return TreeSession(tree: TabTree(items: file.items), selected: file.selected,
-                               sidebarWidth: file.sidebarWidth, collapsed: file.collapsed)
-        default: return nil
-        }
+        let version = version(of: bytes)
+        if version == 1 { return SessionStore.decode(bytes).map { TreeSession(migrating: $0) } }
+        guard version == 2 || version == TreeSession.version,
+              let file = try? JSONDecoder().decode(File.self, from: bytes) else { return nil }
+        let tree = TabTree(items: file.items)
+        guard tree.depth <= (version == 2 ? 1 : GroupDepth.max) else { return nil }
+        return TreeSession(tree: tree, selected: file.selected, sidebarWidth: file.sidebarWidth,
+                           collapsed: file.collapsed)
     }
 
     /// Atomic, as `SessionStore.save`.
@@ -120,28 +122,5 @@ public enum TreeSessionStore {
     private static func version(of bytes: Data) -> Int? {
         struct Head: Decodable { let version: Int }
         return (try? JSONDecoder().decode(Head.self, from: bytes))?.version
-    }
-}
-
-/// An item is `{"tab": …}` or `{"folder": {"name", "collapsed", "tabs"}}`; anything else is refused. A
-/// folder's tabs decode as tabs only, so a folder inside a folder is refused too (one level).
-extension Tree.Item: Codable where Element: Codable {
-    private enum Key: String, CodingKey { case tab, folder }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: Key.self)
-        if let tab = try container.decodeIfPresent(Element.self, forKey: .tab) {
-            self = .tab(tab)
-        } else {
-            self = .folder(try container.decode(TreeFolder<Element>.self, forKey: .folder))
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: Key.self)
-        switch self {
-        case .tab(let tab): try container.encode(tab, forKey: .tab)
-        case .folder(let folder): try container.encode(folder, forKey: .folder)
-        }
     }
 }

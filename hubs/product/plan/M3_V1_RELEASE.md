@@ -30,13 +30,13 @@ Readback adds:
 
 Exit: the gate, R1-R38 PASS.
 
-## P7 — Tab folders (0.8.0, size L, status DOING)
+## P7 — Tab groups (0.8.0, size L, status DOING)
 
 Goal: collapsible groups in the sidebar, as in the headmate's reference screenshot.
 
 Build, Core:
 - `TabTree`: ordered items, each one a tab or a folder (name, collapsed, tabs). One level
-  only: no folder inside a folder.
+  only: no folder inside a folder (nested groups, 4 levels, since P8-GROUPS-1: D27, R49).
 - Operations: add folder, rename, move a tab (into, out of, inside), collapse, delete folder.
   Deleting a folder moves its tabs to the root. It never closes them.
 - Session schema version 2, with a migration from version 1 (flat list to root tabs); the version 1 file is kept once.
@@ -81,15 +81,15 @@ Build:
 - README: install, shortcuts, known limits, and how to open an app that is not notarized.
 - Apple silicon only; an Intel build only when asked. Not notarized (no Apple Developer ID): the first open shows the macOS warning; notarization is a new phase if an ID comes.
 - Final lightness report: the budget table against the measured numbers and the R&D baseline.
-- Headmate requests: P8-MIN-1 a Window menu (Minimize ⌘M, Zoom), `NSApp.windowsMenu` (NT-FEAT-045); P8-FONT-1 the app's own interface in Menlo, one helper `AppFont`, web pages keep their fonts (NT-FEAT-046); P8-CHROME-1 a Toggle Sidebar button in the toolbar, and the toolbar clears the traffic lights with the sidebar hidden (NT-FEAT-047, NT-BUG-018).
+- Headmate requests: P8-MIN-1 a Window menu (Minimize ⌘M, Zoom), `NSApp.windowsMenu` (NT-FEAT-045); P8-FONT-1 the app's own interface in Menlo, one helper `AppFont`, web pages keep their fonts (NT-FEAT-046); P8-CHROME-1 a Toggle Sidebar button in the toolbar, and the toolbar clears the traffic lights with the sidebar hidden (NT-FEAT-047, NT-BUG-018); P8-GROUPS-1 nested tab groups, 4 levels (`GroupDepth.max`), full create, read, update, delete, Folder renamed Group, session version 3, the outline reloaded only on a shape change (NT-FEAT-048 to 050, D27).
 - P8-FIX-1 (review): notes from the Release note column (NT-BLD-003, 004); build.yml only reads; a tag not on master is refused; upload `overwrite`. Notes: R44 passes only from the granted readback app (NT-TG-003); actions pinned by major tag, not SHA (low, open).
 
 Readback adds:
 - R44 download the zip from the Release page, check the SHA-256, unzip to a temporary folder, launch: R1-R8 PASS on that copy.
-- R45 the full run R1-R43, R46-R48 on the installed 1.0.0.
+- R45 the full run R1-R43, R46-R49 on the installed 1.0.0.
 - R46 (P8-MIN-1) Window > Minimize (⌘M) through the probe: minimized true; restored: false, the window shown.
   R47 (P8-FONT-1) a folder and the Settings Hub shown: the probe's font family of each main control is Menlo.
-  R48 (P8-CHROME-1) sidebar hidden: Toggle Sidebar and Back start right of the zoom button, no overlap; the toggle shows, then hides the sidebar; start state put back.
+  R48 (P8-CHROME-1) sidebar hidden: Toggle Sidebar and Back start right of the zoom button, no overlap; the toggle shows, then hides the sidebar; start state put back. R49 (P8-GROUPS-1) through row menus, 5 local pages loaded one at a time: build MBing > FE > PRs > Feedback entry (a tab at each level, levels and tab counts read), a 5th level refused (its reason read), rename PRs, move it to the top level and back, Ungroup FE (no tab closed), Close Group… on Feedback entry and Reopen Closed Tab, relaunch: the same tree; one home tab put back.
 
 Exit: every R step PASS; every hub item is FIXED or listed in the README as a known limit;
 CI and the release run are green.

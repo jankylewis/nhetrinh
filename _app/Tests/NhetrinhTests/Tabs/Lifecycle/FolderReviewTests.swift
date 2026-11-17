@@ -26,7 +26,7 @@ struct FolderReviewTests {
             switch item {
             case .tab(let tab): return tab.title
             case .folder(let folder):
-                let tabs = folder.tabs.map(\.title).joined(separator: ",")
+                let tabs = folder.allTabs.map(\.title).joined(separator: ",")
                 return folder.name + (folder.collapsed ? "*" : "") + ":" + tabs
             }
         }

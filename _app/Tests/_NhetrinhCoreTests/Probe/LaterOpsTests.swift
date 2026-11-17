@@ -18,13 +18,19 @@ func aPressureRequestWithoutAKnownLevelIsMalformed(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
 }
 
-// P7: the folders the probe reads come back as they were sent; an older app's answer has none.
+// P7: the folders the probe reads come back as they were sent; an older app's answer has none. P8-GROUPS-1:
+// the group fields too.
 @Test(arguments: [(["work"], [["a", "b"]], [true]), ([], [], [])])
 func folderFieldsRoundTrip(folders: [String], tabs: [[String]], collapsed: [Bool]) throws {
     var state = ProbeState()
     state.folders = folders
     state.folderTabs = tabs
     state.collapsedFolders = collapsed
+    state.groupPaths = folders.map { "MBing > \($0)" }
+    state.groupCounts = folders.map { _ in 2 }
+    state.rowLevels = folders.map { _ in 3 }
+    state.tabTitles = tabs.flatMap { $0 }
+    state.groupRefusal = folders.isEmpty ? "" : TreeFailure.tooDeep.reason
     let line = try ProbeCodec.encode(ProbeResponse.state(state))
     #expect(try ProbeCodec.decodeResponse(line) == .state(state))
     #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))

@@ -52,4 +52,4 @@ e0b5d3d; 812 KB on the P8 review's readback, 01:30 on e2bbc3f with P5-FIX-2: 212
 - The 1.0.0 build (above). The speed of page loads: never benchmarked (D2).
 - Idle CPU with many tabs in the app itself: R8 measures one tab; the 10-site number is the R&D MVP's.
 - Memory under real pressure: R36-R38 simulate it (D23); real system pressure is never made.
-- The cost of the outline sidebar's reload at every chrome refresh (P7, R-11): not measured on its own.
+- The cost of the outline sidebar's reload (P7, R-11): since P8-GROUPS-1 only a change of the tree's shape reloads it (unit tested); a reload's cost is not measured on its own. Bundle after P8-GROUPS-1: 880 KB (`_build.sh`, 2026-11-17), not read back.

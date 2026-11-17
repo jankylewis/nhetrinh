@@ -3,7 +3,7 @@ import AppKit
 /// Menu actions. Their menu items target the window controller directly (see AppMenu, NT-UIX-001).
 extension BrowserWindowController {
     @objc func newTab(_ sender: Any?) {
-        tree.insert(Tab(url: nil), atFlat: tabs.count)  // the root's end, never inside the last folder
+        tree.insert(Tab(url: nil), atFlat: tabs.count)  // the top level's end, never inside the last group
         select(tabs.count - 1)
         focusAddress(nil)
     }
@@ -15,8 +15,8 @@ extension BrowserWindowController {
     @objc func goBack(_ sender: Any?) { current?.goBack() }
     @objc func goForward(_ sender: Any?) { current?.goForward() }
 
-    /// ⌘1 to ⌘8 select that tab; ⌘9 selects the last. They count the tabs a user sees: a collapsed
-    /// folder's tabs are skipped (P7).
+    /// ⌘1 to ⌘8 select that tab; ⌘9 selects the last. They count the tabs a user sees: a tab under a
+    /// collapsed group, at any level, is skipped (P7, P8-GROUPS-1).
     @objc func selectTabByNumber(_ sender: NSMenuItem) {
         let shown = tree.visibleFlatIndexes
         let number = sender.tag == 9 ? shown.count - 1 : sender.tag - 1

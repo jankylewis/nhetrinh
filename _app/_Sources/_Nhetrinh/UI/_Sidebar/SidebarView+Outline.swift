@@ -1,8 +1,9 @@
 import AppKit
 import NhetrinhCore
 
-/// The outline's data and rows (P7), and a drag: a tab into a folder, out of one, inside one, or along
-/// the root; a folder along the root. A folder never goes into a folder (one level, `Tree.move`).
+/// The outline's data and rows (P7), and a drag: a tab or a group (with all inside) into a group, out of
+/// one, inside one, or along the top level (P8-GROUPS-1). The tree says what is refused (`moveRefusal`):
+/// a group into itself or past `GroupDepth.max` levels.
 extension SidebarView {
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         (item as? SidebarNode)?.children.count ?? nodes.count
@@ -13,16 +14,16 @@ extension SidebarView {
     }
 
     func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        (item as? SidebarNode)?.isFolder ?? false
+        (item as? SidebarNode)?.isGroup ?? false
     }
 
     func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-        (item as? SidebarNode)?.isFolder == false
+        (item as? SidebarNode)?.isGroup == false
     }
 
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
         guard let node = item as? SidebarNode else { return nil }
-        if node.isFolder {
+        if node.isGroup {
             let cell = outlineView.makeView(withIdentifier: FolderRowView.identifier, owner: nil) as? FolderRowView
             return (cell ?? FolderRowView()).shown(node)
         }
@@ -46,8 +47,8 @@ extension SidebarView {
 
     /// The disclosure triangle, clicked: the tree keeps the state (it is saved, P7).
     private func folderToggled(_ notification: Notification, collapsed: Bool) {
-        guard !updating, let node = notification.userInfo?["NSObject"] as? SidebarNode, node.isFolder else { return }
-        onAction?(.setCollapsed(folder: node.path.item, collapsed))
+        guard !updating, let node = notification.userInfo?["NSObject"] as? SidebarNode, node.isGroup else { return }
+        onAction?(.setCollapsed(node.path, collapsed))
     }
 
     // MARK: - Drag
@@ -55,7 +56,7 @@ extension SidebarView {
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
         guard let node = item as? SidebarNode else { return nil }
         let pasteboard = NSPasteboardItem()
-        pasteboard.setString("\(node.path.item),\(node.path.tab ?? -1)", forType: Self.rowType)
+        pasteboard.setString(node.path.indexes.map(String.init).joined(separator: "."), forType: Self.rowType)
         return pasteboard
     }
 
@@ -72,27 +73,25 @@ extension SidebarView {
         return drop(from, onto: item as? SidebarNode, at: index)
     }
 
-    /// The end of a drag, as the outline proposes it: `onto` a folder's row (nil: the root), at `index`
-    /// (-1: on the row itself, its end). A drop on a tab's row, or of a folder into a folder, is refused.
+    /// The end of a drag, as the outline proposes it: `onto` a group's row (nil: the top level), at `index`
+    /// (-1: on the row itself, its end). A drop on a tab's row, or one the tree refuses, is refused.
     @discardableResult
     func drop(_ from: TabPath, onto node: SidebarNode?, at index: Int) -> Bool {
         guard let target = dropTarget(from, onto: node, at: index) else { return false }
-        onAction?(.drop(from: from, folder: target.folder, index: target.index))
+        onAction?(.move(from: from, into: target.into, at: target.at))
         return true
     }
 
-    private func dropTarget(_ from: TabPath, onto node: SidebarNode?, at index: Int) -> (folder: Int?, index: Int?)? {
+    private func dropTarget(_ from: TabPath, onto node: SidebarNode?, at index: Int) -> (into: [Int], at: Int?)? {
         let place = index == NSOutlineViewDropOnItemIndex ? nil : index
-        guard let node else { return (nil, place) }
-        let draggingFolder = from.tab == nil && nodes.indices.contains(from.item) && nodes[from.item].isFolder
-        guard node.isFolder, !draggingFolder else { return nil }
-        return (node.path.item, place)
+        guard node?.isGroup ?? true else { return nil }
+        let into = node?.path.indexes ?? []
+        return moveRefusal?(from, into, place) == nil ? (into, place) : nil
     }
 
     private static func dragged(_ info: NSDraggingInfo) -> TabPath? {
         guard let text = info.draggingPasteboard.pasteboardItems?.first?.string(forType: rowType) else { return nil }
-        let parts = text.split(separator: ",").compactMap { Int($0) }
-        guard parts.count == 2 else { return nil }
-        return TabPath(item: parts[0], tab: parts[1] < 0 ? nil : parts[1])
+        let indexes = text.split(separator: ".").compactMap { Int($0) }
+        return indexes.isEmpty ? nil : TabPath(indexes)
     }
 }

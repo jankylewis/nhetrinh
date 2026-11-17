@@ -100,11 +100,11 @@ extension BrowserWindowController {
         endSheets(of: tab.webView)  // S1
         tab.unload()
         let path = tree.path(ofFlat: index)
-        let folder = path.flatMap { $0.tab == nil ? nil : (try? tree.folder(at: $0.item))?.name }
-        if let url = tab.url {  // its place in the tree, for Reopen Closed Tab (P7-FIX-1, P1)
-            closedTabs.push(ClosedTab(url: url, title: tab.title, index: index, path: path, folder: folder))
+        let groups = path.map { tree.groupNames(along: $0.parent) } ?? []
+        if let url = tab.url {  // its place in the tree, for Reopen Closed Tab (P7-FIX-1, P1; nested: P8-GROUPS-1)
+            closedTabs.push(ClosedTab(url: url, title: tab.title, index: index, path: path, groups: groups))
         }
-        tree.removeTab(atFlat: index)  // its folder stays, even empty (P7)
+        tree.removeTab(atFlat: index)  // its groups stay, even empty (P7)
         if let slot = backgroundSlot, index < slot { backgroundSlot = slot - 1 }  // NT-UIX-003
         if tabs.isEmpty {
             window?.close()

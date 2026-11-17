@@ -93,7 +93,7 @@ func nothingToRestoreGivesAHomeTab(v1WithoutTabs: Bool) throws {
         if v1WithoutTabs { try Data(SessionFixtures.v1NoTabs.utf8).write(to: folder.appendingPathComponent(file)) }
         let loaded = TreeSessionStore.load(from: folder, home: home)
         #expect(loaded.tree.items == [.tab(SessionTab(url: home, title: "www.google.com"))])
-        #expect(loaded.selected == TabPath(item: 0) && TreeSession.version == 2)
+        #expect(loaded.selected == TabPath(item: 0) && TreeSession.version == 3)
     }
 }
 

@@ -67,7 +67,7 @@ func moveTabByFlatIndex(from: Int, to: Int, expected: [TabTree.Item]) {
 ])
 func dropDestination(from: TabPath, folder: Int?, index: Int?, to: TabPath) throws {
     let tree = sampleTree()
-    #expect(tree.destination(of: from, folder: folder, index: index) == to)
+    #expect(try tree.destination(of: from, into: folder.map { [$0] } ?? [], at: index) == to)
     var moved = tree
     try moved.move(from: from, to: to)
     #expect(moved.allTabs.count == 4)
@@ -105,10 +105,10 @@ private func names(_ spec: [String]) -> Tree<String> {
 func aClosedTabComesBackWhereItWas(spec: [String], flat: Int, expected: [String]) throws {
     var tree = names(spec)
     let path = try #require(tree.path(ofFlat: flat))
-    let folder = path.tab.flatMap { _ in try? tree.folder(at: path.item).name }
+    let groups = tree.groupNames(along: path.parent)
     let removed = tree.removeTab(atFlat: flat)
     let tab = try #require(removed)
-    let placed = tree.reinsert(tab, at: path, folder: folder)
+    let placed = tree.reinsert(tab, at: path, groups: groups)
     #expect(tree == names(expected) && placed == path)
 }
 
