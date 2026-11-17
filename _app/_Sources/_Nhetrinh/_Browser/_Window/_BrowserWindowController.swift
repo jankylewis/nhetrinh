@@ -112,6 +112,7 @@ final class BrowserWindowController: NSWindowController {
         sidebar.onClose = { [weak self] index in self?.close(at: index) }
         sidebar.onNewTab = { [weak self] in self?.newTab(nil) }
         sidebar.onAction = { [weak self] action in self?.sidebarAction(action) }
+        toolbar.onToggleSidebar = { [weak self] in self?.toggleTabSidebar(nil) }
         toolbar.onBack = { [weak self] in self?.goBack(nil) }
         toolbar.onForward = { [weak self] in self?.goForward(nil) }
         toolbar.onReload = { [weak self] in self?.reload(nil) }

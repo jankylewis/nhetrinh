@@ -56,6 +56,8 @@ extension BrowserWindowController {
         let sidebarShown = sidebar.window != nil && !sidebar.isHiddenOrHasHiddenAncestor
         state.sidebarWidth = sidebarShown ? Double(sidebar.frame.width) : 0
         state.addressShown = toolbar.address.window != nil && !toolbar.address.isHiddenOrHasHiddenAncestor
+        state.toolbarFrames = toolbar.buttonFrames  // P8-CHROME-1: R48, against the traffic lights
+        state.zoomMaxX = toolbar.zoomMaxX
         state.shortcuts = menu.map { Self.shortcuts(in: $0, path: []) } ?? [:]
         state.icons = sidebar.shownIcons
         state.loading = current?.isLoading ?? false

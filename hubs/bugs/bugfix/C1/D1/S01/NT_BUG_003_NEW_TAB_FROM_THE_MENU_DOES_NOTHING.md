@@ -12,7 +12,7 @@ links: fix=yes lesson=no evidence=yes toolgap=none
 ## Change
 
 Browser menu items target the window controller instead of the responder chain
-(`hubs/failures/failfix/APP/UIX/NT_UIX_001_MENU_ACTION_LOST_WITH_NO_KEY_WINDOW.md`).
+(`hubs/failures/failfix/APP/UIX/C1/D1/S01/NT_UIX_001_MENU_ACTION_LOST_WITH_NO_KEY_WINDOW.md`).
 
 ## Proof
 

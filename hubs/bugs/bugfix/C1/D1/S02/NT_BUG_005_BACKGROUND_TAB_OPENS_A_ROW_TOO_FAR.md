@@ -11,7 +11,7 @@ links: fix=yes lesson=no evidence=no toolgap=none
 ## Change
 
 `close(at:)` moves the background slot up by one when the closed row was above it
-(`hubs/failures/failfix/APP/UIX/NT_UIX_003_CLOSE_LEFT_THE_BACKGROUND_SLOT.md`).
+(`hubs/failures/failfix/APP/UIX/C1/D1/S01/NT_UIX_003_CLOSE_LEFT_THE_BACKGROUND_SLOT.md`).
 
 ## Proof
 

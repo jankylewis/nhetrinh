@@ -1,4 +1,5 @@
 import AppKit
+import NhetrinhCore
 import Testing
 import WebKit
 @testable import Nhetrinh
@@ -113,5 +114,33 @@ struct ChromeFontTests {
         AppFont.apply(to: [menlo])
         #expect(AppFont.family(of: [menlo, other]).hasPrefix("mixed: "))
         #expect(AppFont.family(of: []) == "")
+    }
+}
+
+/// P8-CHROME-1 (NT-BUG-018): with the sidebar hidden, the toolbar's left buttons start right of the window's
+/// real zoom button; the toolbar's Toggle Sidebar acts as View > Toggle Sidebar. Never shown. Red first.
+@MainActor
+struct ToolbarLightsTests {
+    @Test(arguments: [true, false])
+    func theLeftButtonsClearTheTrafficLights(sidebarHidden: Bool) throws {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        browser.split.splitViewItems.first?.isCollapsed = sidebarHidden
+        browser.window?.contentView?.layoutSubtreeIfNeeded()
+        let lights = try #require(browser.toolbar.zoomMaxX)
+        let toggle = try #require(browser.toolbar.buttonFrames["Toggle Sidebar"])
+        let back = try #require(browser.toolbar.buttonFrames["Back"])
+        #expect(toggle[0] >= lights + ToolbarLayout.gap && toggle[0] + toggle[2] <= back[0], "\(toggle) \(back)")
+    }
+
+    @Test func theToggleButtonHidesAndShowsTheSidebar() throws {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        let side = try #require(browser.split.splitViewItems.first)
+        #expect(browser.toolbar.button("Toggle Sidebar")?.toolTip == "Toggle Sidebar (⌘S)")
+        for collapsed in [true, false] {
+            NSAnimationContext.runAnimationGroup { $0.duration = 0; #expect(browser.toolbar.press("Toggle Sidebar")) }
+            #expect(side.isCollapsed == collapsed)
+        }
     }
 }

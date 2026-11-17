@@ -1,8 +1,12 @@
 import AppKit
+import NhetrinhCore
 
-/// Back, forward, reload and the address field. While a page loads, reload is stop and a thin line
-/// along the bottom edge shows the progress (P2).
+/// Toggle Sidebar, back, forward, reload and the address field. While a page loads, reload is stop and a
+/// thin line along the bottom edge shows the progress (P2). The row starts right of the window's traffic
+/// lights when they are over the toolbar (P8-CHROME-1, `ToolbarView+Lights.swift`).
 final class ToolbarView: NSView {
+    /// The toolbar's Toggle Sidebar button: View > Toggle Sidebar's action (P8-CHROME-1).
+    var onToggleSidebar: (() -> Void)?
     var onBack: (() -> Void)?
     var onForward: (() -> Void)?
     var onReload: (() -> Void)?
@@ -12,6 +16,7 @@ final class ToolbarView: NSView {
     var onZoomBadge: (() -> Void)?
 
     let address = NSTextField()
+    private lazy var toggle = makeButton("sidebar.left", "Toggle Sidebar", #selector(tapToggle))
     private lazy var back = makeButton("chevron.left", "Back", #selector(tapBack))
     private lazy var forward = makeButton("chevron.right", "Forward", #selector(tapForward))
     private lazy var reload = makeButton("arrow.clockwise", "Reload", #selector(tapReload))
@@ -25,6 +30,8 @@ final class ToolbarView: NSView {
     private let progressLine = NSView()
     private var loading = false
     private var progress = 0.0
+    /// The row's left edge: the margin, or right of the traffic lights (`placeRow`).
+    var rowLeading: NSLayoutConstraint?
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -35,8 +42,9 @@ final class ToolbarView: NSView {
         address.action = #selector(submit)
         address.setAccessibilityIdentifier("nhetrinh.address")
         AppFont.apply(to: textControls)
+        toggle.toolTip = "Toggle Sidebar (⌘S)"
 
-        let row = NSStackView(views: [back, forward, reload, address, zoomBadge])
+        let row = NSStackView(views: [toggle, back, forward, reload, address, zoomBadge])
         row.spacing = 6
         row.translatesAutoresizingMaskIntoConstraints = false
         addSubview(row)
@@ -44,8 +52,10 @@ final class ToolbarView: NSView {
         progressLine.layer?.backgroundColor = NSColor.controlAccentColor.cgColor
         progressLine.isHidden = true
         addSubview(progressLine)
+        let leading = row.leadingAnchor.constraint(equalTo: leadingAnchor, constant: CGFloat(ToolbarLayout.margin))
+        rowLeading = leading
         NSLayoutConstraint.activate([
-            row.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            leading,
             row.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
             row.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
@@ -75,6 +85,7 @@ final class ToolbarView: NSView {
     var zoomText: String { zoomBadge.isHidden ? "" : zoomBadge.title }
 
     @objc private func tapZoomBadge() { onZoomBadge?() }
+    @objc private func tapToggle() { onToggleSidebar?() }
     @objc private func tapBack() { onBack?() }
     @objc private func tapForward() { onForward?() }
     /// The reload button's label as it reads now: "Reload", or "Stop" while the page loads.
@@ -91,7 +102,13 @@ final class ToolbarView: NSView {
         reload.setAccessibilityLabel(label)
     }
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        watchFullScreen()
+    }
+
     override func layout() {
+        placeRow()  // this view's own frame is set: where the traffic lights fall on it is known
         super.layout()
         progressLine.frame = NSRect(x: 0, y: 0, width: bounds.width * CGFloat(min(1, max(0.05, progress))), height: 2)
     }
@@ -102,11 +119,13 @@ final class ToolbarView: NSView {
 
     /// Press a button by its label, as a click does (the readback probe, R18).
     func press(_ label: String) -> Bool {
-        guard let button = [back, forward, reload].first(where: { $0.accessibilityLabel() == label }),
-              button.isEnabled else { return false }
+        guard let button = button(label), button.isEnabled else { return false }
         button.performClick(nil)
         return true
     }
+
+    /// The symbol buttons, left to right.
+    var buttons: [NSButton] { [toggle, back, forward, reload] }
 
     @objc private func tapReload() { loading ? onStop?() : onReload?() }
     @objc private func submit() { onSubmit?(address.stringValue) }

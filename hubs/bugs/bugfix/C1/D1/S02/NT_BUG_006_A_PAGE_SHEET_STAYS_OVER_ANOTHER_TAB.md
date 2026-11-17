@@ -11,7 +11,7 @@ links: fix=yes lesson=no evidence=no toolgap=none
 ## Change
 
 The window keeps each page's sheet with that page's web view. Closing or leaving the tab ends it
-with no button pressed (`hubs/failures/failfix/APP/UIX/NT_UIX_004_A_SHEET_OUTLIVED_ITS_PAGE.md`).
+with no button pressed (`hubs/failures/failfix/APP/UIX/C1/D1/S01/NT_UIX_004_A_SHEET_OUTLIVED_ITS_PAGE.md`).
 
 ## Proof
 

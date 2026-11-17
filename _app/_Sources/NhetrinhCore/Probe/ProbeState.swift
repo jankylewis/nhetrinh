@@ -60,6 +60,10 @@ public struct ProbeState: Equatable, Sendable {
     /// P8-FONT-1: per main control ("address bar", "sidebar row", …) the font family it shows; "mixed: …"
     /// when its parts differ. A control that is not there (no folder row, no Settings Hub yet) is missing.
     public var fonts: [String: String] = [:]
+    /// P8-CHROME-1: the toolbar's left buttons ("Toggle Sidebar", "Back") as [x, y, width, height] in the
+    /// window's points, and the zoom button's right edge in the same points; nil when it was not read.
+    public var toolbarFrames: [String: [Double]] = [:]
+    public var zoomMaxX: Double?
 
     public init() {}
 }
@@ -77,8 +81,9 @@ extension ProbeState {
                                      "hubShown": hubShown, "downloads": downloads,
                                      "downloadStates": downloadStates, "revealed": revealed, "folders": folders,
                                      "folderTabs": folderTabs, "collapsedFolders": collapsedFolders,
-                                     "minimized": minimized, "fonts": fonts]
+                                     "minimized": minimized, "fonts": fonts, "toolbarFrames": toolbarFrames]
         if let selected { object["selected"] = selected }
+        if let zoomMaxX { object["zoomMaxX"] = zoomMaxX }
         return object
     }
 
@@ -116,6 +121,8 @@ extension ProbeState {
         windowShown = object["windowShown"] as? Bool ?? false
         minimized = object["minimized"] as? Bool ?? false
         fonts = object["fonts"] as? [String: String] ?? [:]
+        toolbarFrames = object["toolbarFrames"] as? [String: [Double]] ?? [:]
+        zoomMaxX = object["zoomMaxX"] as? Double
         sidebarWidth = object["sidebarWidth"] as? Double ?? 0
         addressShown = object["addressShown"] as? Bool ?? false
     }

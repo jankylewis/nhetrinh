@@ -12,7 +12,7 @@ links: fix=yes lesson=no evidence=no toolgap=none
 
 `close(at:)` selects another tab only when the selected tab closes. A row above the selected
 one shifts the selection index by one; the selected tab and its page stay
-(`hubs/failures/failfix/APP/UIX/NT_UIX_002_CLOSE_SELECTED_THE_CLOSED_INDEX.md`).
+(`hubs/failures/failfix/APP/UIX/C1/D1/S01/NT_UIX_002_CLOSE_SELECTED_THE_CLOSED_INDEX.md`).
 
 ## Proof
 

@@ -58,3 +58,15 @@ func fontsRoundTrip(fonts: [String: String]) throws {
     #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
     #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
 }
+
+// P8-CHROME-1: the toolbar's left buttons' frames and the zoom button's right edge come back as sent;
+// an older app's answer has none (no zoom button read: nil, never 0).
+@Test(arguments: [([:], nil), (["Toggle Sidebar": [74, 6, 28, 28], "Back": [108, 6, 28, 28]], 66.0)]
+      as [([String: [Double]], Double?)])
+func toolbarFramesRoundTrip(frames: [String: [Double]], zoomMaxX: Double?) throws {
+    var state = ProbeState()
+    state.toolbarFrames = frames
+    state.zoomMaxX = zoomMaxX
+    #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
+    #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
+}
