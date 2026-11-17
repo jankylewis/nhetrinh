@@ -1,19 +1,32 @@
 import Foundation
 
-/// What the readback's local test server answers (R9-R12): never a site on the Internet.
+/// What the readback's local test server answers (R9-R18): never a site on the Internet.
 ///   /page/<n>      a page titled "nhetrinh test <n>"
 ///   /play          a page that plays /silence.wav in a loop; its title says when it plays
 ///   /silence.wav   2 s of silence (digital zero: nothing is heard on the shared machine)
+///   /icon          a page whose `<link rel="icon">` is /icon.png, a 1 x 1 PNG (R16)
+///   /favicon.ico   the same PNG: the icon of a page with no `<link rel="icon">`, as /page/<n> (R16)
+///   /noicon        a page whose `<link rel="icon">` is /missing.png, which answers 404: no icon (R16)
+///   /links         a page with one link, to /page/5 (R17)
+///   /slow          a page that answers after 30 s, so it is still loading when R18 presses Stop
 enum TestPageContent {
     struct Reply: Equatable {
         var status = "200 OK"
         var type = "text/html; charset=utf-8"
         var headers: [String] = []
         var body = Data()
+        /// Seconds the server waits before it answers.
+        var delay: TimeInterval = 0
     }
 
     static let waitingTitle = "audio test: waiting"
     static let playingTitle = "audio test: playing"
+    static let iconTitle = "icon test"
+    static let noIconTitle = "no icon test"
+    static let linksTitle = "link test"
+    /// A 1 x 1 PNG.
+    static let icon = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9"
+                                          + "awAAAABJRU5ErkJggg==") ?? Data()
 
     static func title(page: Int) -> String { "nhetrinh test \(page)" }
 
@@ -25,6 +38,15 @@ enum TestPageContent {
         switch path {
         case "/play": return html(playPage)
         case "/silence.wav": return ranged(silence, type: "audio/wav", range: range)
+        case "/icon": return html("<title>\(iconTitle)</title><link rel=\"icon\" href=\"/icon.png\"><p>icon</p>")
+        case "/icon.png", "/favicon.ico": return Reply(type: "image/png", body: icon)
+        case "/noicon":
+            return html("<title>\(noIconTitle)</title><link rel=\"icon\" href=\"/missing.png\"><p>no icon</p>")
+        case "/links": return html("<title>\(linksTitle)</title><p><a href=\"/page/5\">test page 5</a></p>")
+        case "/slow":
+            var reply = html("<title>slow test</title><p>slow</p>")
+            reply.delay = 30
+            return reply
         default: return Reply(status: "404 Not Found", type: "text/plain", body: Data("not found".utf8))
         }
     }

@@ -11,6 +11,8 @@ struct AppMenuTests {
         ["File", "New Tab"], ["File", "Close Tab"], ["File", "Open Location"],
         ["View", "Toggle Sidebar"], ["View", "Reload"],
         ["Tabs", "Back"], ["Tabs", "Forward"], ["Tabs", "Tab 1"], ["Tabs", "Tab 9"],
+        ["File", "Reopen Closed Tab"], ["View", "Stop"], ["Tabs", "Select Next Tab"], ["Tabs", "Select Previous Tab"],
+        ["Tabs", "Move Tab Up"], ["Tabs", "Move Tab Down"],
     ]
 
     @Test(arguments: browserItems)
@@ -34,6 +36,17 @@ struct AppMenuTests {
         let menu = AppMenu.build(browser: BrowserWindowController())
         let item = try #require(Self.item(path, in: menu))
         #expect(item.keyEquivalent == key && item.keyEquivalentModifierMask == .command)
+    }
+
+    /// P2 shortcuts, as the menu shows them (the probe's `state.shortcuts`).
+    @Test(arguments: [
+        ("File > Reopen Closed Tab", "⇧⌘T"), ("View > Stop", "⌘."),
+        ("Tabs > Select Next Tab", "⌃⇥"), ("Tabs > Select Previous Tab", "⌃⇧⇥"),
+    ])
+    func p2ShortcutReadsLikeTheMenu(path: String, shortcut: String) {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        #expect(browser.probeState(menu: AppMenu.build(browser: browser)).shortcuts[path] == shortcut)
     }
 
     /// Edit items act on the focused text: they must stay on the responder chain (nil target).

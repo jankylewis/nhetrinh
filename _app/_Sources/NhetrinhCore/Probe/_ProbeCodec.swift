@@ -9,27 +9,16 @@ public enum ProbeRequest: Equatable, Sendable {
     case select(Int)
     /// A menu item by its path, ["Tabs", "Back"], performed as a click on it once the answer is sent.
     case menu([String])
-}
-
-/// What the app shows, as the readback needs it (R1, R3-R7, R9-R12). Every field has a default, so an
-/// answer from an older app still decodes; the readback then sees the default and says so.
-public struct ProbeState: Equatable, Sendable {
-    public var title = ""
-    /// The sidebar rows, top to bottom, as the table shows them.
-    public var rows: [String] = []
-    /// Per row: whether its tab is loaded (a dimmed row is not).
-    public var loaded: [Bool] = []
-    /// The selected sidebar row; nil when none is selected.
-    public var selected: Int?
-    /// The text in the address field.
-    public var address = ""
-    public var windowShown = false
-    public var sidebarWidth = 0.0
-    public var addressShown = false
-    /// Menu item path ("File > New Tab") to its shortcut as the menu shows it ("⌘T").
-    public var shortcuts: [String: String] = [:]
-
-    public init() {}
+    /// A sidebar row's menu, shown on that row, and its item `item` pressed (R13).
+    case rowMenu(row: Int, item: String)
+    /// The context menu of the first link in the selected page, and its item `item` pressed (R17).
+    case linkMenu(item: String)
+    /// A toolbar button by its label ("Stop"), pressed (R18).
+    case button(String)
+    /// A middle click on a sidebar row (R13).
+    case middleClick(row: Int)
+    /// A ⌘-click on the first link in the selected page (R17).
+    case commandClickLink
 }
 
 public enum ProbeResponse: Equatable, Sendable {
@@ -51,6 +40,11 @@ public enum ProbeCodec {
         case .closeTab: return try line(["op": "closeTab"])
         case .select(let index): return try line(["op": "select", "index": index])
         case .menu(let path): return try line(["op": "menu", "path": path])
+        case .rowMenu(let row, let item): return try line(["op": "rowMenu", "index": row, "text": item])
+        case .linkMenu(let item): return try line(["op": "linkMenu", "text": item])
+        case .button(let label): return try line(["op": "button", "text": label])
+        case .middleClick(let row): return try line(["op": "middleClick", "index": row])
+        case .commandClickLink: return try line(["op": "commandClickLink"])
         }
     }
 
@@ -70,6 +64,12 @@ public enum ProbeCodec {
         case ("newTab", _, _): return .newTab
         case ("closeTab", _, _): return .closeTab
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
+        case ("rowMenu", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
+            return .rowMenu(row: row, item: item)
+        case ("linkMenu", .some(let item), _) where !item.isEmpty: return .linkMenu(item: item)
+        case ("button", .some(let label), _) where !label.isEmpty: return .button(label)
+        case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
+        case ("commandClickLink", _, _): return .commandClickLink
         case ("menu", _, _):
             guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
             return .menu(path)
@@ -98,28 +98,5 @@ public enum ProbeCodec {
             throw Failure.malformed(line)
         }
         return object
-    }
-}
-
-extension ProbeState {
-    var object: [String: Any] {
-        var object: [String: Any] = ["title": title, "rows": rows, "loaded": loaded, "address": address,
-                                     "windowShown": windowShown, "sidebarWidth": sidebarWidth,
-                                     "addressShown": addressShown, "shortcuts": shortcuts]
-        if let selected { object["selected"] = selected }
-        return object
-    }
-
-    /// A field that is missing or of another type keeps its default: the readback then sees it.
-    init(_ object: [String: Any]) {
-        title = object["title"] as? String ?? ""
-        rows = object["rows"] as? [String] ?? []
-        loaded = object["loaded"] as? [Bool] ?? []
-        selected = object["selected"] as? Int
-        address = object["address"] as? String ?? ""
-        windowShown = object["windowShown"] as? Bool ?? false
-        sidebarWidth = object["sidebarWidth"] as? Double ?? 0
-        addressShown = object["addressShown"] as? Bool ?? false
-        shortcuts = object["shortcuts"] as? [String: String] ?? [:]
     }
 }

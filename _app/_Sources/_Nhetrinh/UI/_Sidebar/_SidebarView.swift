@@ -1,14 +1,25 @@
 import AppKit
+import NhetrinhCore
 
-/// The vertical tab list. One row per tab; a tab that is not loaded is dimmed.
+/// The vertical tab list. One row per tab (`TabRowView`): icon, title, close button on hover; a tab
+/// that is not loaded is dimmed. A row's menu and a middle click close it; a drag reorders (P2).
 final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
+    struct Row {
+        let title: String
+        let loaded: Bool
+        let icon: NSImage?
+    }
+
+    static let rowType = NSPasteboard.PasteboardType("nhetrinh.tab-row")
+
     var onSelect: ((Int) -> Void)?
     var onClose: ((Int) -> Void)?
     var onNewTab: (() -> Void)?
+    /// A row dragged from `from` to `to` (its index once moved).
+    var onMove: ((Int, Int) -> Void)?
 
-    private let table = NSTableView()
-    private var titles: [String] = []
-    private var loaded: [Bool] = []
+    let table = TabTable()
+    private var rows: [Row] = []
     private var updating = false
 
     override init(frame: NSRect) {
@@ -32,7 +43,10 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         table.dataSource = self
         table.delegate = self
         table.setAccessibilityIdentifier("nhetrinh.sidebar")
-        let close = NSMenuItem(title: "Close Tab", action: #selector(closeClicked), keyEquivalent: "")
+        table.registerForDraggedTypes([Self.rowType])
+        table.setDraggingSourceOperationMask(.move, forLocal: true)
+        table.onMiddleClick = { [weak self] row in self?.onClose?(row) }
+        let close = NSMenuItem(title: "Close Tab", action: #selector(closeFromMenu), keyEquivalent: "")
         close.target = self
         table.menu = NSMenu()
         table.menu?.addItem(close)
@@ -63,9 +77,8 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         ])
     }
 
-    func update(titles: [String], loaded: [Bool], selected: Int) {
-        self.titles = titles
-        self.loaded = loaded
+    func update(_ rows: [Row], selected: Int) {
+        self.rows = rows
         updating = true
         table.reloadData()
         if selected >= 0 { table.selectRowIndexes([selected], byExtendingSelection: false) }
@@ -73,7 +86,7 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
     }
 
     /// The rows as the table shows them, and the selected row (-1: none). Read by the probe (D23).
-    var shownRows: [String] { Array(titles.prefix(table.numberOfRows)) }
+    var shownRows: [String] { Array(rows.map(\.title).prefix(table.numberOfRows)) }
     var selectedRow: Int { table.selectedRow }
 
     /// Select a row as a click does: the table reports the change, and `onSelect` shows that tab.
@@ -85,20 +98,16 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
 
     // MARK: - Table
 
-    func numberOfRows(in tableView: NSTableView) -> Int { titles.count }
+    func numberOfRows(in tableView: NSTableView) -> Int { rows.count }
 
     func tableView(_ tableView: NSTableView, viewFor column: NSTableColumn?, row: Int) -> NSView? {
-        let identifier = NSUserInterfaceItemIdentifier("cell")
-        let cell = tableView.makeView(withIdentifier: identifier, owner: nil) as? NSTextField ?? makeCell(identifier)
-        cell.stringValue = titles[row]
-        cell.textColor = loaded[row] ? .labelColor : .tertiaryLabelColor
-        return cell
-    }
-
-    private func makeCell(_ identifier: NSUserInterfaceItemIdentifier) -> NSTextField {
-        let cell = NSTextField(labelWithString: "")
-        cell.identifier = identifier
-        cell.lineBreakMode = .byTruncatingTail
+        let cell = tableView.makeView(withIdentifier: TabRowView.identifier, owner: nil) as? TabRowView ?? TabRowView()
+        cell.show(rows[row])
+        cell.onClose = { [weak self, weak cell] in
+            guard let self, let cell else { return }
+            let index = self.table.row(for: cell)
+            if index >= 0 { self.onClose?(index) }
+        }
         return cell
     }
 
@@ -107,8 +116,8 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         onSelect?(table.selectedRow)
     }
 
-    @objc private func closeClicked() {
-        if table.clickedRow >= 0 { onClose?(table.clickedRow) }
+    @objc private func closeFromMenu() {
+        if table.menuRow >= 0 { onClose?(table.menuRow) }
     }
 
     @objc private func newClicked() { onNewTab?() }

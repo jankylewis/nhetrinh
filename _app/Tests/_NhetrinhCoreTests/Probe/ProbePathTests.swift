@@ -40,6 +40,10 @@ func folderJoinsWithOrWithoutSlash(temp: String) {
     ("[", ShortcutKeys.command, "⌘["),
     ("a", ShortcutKeys([.control, .option, .shift, .command]), "⌃⌥⇧⌘A"),
     ("", ShortcutKeys.command, ""),
+    ("T", ShortcutKeys.command, "⇧⌘T"),          // a capital key is typed with Shift
+    ("\t", ShortcutKeys.control, "⌃⇥"),
+    ("\t", ShortcutKeys([.control, .shift]), "⌃⇧⇥"),
+    (".", ShortcutKeys.command, "⌘."),
 ])
 func shortcutReadsLikeTheMenu(key: String, keys: ShortcutKeys, text: String) {
     #expect(Shortcut.text(key: key, keys: keys) == text)

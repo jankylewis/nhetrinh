@@ -1,3 +1,4 @@
+import AppKit
 import WebKit
 
 /// One tab. The web view is created on first use and dropped when the tab is unloaded.
@@ -6,6 +7,8 @@ import WebKit
 final class Tab {
     var url: URL?
     var title: String
+    /// The site's icon (P2), 16 pt; nil until the page has finished and its icon was found.
+    var icon: NSImage?
     var webView: WKWebView?
     var lastActive = Date()
     var observers: [NSKeyValueObservation] = []

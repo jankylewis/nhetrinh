@@ -21,7 +21,7 @@ enum Report {
                 + "built from commit \(plist(app, "NHTCommit"))",
             "verdict: \(verdict)", "",
             "Each step acts on the app as a user would and says what it saw. "
-                + "R1, R3-R7 and R9-R12 act through the app's readback probe (`NHT_READBACK=1`, D23), "
+                + "R1, R3-R7 and R9-R18 act through the app's readback probe (`NHT_READBACK=1`, D23), "
                 + "along the user's own paths;",
             "R2 reads the Dock through the Accessibility API; R8 measures a normal launch, without the probe.",
             "NOT READ BACK means the step could not run. It is never counted as passed.", "",

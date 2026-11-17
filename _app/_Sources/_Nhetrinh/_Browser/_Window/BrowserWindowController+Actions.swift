@@ -11,6 +11,7 @@ extension BrowserWindowController {
     @objc func closeTab(_ sender: Any?) { close(at: selected) }
     @objc func focusAddress(_ sender: Any?) { window?.makeFirstResponder(toolbar.address) }
     @objc func reload(_ sender: Any?) { current?.reload() }
+    @objc func stopLoading(_ sender: Any?) { current?.stopLoading() }
     @objc func goBack(_ sender: Any?) { current?.goBack() }
     @objc func goForward(_ sender: Any?) { current?.goForward() }
 

@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import NhetrinhReadback
 
-// R9-R12 use the readback's own local pages. The server is tested here, with no app.
+// R9-R18 use the readback's own local pages. The server is tested here, with no app.
 
 @Test(arguments: [("/page/1", "200 OK", "nhetrinh test 1"), ("/page/12", "200 OK", "nhetrinh test 12"),
                   ("/play", "200 OK", TestPageContent.waitingTitle), ("/page/x", "404 Not Found", ""),
@@ -67,4 +67,32 @@ func requestHeadIsRead(head: String, path: String, range: String?) {
 
 @Test func lifecycleStepsAreR9ToR12() {
     #expect(LifecycleSteps.all.map(\.id) == ["R9", "R10", "R11", "R12"])
+}
+
+@Test func sidebarStepsAreR13ToR18() {
+    #expect(SidebarSteps.all.map(\.id) == ["R13", "R14", "R15", "R16", "R17", "R18"])
+}
+
+// R16-R18 pages (P2).
+
+@Test(arguments: [("/icon", TestPageContent.iconTitle, "rel=\"icon\" href=\"/icon.png\""),
+                  ("/links", TestPageContent.linksTitle, "<a href=\"/page/5\">"),
+                  ("/noicon", TestPageContent.noIconTitle, "rel=\"icon\" href=\"/missing.png\"")])
+func p2PagesCarryWhatTheStepNeeds(path: String, title: String, part: String) {
+    let body = String(decoding: TestPageContent.reply(path: path).body, as: UTF8.self)
+    #expect(body.contains("<title>\(title)</title>") && body.contains(part))
+}
+
+/// A real PNG, so the app's icon decoder accepts it; /favicon.ico is the origin's icon, /missing.png none.
+@Test(arguments: ["/icon.png", "/favicon.ico"])
+func iconIsAPng(path: String) {
+    let reply = TestPageContent.reply(path: path)
+    #expect(TestPageContent.reply(path: "/missing.png").status == "404 Not Found")
+    #expect(reply.type == "image/png" && reply.body.prefix(8) == Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]))
+}
+
+/// Only the slow page waits before its answer, and long enough for R18 to press Stop.
+@Test(arguments: [("/slow", true), ("/page/1", false), ("/icon.png", false)])
+func onlyTheSlowPageWaits(path: String, waits: Bool) {
+    #expect((TestPageContent.reply(path: path).delay >= 20) == waits)
 }

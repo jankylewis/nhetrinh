@@ -1,6 +1,6 @@
 import Foundation
 
-/// The readback's local HTTP server for R9-R12: 127.0.0.1 only, a port the system picks, alive
+/// The readback's local HTTP server for R9-R18: 127.0.0.1 only, a port the system picks, alive
 /// while the readback runs. Each connection gets one reply (`TestPageContent`), then is closed.
 final class TestPages {
     /// Started on first use; a failure to start makes the steps NOT READ BACK.
@@ -56,6 +56,7 @@ final class TestPages {
         guard count > 0 else { return }
         let head = String(decoding: buffer.prefix(count), as: UTF8.self)
         let reply = TestPageContent.reply(path: path(head), range: header("Range", in: head))
+        if reply.delay > 0 { Thread.sleep(forTimeInterval: reply.delay) }
         write(peer, bytes(reply))
     }
 

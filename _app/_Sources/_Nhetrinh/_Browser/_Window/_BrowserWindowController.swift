@@ -4,7 +4,7 @@ import WebKit
 
 /// The one browser window: vertical tab sidebar | toolbar + web view.
 /// Tab lifecycle, menu actions and WebKit delegates are in the `BrowserWindowController+…` files;
-/// session restore and idle unload are in `../Lifecycle/`.
+/// session restore and idle unload are in `../Lifecycle/`; reorder, reopen, links, icons, loading in `../Handling/`.
 final class BrowserWindowController: NSWindowController {
     static let homeURL = URL(string: "https://www.google.com")
 
@@ -19,6 +19,10 @@ final class BrowserWindowController: NSWindowController {
     var saveTimer: Timer?
     var sessionFolder: URL?
     var sidebarWidth = Session.defaultSidebarWidth
+    /// P2 (`../Handling/`): tabs to reopen, site icons, where the next background tab goes (nil: after the selected).
+    var closedTabs = ClosedTabs()
+    let favicons = Favicons()
+    var backgroundSlot: Int?
 
     init() {
         let window = NSWindow(
@@ -80,9 +84,11 @@ final class BrowserWindowController: NSWindowController {
         sidebar.onSelect = { [weak self] index in self?.select(index) }
         sidebar.onClose = { [weak self] index in self?.close(at: index) }
         sidebar.onNewTab = { [weak self] in self?.newTab(nil) }
+        sidebar.onMove = { [weak self] from, to in self?.moveTab(from: from, to: to) }
         toolbar.onBack = { [weak self] in self?.goBack(nil) }
         toolbar.onForward = { [weak self] in self?.goForward(nil) }
         toolbar.onReload = { [weak self] in self?.reload(nil) }
+        toolbar.onStop = { [weak self] in self?.stopLoading(nil) }
         toolbar.onSubmit = { [weak self] text in self?.navigate(text) }
     }
 
@@ -94,11 +100,13 @@ final class BrowserWindowController: NSWindowController {
     /// passes here, so this is also where the session save is scheduled.
     func refreshChrome() {
         sessionChanged()
-        sidebar.update(titles: tabs.map(\.title), loaded: tabs.map(\.isLoaded), selected: selected)
+        sidebar.update(tabs.map { SidebarView.Row(title: $0.title, loaded: $0.isLoaded, icon: $0.icon) },
+                       selected: selected)
         guard tabs.indices.contains(selected) else { return }
         let tab = tabs[selected]
         toolbar.update(url: tab.url, canBack: tab.webView?.canGoBack ?? false,
                        canForward: tab.webView?.canGoForward ?? false)
+        refreshLoading()
         window?.title = tab.title
     }
 }

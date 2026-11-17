@@ -36,6 +36,7 @@ extension BrowserWindowController {
             tabs[selected].lastActive = Date()  // idle from the moment it is left
         }
         selected = index
+        backgroundSlot = nil
         let tab = tabs[index]
         tab.lastActive = Date()
         load(tab)
@@ -53,7 +54,7 @@ extension BrowserWindowController {
     /// A tab unloaded before gets its `interactionState` back: its history and scroll position.
     func load(_ tab: Tab, adopting adopted: WKWebView? = nil) {
         guard tab.webView == nil else { return }
-        let webView = adopted ?? WKWebView(frame: .zero, configuration: WebConfig.shared)
+        let webView = adopted ?? BrowserWebView(frame: .zero, configuration: WebConfig.shared)
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
@@ -82,16 +83,26 @@ extension BrowserWindowController {
             },
             webView.observe(\.canGoBack) { [weak self] _, _ in self?.refreshChrome() },
             webView.observe(\.canGoForward) { [weak self] _, _ in self?.refreshChrome() },
+            webView.observe(\.isLoading) { [weak self] _, _ in self?.refreshLoading() },
+            webView.observe(\.estimatedProgress) { [weak self] _, _ in self?.refreshLoading() },
         ]
     }
 
+    /// Close a tab, kept for File > Reopen Closed Tab. The selection stays unless the selected tab closes.
     func close(at index: Int) {
         guard tabs.indices.contains(index) else { return }
-        tabs[index].unload()
+        let tab = tabs[index]
+        tab.unload()
+        if let url = tab.url { closedTabs.push(ClosedTab(url: url, title: tab.title, index: index)) }
         tabs.remove(at: index)
+        if let slot = backgroundSlot, index < slot { backgroundSlot = slot - 1 }  // NT-UIX-003
         if tabs.isEmpty {
             window?.close()
             return
+        }
+        guard index == selected else {  // a row closed from its button, menu or a middle click (P2)
+            if index < selected { selected -= 1 }
+            return refreshChrome()
         }
         selected = -1
         select(min(index, tabs.count - 1))

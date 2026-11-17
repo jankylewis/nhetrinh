@@ -18,6 +18,7 @@ enum AppMenu {
     private static func fileMenu(_ browser: BrowserWindowController) -> NSMenuItem {
         submenu("File", [
             item("New Tab", #selector(BrowserWindowController.newTab(_:)), "t", browser),
+            item("Reopen Closed Tab", #selector(BrowserWindowController.reopenClosedTab(_:)), "T", browser),
             item("Close Tab", #selector(BrowserWindowController.closeTab(_:)), "w", browser),
             item("Open Location", #selector(BrowserWindowController.focusAddress(_:)), "l", browser),
         ])
@@ -39,6 +40,7 @@ enum AppMenu {
         submenu("View", [
             item("Toggle Sidebar", #selector(BrowserWindowController.toggleTabSidebar(_:)), "s", browser),
             item("Reload", #selector(BrowserWindowController.reload(_:)), "r", browser),
+            item("Stop", #selector(BrowserWindowController.stopLoading(_:)), ".", browser),
         ])
     }
 
@@ -46,6 +48,12 @@ enum AppMenu {
         var items = [
             item("Back", #selector(BrowserWindowController.goBack(_:)), "[", browser),
             item("Forward", #selector(BrowserWindowController.goForward(_:)), "]", browser),
+            NSMenuItem.separator(),
+            item("Select Next Tab", #selector(BrowserWindowController.selectNextTab(_:)), "\t", browser, .control),
+            item("Select Previous Tab", #selector(BrowserWindowController.selectPreviousTab(_:)), "\t", browser,
+                 [.control, .shift]),
+            item("Move Tab Up", #selector(BrowserWindowController.moveTabUp(_:)), "", browser),
+            item("Move Tab Down", #selector(BrowserWindowController.moveTabDown(_:)), "", browser),
             NSMenuItem.separator(),
         ]
         for number in 1...9 {
@@ -65,9 +73,10 @@ enum AppMenu {
         return holder
     }
 
-    private static func item(_ title: String, _ action: Selector, _ key: String,
-                             _ target: AnyObject? = nil) -> NSMenuItem {
+    private static func item(_ title: String, _ action: Selector, _ key: String, _ target: AnyObject? = nil,
+                             _ keys: NSEvent.ModifierFlags = .command) -> NSMenuItem {
         let entry = NSMenuItem(title: title, action: action, keyEquivalent: key)
+        entry.keyEquivalentModifierMask = keys
         entry.target = target
         return entry
     }
