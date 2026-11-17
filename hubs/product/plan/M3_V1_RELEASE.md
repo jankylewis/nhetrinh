@@ -80,16 +80,16 @@ Build:
 - `release.yml`: on a tag `v*` run the checker, the tests and the build; zip the app; compute
   the SHA-256; make a GitHub Release. The notes are built from the `product/features` rows.
 - README: install, shortcuts, known limits, and how to open an app that is not notarized.
-- Apple silicon only; an Intel build only when asked. Not notarized (no Apple Developer ID): the first
-  open shows the macOS warning; notarization is a new phase if an ID comes.
+- Apple silicon only; an Intel build only when asked. Not notarized (no Apple Developer ID): the first open shows the macOS warning; notarization is a new phase if an ID comes.
 - Final lightness report: the budget table against the measured numbers and the R&D baseline.
+- P8-MIN-1 (headmate request): a Window menu (Minimize ⌘M, Zoom), the app's `NSApp.windowsMenu` (NT-FEAT-045).
 - P8-FIX-1 (review): notes from the Release note column (NT-BLD-003, 004); build.yml only reads; a tag not on master
   is refused; upload `overwrite`. Notes: R44 passes only from the granted readback app (NT-TG-003); actions pinned by major tag, not SHA (low, open).
 
 Readback adds:
-- R44 download the zip from the Release page, check the SHA-256, unzip to a temporary folder,
-  launch: R1-R8 PASS on that copy.
-- R45 the full run R1-R43 on the installed 1.0.0.
+- R44 download the zip from the Release page, check the SHA-256, unzip to a temporary folder, launch: R1-R8 PASS on that copy.
+- R45 the full run R1-R43 and R46 on the installed 1.0.0.
+- R46 (P8-MIN-1) Window > Minimize (⌘M) through the probe: minimized true; restored: false, the window shown.
 
 Exit: every R step PASS; every hub item is FIXED or listed in the README as a known limit;
 CI and the release run are green.

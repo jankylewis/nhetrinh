@@ -68,4 +68,13 @@ struct ProbeAnswerTests {
         let (browser, menu) = browser(tabs: ["one", "two"])
         #expect(browser.probeAnswer(.select(row), menu: menu) == .failed("the sidebar has no row \(row)"))
     }
+
+    /// P8-MIN-1: Minimize goes through the Window menu's own item; an unknown item or no menu fails.
+    @Test(arguments: [
+        ("Minimize", false, "no menu item Window > Minimize"), ("Close", true, "no menu item Window > Close"),
+    ])
+    func windowRequestNeedsItsMenuItem(item: String, withMenu: Bool, why: String) {
+        let (browser, menu) = browser()
+        #expect(browser.probeAnswer(.window(item), menu: withMenu ? menu : nil) == .failed(why))
+    }
 }

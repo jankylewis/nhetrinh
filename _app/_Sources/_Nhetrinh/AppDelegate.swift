@@ -12,7 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         setDockIcon()
         let browser = BrowserWindowController()
         self.browser = browser
-        NSApp.mainMenu = AppMenu.build(browser: browser)
+        AppMenu.install(browser: browser)
         browser.showWindow(nil)
         browser.openInitialTabs()
         browser.openIncoming(incoming)

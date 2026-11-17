@@ -55,6 +55,8 @@ public struct ProbeState: Equatable, Sendable {
     public var folders: [String] = []
     public var folderTabs: [[String]] = []
     public var collapsedFolders: [Bool] = []
+    /// P8-MIN-1: whether the browser window is minimized to the Dock.
+    public var minimized = false
 
     public init() {}
 }
@@ -71,7 +73,8 @@ extension ProbeState {
                                      "findResult": findResult, "zoomBadge": zoomBadge, "appearance": appearance,
                                      "hubShown": hubShown, "downloads": downloads,
                                      "downloadStates": downloadStates, "revealed": revealed, "folders": folders,
-                                     "folderTabs": folderTabs, "collapsedFolders": collapsedFolders]
+                                     "folderTabs": folderTabs, "collapsedFolders": collapsedFolders,
+                                     "minimized": minimized]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -83,9 +86,7 @@ extension ProbeState {
         loaded = object["loaded"] as? [Bool] ?? []
         selected = object["selected"] as? Int
         address = object["address"] as? String ?? ""
-        windowShown = object["windowShown"] as? Bool ?? false
-        sidebarWidth = object["sidebarWidth"] as? Double ?? 0
-        addressShown = object["addressShown"] as? Bool ?? false
+        readWindow(object)
         shortcuts = object["shortcuts"] as? [String: String] ?? [:]
         icons = object["icons"] as? [Bool] ?? []
         loading = object["loading"] as? Bool ?? false
@@ -106,6 +107,13 @@ extension ProbeState {
         hubShown = object["hubShown"] as? Bool ?? false
         readDownloads(object)
         readFolders(object)
+    }
+
+    private mutating func readWindow(_ object: [String: Any]) {
+        windowShown = object["windowShown"] as? Bool ?? false
+        minimized = object["minimized"] as? Bool ?? false
+        sidebarWidth = object["sidebarWidth"] as? Double ?? 0
+        addressShown = object["addressShown"] as? Bool ?? false
     }
 
     private mutating func readDownloads(_ object: [String: Any]) {

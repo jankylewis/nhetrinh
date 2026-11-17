@@ -31,6 +31,7 @@ extension BrowserWindowController {
             return sidebar.middleClick(row) ? .done : .failed("the sidebar has no row \(row)")
         case .commandClickLink: return commandClickFirstLink().map { .failed($0) } ?? .done
         case .download(let row, let item): return pressDownload(row: row, item: item)
+        case .window(let item): return windowAnswer(item, menu: menu)
         }
     }
 
@@ -51,6 +52,7 @@ extension BrowserWindowController {
         state.selected = sidebar.selectedRow >= 0 ? sidebar.selectedRow : nil
         state.address = toolbar.address.stringValue
         state.windowShown = window?.isVisible ?? false
+        state.minimized = window?.isMiniaturized ?? false
         let sidebarShown = sidebar.window != nil && !sidebar.isHiddenOrHasHiddenAncestor
         state.sidebarWidth = sidebarShown ? Double(sidebar.frame.width) : 0
         state.addressShown = toolbar.address.window != nil && !toolbar.address.isHiddenOrHasHiddenAncestor
@@ -63,6 +65,20 @@ extension BrowserWindowController {
         readSheet(into: &state)
         readDownloads(into: &state)
         return state
+    }
+
+    /// P8-MIN-1: a Window menu item's own action sent to this window, as the menu sends it to the key
+    /// window: the readback starts the app without the focus (D18), so there is no key window.
+    /// "Restore" brings the window back as a click on its Dock item does; it takes no focus.
+    private func windowAnswer(_ item: String, menu: NSMenu?) -> ProbeResponse {
+        guard let window else { return .failed("the browser window is gone") }
+        if item == "Restore" {
+            window.deminiaturize(nil)
+            return .done
+        }
+        guard let entry = menu?.item(withTitle: "Window")?.submenu?.item(withTitle: item), let action = entry.action
+        else { return .failed("no menu item Window > \(item)") }
+        return NSApp.sendAction(action, to: window, from: entry) ? .done : .failed("Window > \(item) reached no window")
     }
 
     /// Perform a menu item as a click does: its own action, sent to its own target. `afterAnswer`

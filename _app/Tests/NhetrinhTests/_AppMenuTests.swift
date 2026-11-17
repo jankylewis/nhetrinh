@@ -63,6 +63,23 @@ struct AppMenuTests {
         #expect(item.target == nil)
     }
 
+    /// P8-MIN-1: ⌘M minimizes. Window items keep a nil target: they act on the key window.
+    @Test(arguments: [("Minimize", "m", "performMiniaturize:"), ("Zoom", "", "performZoom:")])
+    func windowItemActsOnTheKeyWindow(title: String, key: String, action: String) throws {
+        let menu = AppMenu.build(browser: BrowserWindowController())
+        let item = try #require(Self.item(["Window", title], in: menu))
+        #expect(item.action.map(NSStringFromSelector) == action && item.target == nil)
+        #expect(item.keyEquivalent == key && item.keyEquivalentModifierMask == .command)
+    }
+
+    /// macOS adds its own window items (the window list, Bring All to Front) to `NSApp.windowsMenu`.
+    @Test func windowMenuIsTheAppsWindowsMenu() throws {
+        _ = NSApplication.shared
+        AppMenu.install(browser: BrowserWindowController())
+        let window = try #require(NSApp.mainMenu?.item(withTitle: "Window")?.submenu)
+        #expect(NSApp.windowsMenu === window)
+    }
+
     static func item(_ path: [String], in menu: NSMenu) -> NSMenuItem? {
         var current: NSMenu? = menu
         var found: NSMenuItem?

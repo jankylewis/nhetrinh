@@ -1,50 +1,5 @@
 import Foundation
 
-/// A readback probe request (D23). One JSON object per line, one request per connection.
-public enum ProbeRequest: Equatable, Sendable {
-    case state
-    case navigate(String)
-    case newTab
-    case closeTab
-    case select(Int)
-    /// A menu item by its path, ["Tabs", "Back"], performed as a click on it once the answer is sent.
-    case menu([String])
-    /// A sidebar row's menu, shown on that row, and its item `item` pressed (R13).
-    case rowMenu(row: Int, item: String)
-    /// The context menu of the first link in the selected page, and its item `item` pressed (R17).
-    case linkMenu(item: String)
-    /// A toolbar button by its label ("Stop"), pressed (R18).
-    case button(String)
-    /// A left click on the first element the CSS selector finds in the selected page (P3).
-    case click(String)
-    /// The window's sheet: press its button `label` (P3: a page dialog, the open or print panel).
-    case sheetButton(String)
-    /// The window's sheet: type `text` into its text field `index` (0 first), as a user replaces it (P3).
-    case sheetField(index: Int, text: String)
-    /// Bring nhetrinh to the front and take the focus: only R26a and R26b, only with `--allow-focus` (D25).
-    case front
-    /// Simulate macOS memory pressure at this level (P6). Readback only: the probe exists only with
-    /// NHT_READBACK=1; real system pressure is never made.
-    case pressure(UnloadPolicy.Pressure)
-    /// The find bar's field: `text` typed, then Return, as a user searches (P4, R27).
-    case find(String)
-    /// The Settings Hub's control `name` set to `value` as a user picks it ("Search engine", "DuckDuckGo") (P4).
-    case setting(name: String, value: String)
-    /// A middle click on a sidebar row (R13).
-    case middleClick(row: Int)
-    /// A ⌘-click on the first link in the selected page (R17).
-    case commandClickLink
-    /// The download row `row` (0 top) in the sidebar footer: "Cancel" pressed, or the row clicked
-    /// ("Show in Finder") (P5).
-    case download(row: Int, item: String)
-}
-
-public enum ProbeResponse: Equatable, Sendable {
-    case state(ProbeState)
-    case done
-    case failed(String)
-}
-
 /// Encodes and decodes probe lines: one JSON object per line. Anything unknown or malformed
 /// throws; nothing crashes. `JSONSerialization`, not `Codable`: it adds less code to the app.
 public enum ProbeCodec {
@@ -71,6 +26,7 @@ public enum ProbeCodec {
         case .middleClick(let row): return try line(["op": "middleClick", "index": row])
         case .commandClickLink: return try line(["op": "commandClickLink"])
         case .download(let row, let item): return try line(["op": "download", "index": row, "text": item])
+        case .window(let item): return try line(["op": "window", "text": item])
         }
     }
 
@@ -106,9 +62,8 @@ public enum ProbeCodec {
             return .sheetField(index: index, text: text)
         case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
         case ("commandClickLink", _, _): return .commandClickLink
-        case ("menu", _, _):
-            guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
-            return .menu(path)
+        case ("window", .some(let item), _) where !item.isEmpty: return .window(item)
+        case ("menu", _, _): return .menu(try path(object, of: line))
         default: throw Failure.malformed(line)
         }
     }
@@ -121,6 +76,12 @@ public enum ProbeCodec {
         case ("failed", _, .some(let reason)): return .failed(reason)
         default: throw Failure.malformed(line)
         }
+    }
+
+    /// A menu item's path; a missing or empty one is malformed.
+    private static func path(_ object: [String: Any], of line: String) throws -> [String] {
+        guard let path = object["path"] as? [String], !path.isEmpty else { throw Failure.malformed(line) }
+        return path
     }
 
     /// A pressure level by its name (P6); an unknown or missing one is malformed, never guessed.

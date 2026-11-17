@@ -3,11 +3,18 @@ import AppKit
 /// The main menu. Every keyboard shortcut of the app is defined here, and nowhere else.
 /// Browser items target the window controller directly: with no key window (the app not active,
 /// as the readback starts it, D18) a nil target reaches nobody (NT-UIX-001).
-/// Edit items keep a nil target: they act on the focused text, through the responder chain.
+/// Edit and Window items keep a nil target: they act on the focused text or the key window.
 enum AppMenu {
+    /// The main menu, and its Window menu as the app's: macOS adds the window list to it (P8-MIN-1).
+    static func install(browser: BrowserWindowController) {
+        let main = build(browser: browser)
+        NSApp.mainMenu = main
+        NSApp.windowsMenu = main.item(withTitle: "Window")?.submenu
+    }
+
     static func build(browser: BrowserWindowController) -> NSMenu {
         let main = NSMenu()
-        [appMenu(browser), fileMenu(browser), editMenu(browser), viewMenu(browser), tabsMenu(browser)]
+        [appMenu(browser), fileMenu(browser), editMenu(browser), viewMenu(browser), tabsMenu(browser), windowMenu()]
             .forEach(main.addItem)
         return main
     }
@@ -90,6 +97,14 @@ enum AppMenu {
             items.append(entry)
         }
         return submenu("Tabs", items)
+    }
+
+    /// ⌘M minimizes the key window (P8-MIN-1); Zoom has no key, as in every Mac app.
+    private static func windowMenu() -> NSMenuItem {
+        submenu("Window", [
+            item("Minimize", #selector(NSWindow.performMiniaturize(_:)), "m"),
+            item("Zoom", #selector(NSWindow.performZoom(_:)), ""),
+        ])
     }
 
     private static func submenu(_ title: String, _ items: [NSMenuItem]) -> NSMenuItem {

@@ -29,3 +29,23 @@ func folderFieldsRoundTrip(folders: [String], tabs: [[String]], collapsed: [Bool
     #expect(try ProbeCodec.decodeResponse(line) == .state(state))
     #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
 }
+
+// P8-MIN-1: the window request and the minimized state come back as they were sent.
+@Test(arguments: ["Minimize", "Restore"])
+func windowRequestRoundTrips(item: String) throws {
+    let line = try ProbeCodec.encode(ProbeRequest.window(item))
+    #expect(try ProbeCodec.decodeRequest(line) == .window(item))
+    #expect(line.contains("\"op\":\"window\""))
+}
+
+@Test(arguments: [#"{"op":"window"}"#, #"{"op":"window","text":""}"#])
+func aWindowRequestWithoutAnItemIsMalformed(line: String) {
+    #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
+}
+
+@Test(arguments: [true, false])
+func minimizedRoundTrips(minimized: Bool) throws {
+    var state = ProbeState()
+    state.minimized = minimized
+    #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
+}
