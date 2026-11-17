@@ -23,7 +23,7 @@ struct FoldersTests {
 
     /// The probe presses a sheet's button on the next turn of the main queue: wait for it (5 s at most).
     private func pressed(_ browser: BrowserWindowController) async {
-        for _ in 0..<50 where browser.window?.attachedSheet != nil { try? await Task.sleep(nanoseconds: 100_000_000) }
+        for _ in 0..<50 where browser.shownSheet != nil { try? await Task.sleep(nanoseconds: 100_000_000) }
     }
 
     @Test(arguments: [(false, ["t1", "work", "t2", "t3", "t4"]), (true, ["t1", "work", "t4"])])
@@ -37,6 +37,7 @@ struct FoldersTests {
     @Test(arguments: [("Create", ["work", "news"]), ("Cancel", ["work"])])
     func newFolderAsksItsName(button: String, folders: [String]) async {
         let browser = browser()
+        defer { browser.closeAfterTest() }
         #expect(browser.probeAnswer(.rowMenu(row: 4, item: SidebarView.newGroup), menu: nil) == .done)
         #expect(browser.probeAnswer(.sheetField(index: 0, text: "  news "), menu: nil) == .done)
         #expect(browser.probeAnswer(.sheetButton(button), menu: nil) == .done)
@@ -49,6 +50,7 @@ struct FoldersTests {
     @Test(arguments: ["Rename Group…", "Collapse Group", "Ungroup"])
     func aFolderRowsMenu(item: String) async {
         let browser = browser()
+        defer { browser.closeAfterTest() }
         #expect(browser.probeAnswer(.rowMenu(row: 1, item: item), menu: nil) == .done)
         if item == "Rename Group…" {
             _ = browser.probeAnswer(.sheetField(index: 0, text: "home"), menu: nil)

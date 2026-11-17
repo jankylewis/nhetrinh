@@ -13,7 +13,7 @@ extension BrowserWindowController {
         sheets.openPanel = panel
         sheets.shown += 1
         keep(panel, for: webView)
-        panel.beginSheetModal(for: window) { [weak self] response in
+        Screen.presenter.begin(panel, on: window) { [weak self] response in
             self?.forget(panel)
             if self?.sheets.openPanel === panel { self?.sheets.openPanel = nil }
             completionHandler(Self.uploadAnswer(response, chosen: panel.urls))
@@ -38,7 +38,7 @@ extension BrowserWindowController {
 
     /// File > Print… (⌘P): the selected page, through the print panel as a sheet.
     @objc func printPage(_ sender: Any?) {
-        guard let webView = current, let window, window.attachedSheet == nil else { return }
+        guard let webView = current, let window, Screen.presenter.sheet(on: window) == nil else { return }
         let operation = webView.printOperation(with: NSPrintInfo.shared)
         operation.view?.frame = webView.bounds  // WebKit prints nothing from a view with no frame
         sheets.printing = true

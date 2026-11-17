@@ -32,6 +32,7 @@ extension BrowserWindowController {
         if old?.idleUnloadMinutes != prefs.idleUnloadMinutes, old != nil { startIdleUnloading() }
         if old == nil { startIdleUnloading() }
         if let old, old.zoom != prefs.zoom { applyZoomToLoadedTabs() }
+        if old?.sidebarSide != prefs.sidebarSide { placeSidebar(prefs.sidebarSide) }  // P8-SIDE-1, at once
         hub?.show(prefs)
     }
 
@@ -50,7 +51,6 @@ extension BrowserWindowController {
         self.hub = hub
         hub.onChange = { [weak self] change in self?.updatePrefs(change) }
         hub.show(prefs)
-        hub.showWindow(nil)
-        hub.window?.makeKeyAndOrderFront(nil)
+        Screen.presenter.show(hub)  // on screen only in the launched app (P8-TESTWIN-1)
     }
 }

@@ -22,6 +22,7 @@ struct GroupMenuTests {
                       (6, SidebarView.newGroupFromTab, "MBing > FE > PRs > G")] as [(Int, String, String)])
     func makeAGroup(row: Int, item: String, made: String) async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         await press(browser, row: row, item, name: "G")
         let paths: [String] = headmatePaths + [made]
         #expect(groupState(browser).groupPaths.sorted() == paths.sorted())
@@ -31,6 +32,7 @@ struct GroupMenuTests {
     /// New Group Inside… on Feedback (level 4): no name is asked; the sheet says why; nothing changes.
     @Test func aFifthLevelIsRefusedWithItsReason() async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         await press(browser, row: 7, SidebarView.newGroupInside)
         let state = groupState(browser)
         #expect(state.sheet.contains(TreeFailure.tooDeep.reason) && state.groupRefusal == TreeFailure.tooDeep.reason)
@@ -42,6 +44,7 @@ struct GroupMenuTests {
     /// Rename Group… (a sheet), and a double click on the group's name.
     @Test func renameByMenuAndByDoubleClick() async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         await press(browser, row: 5, "Rename Group…", name: "Pull requests", button: "Rename")
         #expect(groupState(browser).groupPaths[2] == "MBing > FE > Pull requests")
         browser.sidebar.doubleClick(row: 3)
@@ -53,6 +56,7 @@ struct GroupMenuTests {
     /// Move Group to > Top Level, and back to MBing > FE; a group never into itself or too deep (item off).
     @Test func moveAGroupOutAndBack() async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         await press(browser, row: 5, "Move Group to > Top Level")
         #expect(groupState(browser).groupPaths == ["MBing", "MBing > FE", "PRs", "PRs > Feedback"])
         let row = groupState(browser).rows.firstIndex(of: "PRs") ?? -1
@@ -66,6 +70,7 @@ struct GroupMenuTests {
     /// Ungroup FE: its tab and its group move up into MBing, in its place; no tab closes.
     @Test func ungroupMovesItsItemsUp() async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         await press(browser, row: 3, "Ungroup")
         #expect(groupState(browser).groupPaths == ["MBing", "MBing > PRs", "MBing > PRs > Feedback"])
         #expect(groupState(browser).rows == ["t1", "MBing", "t2", "t3", "PRs", "t4", "Feedback", "t5", "t6"])
@@ -76,6 +81,7 @@ struct GroupMenuTests {
                       (8, "Move Out of Group", ["t1", "t2", "t3", "t4", "t5", "t6"])])
     func moveATab(row: Int, item: String, order: [String]) async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         await press(browser, row: row, item)
         #expect(groupState(browser).tabTitles == order)
         #expect(groupState(browser).groupCounts == (row == 0 ? [5, 4, 3, 2] : [4, 3, 2, 0]))
@@ -84,6 +90,7 @@ struct GroupMenuTests {
     /// A drag: a group with all inside to the top level; into its own group or a tab's row: refused.
     @Test func dropAGroup() throws {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         #expect(browser.sidebar.drop(TabPath([1, 1, 1]), onto: nil, at: 0))
         #expect(groupState(browser).groupPaths == ["PRs", "PRs > Feedback", "MBing", "MBing > FE"])
         let feedback = try #require(browser.sidebar.node(at: TabPath([0, 1])))

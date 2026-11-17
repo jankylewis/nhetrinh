@@ -25,6 +25,7 @@ struct ToolsProbeTests {
         let engine = browser.prefs.searchEngine.title
         #expect(name == "Search engine" ? engine == value : browser.prefs.idleUnloadMinutes == 30)
         browser.hub?.close()
+        browser.closeAfterTest()
     }
 
     /// A value the hub does not offer is refused; bad minutes keep the old value.
@@ -35,6 +36,7 @@ struct ToolsProbeTests {
         #expect(browser.probeAnswer(.setting(name: name, value: value), menu: menu)
                 == .failed("the Settings Hub has no \(name) \(value)"))
         browser.hub?.close()
+        browser.closeAfterTest()
     }
 
     @Test(arguments: ["0", "-3", "ten", ""])
@@ -45,6 +47,7 @@ struct ToolsProbeTests {
         #expect(browser.prefs.idleUnloadMinutes == Prefs.defaultIdleMinutes)
         #expect(browser.hub?.minutes.stringValue == "\(Prefs.defaultIdleMinutes)")
         browser.hub?.close()
+        browser.closeAfterTest()
     }
 
     /// The find bar: typed into only once shown (Edit > Find > Find…); Close hides it.

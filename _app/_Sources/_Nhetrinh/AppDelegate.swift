@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var incoming: [URL] = []
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        Screen.presenter = AppKitScreen()  // before a launch nothing comes on screen (P8-TESTWIN-1)
         setDockIcon()
         let browser = BrowserWindowController()
         self.browser = browser

@@ -56,8 +56,9 @@ Default web browser. nhetrinh never changes that setting itself.
 
 ## Settings Hub (⌘,)
 
-Appearance (System, Light, Dark) · Search engine (Google, DuckDuckGo, Bing) · Unload idle tabs after
-N minutes · Clear Website Data… (the last hour, or all). Your tabs and settings stay on this Mac:
+Appearance (System, Light, Dark) · Sidebar position (Left, Right) · Search engine (Google, DuckDuckGo,
+Bing) · Unload idle tabs after N minutes · Clear Website Data… (the last hour, or all). Your tabs and
+settings stay on this Mac:
 `~/Library/Application Support/nhetrinh/` (`session.json`, `prefs.json`).
 
 ## Known limits

@@ -3,7 +3,8 @@ import NhetrinhCore
 import WebKit
 
 /// The one browser window: vertical tab sidebar | toolbar + web view.
-/// Tab lifecycle, menu actions and WebKit delegates are in the `BrowserWindowController+…` files;
+/// Tab lifecycle and WebKit delegates are in the `BrowserWindowController+…` files, menu actions and the
+/// sidebar's side (P8-SIDE-1) in `Chrome/`;
 /// session restore and idle unload are in `../Lifecycle/`; reorder, reopen, links, icons, loading in `../Handling/`.
 final class BrowserWindowController: NSWindowController {
     static let homeURL = URL(string: "https://www.google.com")
@@ -66,11 +67,7 @@ final class BrowserWindowController: NSWindowController {
     // MARK: - Layout
 
     private func buildLayout() {
-        let sideItem = NSSplitViewItem(sidebarWithViewController: controller(for: sidebar))
-        sideItem.minimumThickness = 180
-        sideItem.maximumThickness = 420
-        sideItem.canCollapse = true
-        split.addSplitViewItem(sideItem)
+        split.addSplitViewItem(Self.makeSideItem(controller(for: sidebar)))  // on the left; Right: `placeSidebar`
         split.addSplitViewItem(NSSplitViewItem(viewController: controller(for: makeMainView())))
         window?.contentViewController = split
         window?.setContentSize(NSSize(width: 1280, height: 820))

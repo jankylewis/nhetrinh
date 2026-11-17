@@ -29,9 +29,9 @@ extension BrowserWindowController {
         tree = session.tree.compactMapTabs { Tab(url: $0.url, title: $0.title) }
         if tabs.isEmpty { tabs = [Tab(url: nil)] }
         sidebarWidth = session.sidebarWidth
-        if let side = split.splitViewItems.first {
+        if let side = sideItem {
             side.isCollapsed = session.collapsed
-            if !session.collapsed { split.splitView.setPosition(CGFloat(session.sidebarWidth), ofDividerAt: 0) }
+            if !session.collapsed { keepSidebarWidth(session.sidebarWidth) }  // on its side (P8-SIDE-1)
         }
         selected = -1
         select(min(max(0, session.selectedIndex), tabs.count - 1))
@@ -47,7 +47,7 @@ extension BrowserWindowController {
 
     /// The session as the window shows it now.
     var currentSession: TreeSession {
-        let collapsed = split.splitViewItems.first?.isCollapsed ?? false
+        let collapsed = sideItem?.isCollapsed ?? false
         if !collapsed, sidebar.frame.width >= 100 { sidebarWidth = Double(sidebar.frame.width) }
         return TreeSession.capture(tree, selected: selected, sidebarWidth: sidebarWidth, collapsed: collapsed) { tab in
             tab.url.map { SessionTab(url: $0, title: tab.title) }

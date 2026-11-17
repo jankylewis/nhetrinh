@@ -2,17 +2,20 @@ import AppKit
 import NhetrinhCore
 import WebKit
 
-/// The Settings Hub (D19): one small native window, nhetrinh > Settings Hub… (⌘,). Appearance, Search
-/// engine, Unload idle tabs after N minutes, Clear Website Data…. Every change applies at once; the
-/// browser keeps it (`PrefsKeeping`). Actions and the readback probe's presses: `SettingsHub+Actions`.
+/// The Settings Hub (D19): one small native window, nhetrinh > Settings Hub… (⌘,). Appearance, Sidebar
+/// position (P8-SIDE-1), Search engine, Unload idle tabs after N minutes, Clear Website Data…. Every change
+/// applies at once; the browser keeps it (`PrefsKeeping`). Actions and the readback probe's presses:
+/// `SettingsHub+Actions`.
 final class SettingsHub: NSWindowController {
     static let title = "Settings Hub"
     static let clearTitle = "Clear Website Data…"
+    static let positionTitle = "Sidebar position"
     /// The browser applies and saves a change.
     var onChange: (((inout Prefs) -> Void) -> Void)?
     let store: WKWebsiteDataStore
     let appearance = NSPopUpButton()
     let engine = NSPopUpButton()
+    let position = NSPopUpButton()
     let minutes = NSTextField()
     lazy var clear = NSButton(title: Self.clearTitle, target: self, action: #selector(askToClear))
     /// The prefs shown last: a bad minutes value goes back to it.
@@ -20,7 +23,7 @@ final class SettingsHub: NSWindowController {
 
     init(store: WKWebsiteDataStore) {
         self.store = store
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 180),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 210),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.title = Self.title
         window.isReleasedWhenClosed = false
@@ -35,6 +38,9 @@ final class SettingsHub: NSWindowController {
         appearance.addItems(withTitles: Appearance.allCases.map(\.title))
         appearance.target = self
         appearance.action = #selector(appearanceChosen)
+        position.addItems(withTitles: SidebarSide.allCases.map(\.title))
+        position.target = self
+        position.action = #selector(sideChosen)
         engine.addItems(withTitles: SearchEngine.allCases.map(\.title))
         engine.target = self
         engine.action = #selector(engineChosen)
@@ -43,7 +49,7 @@ final class SettingsHub: NSWindowController {
         minutes.widthAnchor.constraint(equalToConstant: 60).isActive = true
         let idle = NSStackView(views: [minutes, NSTextField(labelWithString: "minutes")])
         let grid = NSGridView(views: [
-            [label("Appearance"), appearance], [label("Search engine"), engine],
+            [label("Appearance"), appearance], [label(Self.positionTitle), position], [label("Search engine"), engine],
             [label("Unload idle tabs after"), idle], [NSGridCell.emptyContentView, clear],
         ])
         grid.rowSpacing = 12
@@ -68,6 +74,7 @@ final class SettingsHub: NSWindowController {
     func show(_ prefs: Prefs) {
         shown = prefs
         appearance.selectItem(withTitle: prefs.appearance.title)
+        position.selectItem(withTitle: prefs.sidebarSide.title)
         engine.selectItem(withTitle: prefs.searchEngine.title)
         minutes.integerValue = prefs.idleUnloadMinutes
     }

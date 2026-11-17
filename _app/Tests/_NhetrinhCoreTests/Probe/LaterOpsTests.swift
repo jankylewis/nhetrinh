@@ -76,3 +76,16 @@ func toolbarFramesRoundTrip(frames: [String: [Double]], zoomMaxX: Double?) throw
     #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
     #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
 }
+
+// P8-SIDE-1: the sidebar's side and the sidebar's and the web view's frames come back as sent; an older
+// app's answer has none ("" and empty: never taken as Left, never as no overlap).
+@Test(arguments: [("", [], []), ("right", [780.0, 0, 220, 800], [0.0, 0, 779, 760])] as [(String, [Double], [Double])])
+func sidebarSideAndFramesRoundTrip(side: String, sidebar: [Double], web: [Double]) throws {
+    var state = ProbeState()
+    state.sidebarSide = side
+    state.toggleSymbol = side.isEmpty ? "" : "sidebar." + side
+    state.sidebarFrame = sidebar
+    state.webFrame = web
+    #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
+    #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
+}

@@ -6,7 +6,10 @@ import WebKit
 /// its field typed in as a user does, and a left click on an element of the page, sent to this app only.
 extension BrowserWindowController {
     /// The browser window's sheet, else the Settings Hub's (P4: Clear Website Data…).
-    var shownSheet: NSWindow? { window?.attachedSheet ?? hub?.window?.attachedSheet }
+    var shownSheet: NSWindow? {
+        let windows = [window, hub?.window].compactMap { $0 }
+        return windows.lazy.compactMap { Screen.presenter.sheet(on: $0) }.first
+    }
 
     /// P4: the find bar, the zoom badge, the window's look, the Settings Hub.
     private func readTools(into state: inout ProbeState) {
@@ -15,7 +18,7 @@ extension BrowserWindowController {
         state.zoomBadge = toolbar.zoomText
         let look = window?.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua])
         state.appearance = look == .darkAqua ? "dark" : "light"
-        state.hubShown = hub?.window?.isVisible ?? false
+        state.hubShown = hub?.window.map { Screen.presenter.isShown($0) } ?? false
     }
 
     /// P4's probe ops: the find bar's field, a Settings Hub control.
@@ -23,7 +26,9 @@ extension BrowserWindowController {
         switch request {
         case .find(let text): return typeInFindBar(text)
         case .setting(let name, let value):
-            guard let hub, hub.window?.isVisible == true else { return .failed("the Settings Hub is not shown") }
+            guard let hub, let shown = hub.window, Screen.presenter.isShown(shown) else {
+                return .failed("the Settings Hub is not shown")
+            }
             return hub.set(name, to: value) ? .done : .failed("the Settings Hub has no \(name) \(value)")
         default: return .failed("not a tool request")
         }
@@ -55,9 +60,9 @@ extension BrowserWindowController {
     /// The open panel is the system's: only its Cancel is pressed, through the panel itself.
     func pressSheetButton(_ label: String) -> ProbeResponse {
         guard let sheet = shownSheet else { return .failed("no sheet is shown") }
-        if let panel = sheets.openPanel, sheet === panel {
+        if let panel = sheets.openPanel, sheet === panel, let window {
             guard label == "Cancel" else { return .failed("the open panel is the system's: only Cancel is pressed") }
-            DispatchQueue.main.async { panel.cancel(nil) }
+            DispatchQueue.main.async { Screen.presenter.end(panel, on: window, .cancel) }
             return .done
         }
         let buttons = Self.views(in: sheet.contentView).compactMap { $0 as? NSButton }

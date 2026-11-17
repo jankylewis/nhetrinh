@@ -44,8 +44,8 @@ enum ToggleStep {
             + "the toolbar's toggle showed the sidebar, then hid it; start state put back"
     }
 
-    /// `request` performed, then the sidebar read until it is shown (or hidden), 5 s at most.
-    private static func sidebar(_ app: AppSession, shown: Bool, by request: ProbeRequest) throws {
+    /// `request` performed, then the sidebar read until it is shown (or hidden), 5 s at most (R48, R50).
+    static func sidebar(_ app: AppSession, shown: Bool, by request: ProbeRequest) throws {
         let action = request == .menu(["View", "Toggle Sidebar"]) ? "View > Toggle Sidebar" : "the toolbar's toggle"
         try app.act(request, action)
         waitUntil(5) { (try? app.state()).map { ($0.sidebarWidth > 0) == shown } == true }

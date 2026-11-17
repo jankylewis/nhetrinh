@@ -10,6 +10,13 @@ extension SettingsHub {
         onChange? { $0.appearance = choice }
     }
 
+    /// P8-SIDE-1: Left or Right; the sidebar moves at once.
+    @objc func sideChosen() {
+        let title = position.titleOfSelectedItem
+        guard let choice = SidebarSide.allCases.first(where: { $0.title == title }) else { return }
+        onChange? { $0.sidebarSide = choice }
+    }
+
     @objc func engineChosen() {
         let title = engine.titleOfSelectedItem
         guard let choice = SearchEngine.allCases.first(where: { $0.title == title }) else { return }
@@ -32,7 +39,7 @@ extension SettingsHub {
         alert.informativeText = "Cookies, caches and site storage are removed for every site."
         for title in ClearRange.buttons { alert.addButton(withTitle: title) }
         alert.buttons.last?.hasDestructiveAction = true
-        alert.beginSheetModal(for: window) { [weak self] response in
+        Screen.presenter.begin(alert, on: window) { [weak self] response in
             let first = NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
             if let range = ClearRange(button: response.rawValue - first) { self?.clear(range) }
         }
@@ -53,8 +60,8 @@ extension SettingsHub {
     /// The probe's `setting`: the control named `name` set to `value` as a user picks or types it.
     func set(_ name: String, to value: String) -> Bool {
         switch name {
-        case "Appearance", "Search engine":
-            let popup = name == "Appearance" ? appearance : engine
+        case "Appearance", "Search engine", Self.positionTitle:
+            let popup = name == "Appearance" ? appearance : name == "Search engine" ? engine : position
             guard popup.item(withTitle: value) != nil else { return false }
             popup.selectItem(withTitle: value)
             return popup.sendAction(popup.action, to: popup.target)
@@ -67,7 +74,7 @@ extension SettingsHub {
 
     /// The probe's `button`: Clear Website Data…, as a click does.
     func press(_ label: String) -> Bool {
-        guard label == Self.clearTitle, window?.isVisible == true else { return false }
+        guard label == Self.clearTitle, let window, Screen.presenter.isShown(window) else { return false }
         clear.performClick(nil)
         return true
     }

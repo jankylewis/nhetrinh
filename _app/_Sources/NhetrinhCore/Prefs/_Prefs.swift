@@ -42,6 +42,8 @@ public struct Prefs: Equatable, Sendable {
     /// Unload a background tab idle this long (minutes, at least 1).
     public var idleUnloadMinutes = Prefs.defaultIdleMinutes
     public var appearance = Appearance.system
+    /// P8-SIDE-1: the side of the window the tab sidebar sits on.
+    public var sidebarSide = SidebarSide.left
 
     public init() {}
 
@@ -58,6 +60,7 @@ public struct Prefs: Equatable, Sendable {
         }
         prefs.searchEngine = (object["searchEngine"] as? String).flatMap(SearchEngine.init(rawValue:)) ?? .google
         prefs.appearance = (object["appearance"] as? String).flatMap(Appearance.init(rawValue:)) ?? .system
+        prefs.sidebarSide = (object["sidebarSide"] as? String).flatMap(SidebarSide.init(rawValue:)) ?? .left
         if let minutes = number(object["idleUnloadMinutes"]).flatMap(Int.init(exactly:)), minutes >= 1 {
             prefs.idleUnloadMinutes = minutes
         }
@@ -75,7 +78,8 @@ public struct Prefs: Equatable, Sendable {
 
     public func encoded() throws -> Data {
         let object: [String: Any] = ["zoom": zoom, "searchEngine": searchEngine.rawValue,
-                                     "idleUnloadMinutes": idleUnloadMinutes, "appearance": appearance.rawValue]
+                                     "idleUnloadMinutes": idleUnloadMinutes, "appearance": appearance.rawValue,
+                                     "sidebarSide": sidebarSide.rawValue]
         return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .prettyPrinted])
     }
 }

@@ -42,15 +42,54 @@ struct SheetGapsTests {
         alert.addButton(withTitle: "OK")
         alert.addButton(withTitle: "Cancel")
         browser.ask(alert, for: asking) { answer = $0 }
-        try #require(browser.window?.attachedSheet != nil, "the sheet is shown on the window")
+        defer { browser.closeAfterTest() }
+        try #require(browser.shownSheet != nil, "the sheet is shown on the window")
         pressAsKey(path, in: menu, browser)
         let stillShowsTheAsker = browser.tabs.indices.contains(browser.selected)
             && browser.tabs[browser.selected].webView === asking
-        let sheetGone = browser.window?.attachedSheet == nil
+        let sheetGone = browser.shownSheet == nil
         let shown = browser.tabs[browser.selected].title
         let seen = "after \(path.joined(separator: " > ")): the selected tab is \(shown), "
             + "the sheet is \(sheetGone ? "gone" : "still shown"), the answer \(answer.map(String.init) ?? "none")"
         #expect(stillShowsTheAsker || (sheetGone && answer != nil), "\(seen)")
-        if let sheet = browser.window?.attachedSheet { browser.window?.endSheet(sheet) }
+        if let sheet = browser.shownSheet, let window = browser.window {
+            Screen.presenter.end(sheet, on: window, .abort)
+        }
+    }
+}
+
+/// P8-TESTWIN-1: a unit test never shows a window on the headmate's screen. The paths that did (a sheet on the
+/// browser window, the Settings Hub and its Clear sheet) are taken here and read as shown; then no window of
+/// this process is visible, nor one a test that ran before left visible.
+@MainActor
+struct NoWindowOnScreenTests {
+    @Test func noTestWindowIsEverVisible() throws {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        defer { browser.closeAfterTest() }
+        let alert = NSAlert()
+        alert.addButton(withTitle: "OK")
+        var answer: Int?
+        browser.ask(alert, for: nil) { answer = $0 }
+        browser.showSettingsHub(nil)
+        let hub = try #require(browser.hub)
+        defer { hub.close() }
+        hub.askToClear()
+        let hubSheet = try #require(hub.window.flatMap { Screen.presenter.sheet(on: $0) }, "the Clear sheet is held")
+        #expect(browser.shownSheet === alert.window && browser.probeState(menu: nil).hubShown)
+        let visible = NSApp.windows.filter(\.isVisible).map { "\($0.className) \($0.title)" }
+        #expect(visible.isEmpty, "windows on screen: \(visible)")
+        alert.buttons[0].performClick(nil)
+        #expect(answer == 0 && browser.shownSheet === hubSheet, "a held sheet's button answers it")
+        if let window = hub.window { Screen.presenter.end(hubSheet, on: window, .cancel) }
+    }
+}
+
+extension BrowserWindowController {
+    /// P8-TESTWIN-1: a test's browser window ends closed. A window made in code is released by AppKit when it
+    /// closes, while ARC still holds it: kept instead.
+    func closeAfterTest() {
+        window?.isReleasedWhenClosed = false
+        close()
     }
 }

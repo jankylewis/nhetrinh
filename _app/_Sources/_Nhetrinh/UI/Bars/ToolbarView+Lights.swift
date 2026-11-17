@@ -36,6 +36,13 @@ extension ToolbarView {
         if rowLeading.constant != CGFloat(leading) { rowLeading.constant = CGFloat(leading) }
     }
 
+    /// P8-SIDE-1: the toggle drawn with the sidebar on `side`. The row is laid out again by the split view.
+    func showSide(_ side: SidebarSide) {
+        guard toggleSymbol != side.symbol, let toggle = button("Toggle Sidebar") else { return }
+        toggle.image = NSImage(systemSymbolName: side.symbol, accessibilityDescription: "Toggle Sidebar")
+        toggleSymbol = side.symbol
+    }
+
     /// Full screen moves the traffic lights to the title bar's own window: lay out again once it is done.
     func watchFullScreen() {
         let center = NotificationCenter.default

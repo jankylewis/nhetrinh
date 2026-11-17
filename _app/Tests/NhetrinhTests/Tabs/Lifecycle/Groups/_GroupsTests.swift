@@ -30,7 +30,7 @@ func groupState(_ browser: BrowserWindowController) -> ProbeState { browser.prob
 /// The probe presses a sheet's button on the next turn of the main queue: wait for it (5 s at most).
 @MainActor
 func sheetGone(_ browser: BrowserWindowController) async {
-    for _ in 0..<50 where browser.window?.attachedSheet != nil { try? await Task.sleep(nanoseconds: 100_000_000) }
+    for _ in 0..<50 where browser.shownSheet != nil { try? await Task.sleep(nanoseconds: 100_000_000) }
 }
 
 @MainActor
@@ -67,6 +67,7 @@ struct GroupsTests {
     /// Tab brings the group back where it was, its tab selected.
     @Test func closeGroupAndReopenIt() async {
         let browser = groupBrowser()
+        defer { browser.closeAfterTest() }
         #expect(browser.probeAnswer(.rowMenu(row: 5, item: "Close Group…"), menu: nil) == .done)
         #expect(groupState(browser).sheet.contains("“PRs” and its 2 tabs?"))
         #expect(browser.probeAnswer(.sheetButton("Close"), menu: nil) == .done)

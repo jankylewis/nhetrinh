@@ -71,6 +71,12 @@ public struct ProbeState: Equatable, Sendable {
     /// window's points, and the zoom button's right edge in the same points; nil when it was not read.
     public var toolbarFrames: [String: [Double]] = [:]
     public var zoomMaxX: Double?
+    /// P8-SIDE-1: the sidebar's side ("left", "right"; "" not read), the toolbar toggle's symbol, the sidebar's
+    /// frame ([] when hidden) and the web view's frame, as [x, y, width, height] in the window's points.
+    public var sidebarSide = ""
+    public var toggleSymbol = ""
+    public var sidebarFrame: [Double] = []
+    public var webFrame: [Double] = []
 
     public init() {}
 }
@@ -90,7 +96,7 @@ extension ProbeState {
                                      "minimized": minimized, "fonts": fonts, "toolbarFrames": toolbarFrames]
         if let selected { object["selected"] = selected }
         if let zoomMaxX { object["zoomMaxX"] = zoomMaxX }
-        return object.merging(groupObject) { first, _ in first }
+        return object.merging(groupObject) { first, _ in first }.merging(sideObject) { first, _ in first }
     }
 
     /// A field that is missing or of another type keeps its default: the readback then sees it.
@@ -121,6 +127,7 @@ extension ProbeState {
         hubShown = object["hubShown"] as? Bool ?? false
         readDownloads(object)
         readGroups(object)
+        readSide(object)
     }
 
     private mutating func readWindow(_ object: [String: Any]) {

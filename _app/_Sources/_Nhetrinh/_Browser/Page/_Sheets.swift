@@ -30,7 +30,7 @@ extension BrowserWindowController {
         sheets.shown += 1
         let sheet = alert.window
         keep(sheet, for: webView)
-        alert.beginSheetModal(for: window) { [weak self] response in
+        Screen.presenter.begin(alert, on: window) { [weak self] response in
             self?.forget(sheet)
             let first = NSApplication.ModalResponse.alertFirstButtonReturn.rawValue
             done(response == .abort ? -1 : response.rawValue - first)
@@ -44,9 +44,7 @@ extension BrowserWindowController {
         guard let webView, let window else { return }
         let page = ObjectIdentifier(webView)
         for entry in sheets.waiting where entry.page == page {
-            if let panel = entry.sheet as? NSSavePanel { panel.cancel(nil) } else {
-                window.endSheet(entry.sheet, returnCode: .abort)
-            }
+            Screen.presenter.end(entry.sheet, on: window, .abort)  // a panel is cancelled
         }
     }
 

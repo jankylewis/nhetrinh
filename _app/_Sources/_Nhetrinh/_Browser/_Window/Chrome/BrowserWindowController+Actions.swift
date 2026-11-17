@@ -24,7 +24,7 @@ extension BrowserWindowController {
     }
 
     @objc func toggleTabSidebar(_ sender: Any?) {
-        split.splitViewItems.first?.animator().isCollapsed.toggle()
+        sideItem?.animator().isCollapsed.toggle()
         sessionChanged()
     }
 }

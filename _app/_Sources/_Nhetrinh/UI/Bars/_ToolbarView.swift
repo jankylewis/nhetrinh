@@ -16,7 +16,9 @@ final class ToolbarView: NSView {
     var onZoomBadge: (() -> Void)?
 
     let address = NSTextField()
-    private lazy var toggle = makeButton("sidebar.left", "Toggle Sidebar", #selector(tapToggle))
+    /// The toggle's symbol: the sidebar on its side (P8-SIDE-1, `showSide`).
+    var toggleSymbol = SidebarSide.left.symbol
+    private lazy var toggle = makeButton(toggleSymbol, "Toggle Sidebar", #selector(tapToggle))
     private lazy var back = makeButton("chevron.left", "Back", #selector(tapBack))
     private lazy var forward = makeButton("chevron.right", "Forward", #selector(tapForward))
     private lazy var reload = makeButton("arrow.clockwise", "Reload", #selector(tapReload))

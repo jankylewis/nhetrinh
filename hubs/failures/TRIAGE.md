@@ -35,6 +35,8 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-009 | `exited with unexpected signal code 5` | OBSERVED | Does a `@MainActor` test run `RunLoop.main`? It runs other tests inside; press the item at once |
 | NT-GAT-010 | `the confirm sheet's buttons are ["Cancel", "OK"]` | OBSERVED | A sheet's buttons from the probe are in view order: compare them as a set |
 | NT-GAT-011 | `R37 PASS` with no tab left for the critical level | FIXED | Would the check fail if the action did nothing, or the other button? Add a control the action must change (R37 row 4, `ClearRange`, R29 relaunch) |
+| NT-GAT-012 | `noTestWindowIsEverVisible` | OBSERVED | A window on screen during test.sh? Does a sheet or window skip `Screen.presenter`? |
+| NT-GAT-013 | `aDownloadIsPartialUntilDoneThenQuarantined` | OBSERVED | A wait on a clock, or two reads of one folder? Wait for the event (the row's rename), read once |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | FIXED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
 | NT-PRF-003 | `anIconOfHugePixelSizeIsRefusedBeforeItIsDecoded` | OBSERVED | A small icon file of huge pixel size? `Favicons.fits` reads the size before any decode |
