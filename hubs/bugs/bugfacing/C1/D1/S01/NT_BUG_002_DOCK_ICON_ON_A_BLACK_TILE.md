@@ -4,6 +4,7 @@ id: NT-BUG-002
 family: UIX
 status: FIXED
 date: 2026-11-16
+found_by: headmate (2026-11-16 report, "no black background", Dock screenshot)
 signature: Dock icon on a black tile
 source: headmate report 2026-11-16 ("bigger plz, and no black background", Dock screenshot)
 observed: the transparent Hirono icon showed small, inside a dark rounded tile, in the Dock

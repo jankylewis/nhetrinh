@@ -4,6 +4,7 @@ id: NT-BUG-010
 family: UIX
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P4/P6 review)
 signature: clearAllForgetsTheZoom
 source: _app/_Sources/_Nhetrinh/UI/Settings/SettingsHub+Actions.swift on p6/memory 96130c6 (`askToClear`)
 source: _app/Tests/NhetrinhTests/Page/ToolsReviewTests.swift `clearAllForgetsTheZoom`

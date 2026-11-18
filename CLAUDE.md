@@ -14,7 +14,7 @@ Read first, in this order:
 2. **Conventions are checked by tool, never by eye.** `python3 _app/scripts/conventions/_check.py`
    prints 0 violations before every commit. It checks: exactly one `_` entry per folder (the most
    critical one) and at most 5 entries; `.md` 100 lines; code 150 lines and 120 characters a line;
-   function 30 lines and 5 parameters; no force unwrap, `try!`, `as!`; no package dependency.
+   function 30 lines and 5 parameters; no force unwrap, `try!`, `as!`; no package dependency; `found_by` on hubs.
    Past 5 entries, group by meaning; never widen a folder.
 3. **Tests first.** Logic that needs no AppKit lives in `NhetrinhCore`, with parameterized Swift
    Testing tests. A bug fix starts with a test that fails. A test that cannot fail is a defect.
@@ -26,6 +26,7 @@ Read first, in this order:
    A change that breaks it stops until the cost is removed or the headmate accepts a new number.
 6. **Hubs in the same change.** Every bug, failure, lesson, tool gap and feature gets its entry
    (`hubs/_SCHEMA.md`). Every claim cites a source. Write "not proven" for what is not proven.
+   Every bug is recorded with `found_by` (headmate, readback, self-test or development), checked by tool.
 7. **The machine is shared with the headmate.** One heavy command at a time, always with
    `nice -n 10`. Never run the benchmark (`hubs/product/rnd`). Never start the app yourself unless
    your brief says so. Never capture the screen.

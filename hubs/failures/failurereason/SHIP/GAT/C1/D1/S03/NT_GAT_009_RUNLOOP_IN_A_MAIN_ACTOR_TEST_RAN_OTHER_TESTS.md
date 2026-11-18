@@ -4,6 +4,7 @@ id: NT-GAT-009
 family: GAT
 status: OBSERVED
 date: 2026-11-16
+found_by: self-test (test.sh fatal error, P2-BUILD-1)
 signature: exited with unexpected signal code 5
 source: test.sh run of P2-BUILD-1 (draft `TabHandlingTests`, before the fix): `Fatal error: Index out of range`, NhetrinhTests
 links: fix=yes lesson=no evidence=no toolgap=none

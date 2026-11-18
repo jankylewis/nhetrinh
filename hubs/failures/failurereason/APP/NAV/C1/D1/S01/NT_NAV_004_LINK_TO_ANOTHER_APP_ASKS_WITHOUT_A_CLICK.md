@@ -4,6 +4,7 @@ id: NT-NAV-004
 family: NAV
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P3-REVIEW P3, from the code)
 signature: followed = ... || action.targetFrame?.isMainFrame != false
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+WebKit.swift (`decidePolicyFor`)
 links: fix=no lesson=no evidence=no toolgap=none

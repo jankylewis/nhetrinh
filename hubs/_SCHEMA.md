@@ -54,12 +54,26 @@ id: NT-NAV-001            (or NT-BUG-001, NT-TG-001)
 family: NAV
 status: OPEN | OBSERVED | FIXED
 date: <first seen, YYYY-MM-DD>
+found_by: <headmate|readback|self-test|development> (<the source that proves it>)
 signature: <exact text to grep in a log or report; failurereason and bugfacing only>
 source: <tracked path + line, commit, or report>   (one per source)
 observed: <what was seen outside the repo, sanitized, no personal paths>
 links: fix=<yes|no> lesson=<yes|no> evidence=<yes|no> toolgap=<NT-TG-nnn|none>
 cause: <NT-FAM-nnn>       (bugfacing only, when proven)
 ```
+
+`found_by` (headmate rule 2026-11-18; required on bugfacing, failurereason, toolgap and lessonlearn
+entries, and as the Found by column of both TRIAGE tables; the conventions checker enforces it):
+
+| found_by | Means |
+|---|---|
+| `headmate` | the headmate reported it: the date and a short sanitized quote, or the brief |
+| `readback` | a readback step showed it: the run time and the step (R2 13:19) |
+| `self-test` | a unit test, the conventions checker, a build check or GitHub CI showed it |
+| `development` | found while writing, reviewing or debugging code (review defects included) |
+
+The source in parentheses is never empty, and the line sits among the head lines (before the first `## `).
+When the source cannot prove who found it: `development (found_by not proven)`.
 
 | Status | Means |
 |---|---|

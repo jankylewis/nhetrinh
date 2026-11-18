@@ -4,6 +4,7 @@ id: NT-GAT-011
 family: GAT
 status: FIXED
 date: 2026-11-17
+found_by: development (P4/P6 review, every step PASS at 00:18)
 signature: R37 PASS with no tab left for the critical level to unload
 source: _app/_Sources/NhetrinhReadback/_Steps/System/PressureSteps.swift on p6/memory 96130c6 (`playingTabSurvives`)
 source: _app/_Sources/NhetrinhReadback/_Steps/Tabs/Tools/HubSteps.swift on p6/memory 96130c6 (`clearData`, `engine`)

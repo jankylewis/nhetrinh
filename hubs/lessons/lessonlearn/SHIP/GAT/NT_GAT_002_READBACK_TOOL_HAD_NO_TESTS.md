@@ -4,6 +4,7 @@ id: NT-GAT-002
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: development (P0 brief P0-HAR-3: the readback tool had no tests)
 links: fix=yes lesson=yes evidence=no toolgap=none
 
 ## Believed

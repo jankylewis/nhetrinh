@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 
-from sizes import FUNC_MAX_LINES, MAX_PARAMS
+from rules.sizes import FUNC_MAX_LINES, MAX_PARAMS
 
 MODIFIERS = "private|fileprivate|internal|public|open|static|class|final|override|mutating|convenience|required"
 DECL = re.compile(rf"^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:(?:{MODIFIERS})\s+)*(func\s+[\w`]+|init[?!]?)\s*[<(]")

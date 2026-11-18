@@ -4,6 +4,7 @@ id: NT-BLD-004
 family: BLD
 status: OBSERVED
 date: 2026-11-17
+found_by: development (REVIEW_P8 R3)
 signature: test_a_feature_row_of_the_wrong_shape_is_an_error
 source: REVIEW_P8.md R3 (reviewer seat); the test is in 2fde920
 links: fix=yes lesson=no evidence=no toolgap=none

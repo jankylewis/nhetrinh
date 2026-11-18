@@ -4,6 +4,7 @@ id: NT-BUG-005
 family: UIX
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P2-REVIEW)
 signature: closingARowKeepsTheBackgroundSlotInPlace
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift on p2/sidebar cc8affe (`close(at:)`)
 source: _app/Tests/NhetrinhTests/Tabs/ReviewGapsTests.swift `closingARowKeepsTheBackgroundSlotInPlace` (P2-REVIEW)

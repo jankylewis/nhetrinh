@@ -4,6 +4,7 @@ id: NT-BUG-016
 family: TAB
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P7 review)
 signature: moveTabStepsOneRow
 source: _app/_Sources/NhetrinhCore/Tabs/Lifecycle/Tree/TreeFlat.swift on p7/prep e0b91ff (`moveTab(fromFlat:toFlat:)`)
 observed: found by the P7 adversarial review (code read, then a test); no user report

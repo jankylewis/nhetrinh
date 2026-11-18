@@ -4,6 +4,7 @@ id: NT-BUG-001
 family: NAV
 status: FIXED
 date: 2026-11-16
+found_by: development (found while moving the address parser into NhetrinhCore (its `observed:` line))
 signature: search cut off at &
 source: _app/_Sources/NhetrinhCore/_Navigation/_AddressParser.swift (query encoding)
 source: _app/Tests/_NhetrinhCoreTests/_Navigation/_AddressParserTests.swift `textBecomesOneSearchQuery`

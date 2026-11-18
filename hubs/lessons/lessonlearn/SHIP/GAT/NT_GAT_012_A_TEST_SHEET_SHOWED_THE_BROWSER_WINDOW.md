@@ -4,6 +4,7 @@ id: NT-GAT-012
 family: GAT
 status: OBSERVED
 date: 2026-11-17
+found_by: headmate (2026-11-17, a browser window on screen during a test run, P8-SIDE review brief)
 links: fix=no lesson=yes evidence=no toolgap=none
 
 ## Believed

@@ -4,6 +4,7 @@ id: NT-GAT-013
 family: GAT
 status: OBSERVED
 date: 2026-11-17
+found_by: self-test (red once in a test.sh run)
 signature: aDownloadIsPartialUntilDoneThenQuarantined
 source: nhetrinh_wt/REVIEW_P8_SIDE.md, part (a)
 source: _app/_Sources/NhetrinhCore/_Navigation/Downloads/_DownloadNamer.swift:23-29 (`canWrite`)

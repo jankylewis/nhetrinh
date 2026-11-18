@@ -41,7 +41,7 @@ Proposed by the agent; accepted as a group when the headmate approved the plan.
 
 | Id | Assumption | If the headmate says no |
 |---|---|---|
-| A1 | Caps: `.md` 100 lines; `.swift` and other code 150 lines; function 30 lines; line 120 characters; 5 parameters | change the numbers in `_app/scripts/conventions/sizes.py` (read by `conventions/_check.py`); nothing else moves |
+| A1 | Caps: `.md` 100 lines; `.swift` and other code 150 lines; function 30 lines; line 120 characters; 5 parameters | change the numbers in `_app/scripts/conventions/rules/sizes.py` (read by `conventions/_check.py`); nothing else moves |
 | A2 | `rnd/` moves to `hubs/product/rnd/`, so `AGENTS.md` can sit at the root (5 root entries) | keep `rnd/` at the root and put the agent files only under `.claude/` |
 | A3 | The readback tool drives the app through macOS Accessibility; this needs one permission grant for the terminal (since D23: R2 only) | weaker checks from inside the app, reported as such (risk R-1) |
 

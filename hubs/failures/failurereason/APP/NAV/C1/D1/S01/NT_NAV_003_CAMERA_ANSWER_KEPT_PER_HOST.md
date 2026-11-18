@@ -4,6 +4,7 @@ id: NT-NAV-003
 family: NAV
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P3-REVIEW P1)
 signature: aSiteIsAnOrigin
 source: _app/_Sources/_Nhetrinh/_Browser/Page/Panels.swift on p3/pages 1d391d9 (`origin.host` only)
 source: P3-REVIEW finding P1 (the review notes are kept outside the repository)

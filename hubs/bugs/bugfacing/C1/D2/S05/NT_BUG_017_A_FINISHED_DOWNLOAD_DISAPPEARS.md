@@ -4,6 +4,7 @@ id: NT-BUG-017
 family: NAV
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P5-REVIEW)
 signature: aCancelNeverRemovesTheNextDownloadsFile
 source: _app/_Sources/_Nhetrinh/_Browser/Page/Outside/_Downloads.swift on p5/downloads e7dccf9 (`end`, `remove(_:after:)`)
 source: _app/Tests/NhetrinhTests/Page/Outside/_DownloadRaceTests.swift `aCancelNeverRemovesTheNextDownloadsFile`

@@ -4,6 +4,7 @@ id: NT-NAV-001
 family: NAV
 status: FIXED
 date: 2026-11-16
+found_by: development (as NT-BUG-001)
 signature: search cut off at &
 source: _app/_Sources/NhetrinhCore/_Navigation/_AddressParser.swift
 links: fix=yes lesson=no evidence=no toolgap=none

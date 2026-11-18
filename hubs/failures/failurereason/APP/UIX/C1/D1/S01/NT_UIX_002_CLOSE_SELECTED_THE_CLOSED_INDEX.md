@@ -4,6 +4,7 @@ id: NT-UIX-002
 family: UIX
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P2-BUILD-1, code read then a mutation)
 signature: the selected tab stays
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift on master 7176264 (`close(at:)`)
 source: _app/_Sources/_Nhetrinh/UI/_SidebarView.swift on master 7176264 (`closeClicked`: the row's menu closes `clickedRow`)

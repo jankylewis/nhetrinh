@@ -4,6 +4,7 @@ id: NT-NAV-006
 family: NAV
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P5-REVIEW)
 signature: everyRunningDownloadCanBeCancelled
 source: _app/_Sources/NhetrinhCore/_Navigation/Downloads/DownloadList.swift on e7dccf9 (`shownItems`: the first 3)
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+WebKit.swift (`shouldPerformDownload`)

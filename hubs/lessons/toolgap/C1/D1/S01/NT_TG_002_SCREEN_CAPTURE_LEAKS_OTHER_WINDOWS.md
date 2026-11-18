@@ -4,6 +4,7 @@ id: NT-TG-002
 family: UIX
 status: OPEN
 date: 2026-11-16
+found_by: development (MVP B screenshot attempt)
 source: MVP B screenshot attempt (2026-11-16): a region capture caught another app's window instead of nhetrinh
 links: fix=no lesson=no evidence=no toolgap=NT-TG-002
 

@@ -4,6 +4,7 @@ id: NT-BUG-007
 family: TAB
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P4/P6 review)
 signature: aCapturingTabIsKept
 source: _app/_Sources/NhetrinhCore/Tabs/Lifecycle/UnloadPolicy.swift on p6/memory 96130c6 (`tabsToUnload`)
 source: _app/Tests/_NhetrinhCoreTests/Tabs/Lifecycle/PressurePolicyTests.swift `aCapturingTabIsKept`

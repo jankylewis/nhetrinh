@@ -4,6 +4,7 @@ id: NT-BLD-001
 family: BLD
 status: FIXED
 date: 2026-11-16
+found_by: headmate (2026-11-16 Dock report, NT-BUG-002)
 links: fix=yes lesson=yes evidence=yes toolgap=NT-TG-001
 
 ## Believed

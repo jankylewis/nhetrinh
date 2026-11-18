@@ -4,6 +4,7 @@ id: NT-NAV-007
 family: NAV
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P5-REVIEW)
 signature: linksFromAnotherAppLoadOnlyTheShownTab
 source: _app/_Sources/_Nhetrinh/_Browser/Page/Outside/BrowserWindowController+Outside.swift on e7dccf9 (`openIncoming`)
 source: _app/Tests/NhetrinhTests/Page/Outside/IncomingTests.swift

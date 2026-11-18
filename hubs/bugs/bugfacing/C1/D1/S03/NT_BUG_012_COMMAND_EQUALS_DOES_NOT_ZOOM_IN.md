@@ -4,6 +4,7 @@ id: NT-BUG-012
 family: UIX
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P4/P6 review)
 signature: zoomInHasBothKeys
 source: _app/_Sources/_Nhetrinh/UI/AppMenu.swift on p6/memory 96130c6 (View > Zoom In, key `+`)
 source: _app/Tests/NhetrinhTests/Page/ToolsReviewTests.swift `zoomInHasBothKeys`

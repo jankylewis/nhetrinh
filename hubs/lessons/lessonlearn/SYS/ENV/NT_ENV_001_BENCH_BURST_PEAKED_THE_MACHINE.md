@@ -4,6 +4,7 @@ id: NT-ENV-001
 family: ENV
 status: OBSERVED
 date: 2026-11-16
+found_by: headmate (2026-11-16, "dont make my machine peak!", Activity Monitor screenshot)
 links: fix=no lesson=yes evidence=yes toolgap=none
 
 ## Believed

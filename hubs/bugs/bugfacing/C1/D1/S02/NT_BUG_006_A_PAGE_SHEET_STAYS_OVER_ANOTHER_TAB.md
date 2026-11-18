@@ -4,6 +4,7 @@ id: NT-BUG-006
 family: UIX
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P3-REVIEW)
 signature: the sheet is still shown, the answer none
 source: _app/_Sources/_Nhetrinh/_Browser/Page/_Sheets.swift on p3/pages 1d391d9 (`ask`)
 source: _app/Tests/NhetrinhTests/Page/_SheetGapsTests.swift `aSheetNeverOutlivesOrHidesTheTabThatAsked` (P3-REVIEW)

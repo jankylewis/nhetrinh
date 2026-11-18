@@ -4,6 +4,7 @@ id: NT-TG-003
 family: GAT
 status: OPEN
 date: 2026-11-16
+found_by: readback (R1, R3-R7 "no element", readbacks 19:51 and 20:01)
 source: brief P0-RBK-3 (2026-11-16): `AXIsProcessTrusted` false in an agent session although the terminal app is switched on in Accessibility
 source: `_app/_Sources/NhetrinhReadback/Driver/_AX.swift` (`AXNode.isTrusted`)
 source: brief P0-SIGN-1 (2026-11-16): grants dropped after a rebuild of the ad-hoc signed readback app, seen 19:09
@@ -21,19 +22,17 @@ Not proven: which process macOS checks for a session started by an agent.
 
 ## Workaround
 
-`_app/scripts/install/readback_app.sh` wraps the release binary into
-`~/Applications/nhetrinh-readback.app` (id `io.github.jankylewis.nhetrinh.readback`, `LSUIElement`,
-ad-hoc signed). The headmate grants it once. `readback_app.sh run [--steps ...]` launches it with
-`open -W -n ... --args --evidence <repo> --log <file>`: `open` passes no stdout and does not return
-the app's exit code, so the app writes both to the log, the code as its last line `exit: <code>`
-(tests `logIsFoundBeforeTheCommandLineIsChecked`, `lastLogLineHoldsTheExitCode`). `--evidence`
-refuses a path outside the repository (test `badAppFlagIsAUsageError`).
-The app is rebuilt only when the hash of the readback sources changes (`NHTSourceHash`), because a
-rebuild changes the ad-hoc signature and macOS then drops the Accessibility and Screen Recording
-grants (risk R-2, seen 2026-11-16 19:09, brief P0-SIGN-1).
-A step without a grant is NOT READ BACK and names the app that lacks it: `nhetrinh-readback.app`
-when run as that app, `the terminal app` otherwise (`Grant` in `Driver/AppSession.swift`, tests
-`granteeIsTheAppThatRuns`, `missingGrantNamesTheGranteeAndNoPath`). A full run through the app: proven at 21:24 (below).
+`_app/scripts/install/readback_app.sh` wraps the release binary into `~/Applications/nhetrinh-readback.app` (id
+`io.github.jankylewis.nhetrinh.readback`, `LSUIElement`, ad-hoc signed). The headmate grants it once.
+`readback_app.sh run [--steps ...]` launches it with `open -W -n ... --args --evidence <repo> --log <file>`: `open`
+passes no stdout and does not return the app's exit code, so the app writes both to the log, the code as its last
+line `exit: <code>` (tests `logIsFoundBeforeTheCommandLineIsChecked`, `lastLogLineHoldsTheExitCode`). `--evidence`
+refuses a path outside the repository (test `badAppFlagIsAUsageError`). The app is rebuilt only when the hash of
+the readback sources changes (`NHTSourceHash`), because a rebuild changes the ad-hoc signature and macOS then drops
+the Accessibility and Screen Recording grants (risk R-2, seen 2026-11-16 19:09, brief P0-SIGN-1). A step without a
+grant is NOT READ BACK and names the app that lacks it: `nhetrinh-readback.app` when run as that app, `the terminal
+app` otherwise (`Grant` in `Driver/AppSession.swift`, tests `granteeIsTheAppThatRuns`,
+`missingGrantNamesTheGranteeAndNoPath`). A full run through the app: proven at 21:24 (below).
 
 ## Wanted: one stable local signing identity (written, not run)
 

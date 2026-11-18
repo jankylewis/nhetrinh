@@ -4,6 +4,7 @@ id: NT-NAV-012
 family: NAV
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P5-REVIEW)
 signature: sameFileIgnoresCaseAndNormalization
 source: _app/_Sources/_Nhetrinh/_Browser/Page/Outside/_Downloads.swift (`reserve`)
 source: _app/_Sources/NhetrinhCore/_Navigation/Downloads/_DownloadNamer.swift (`key`)

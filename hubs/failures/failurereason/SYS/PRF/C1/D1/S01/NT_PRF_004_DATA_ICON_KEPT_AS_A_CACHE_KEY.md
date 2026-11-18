@@ -4,6 +4,7 @@ id: NT-PRF-004
 family: PRF
 status: OBSERVED
 date: 2026-11-16
+found_by: development (REVIEW_P2 F3)
 signature: aLargeDataHrefGivesNoIcon
 source: _app/_Sources/NhetrinhCore/Tabs/FaviconURL.swift on p2/sidebar cc8affe (`resolve`: a `data:` href is returned as is)
 source: _app/_Sources/_Nhetrinh/_Browser/Handling/Favicons.swift on cc8affe (`cache`, `missing`: keyed by the icon URL)

@@ -4,6 +4,7 @@ id: NT-TAB-003
 family: TAB
 status: OBSERVED
 date: 2026-11-17
+found_by: self-test (`aLinkFromAnotherAppKeepsTheFolders` red on the P7-MERGE-1 merge)
 signature: aLinkFromAnotherAppKeepsTheFolders
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/_BrowserWindowController.swift (`tabs`: get `tree.allTabs`, set `Tree(tabs:)`)
 source: _app/_Sources/_Nhetrinh/_Browser/Page/Outside/BrowserWindowController+Outside.swift (`openIncoming`, P5)

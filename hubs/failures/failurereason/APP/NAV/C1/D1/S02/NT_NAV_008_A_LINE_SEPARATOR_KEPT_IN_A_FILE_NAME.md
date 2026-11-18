@@ -4,6 +4,7 @@ id: NT-NAV-008
 family: NAV
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P5-REVIEW)
 signature: cleanRemovesLineBreakingSeparators
 source: _app/_Sources/NhetrinhCore/_Navigation/Downloads/_DownloadNamer.swift on e7dccf9 (`clean`)
 source: nhetrinh_wt/REVIEW_P5.md (P5-REVIEW, outside the repository)

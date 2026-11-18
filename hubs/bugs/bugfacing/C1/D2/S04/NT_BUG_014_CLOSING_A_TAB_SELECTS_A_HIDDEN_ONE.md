@@ -4,6 +4,7 @@ id: NT-BUG-014
 family: TAB
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P7 review)
 signature: closingTheSelectedTabSelectsAVisibleTab
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift on p7/prep e0b91ff (`close(at:)`)
 observed: found by the P7 adversarial review (code read, then a test); no user report

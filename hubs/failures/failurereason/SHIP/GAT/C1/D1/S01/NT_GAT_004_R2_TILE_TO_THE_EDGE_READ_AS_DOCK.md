@@ -4,6 +4,7 @@ id: NT-GAT-004
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: development (P0 cross-review, P0-RBK-1, red tests 4ee85bf, 90b8cab)
 signature: R2 the Dock icon has no tile | PASS (with a tile as large as the Dock item)
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift `borderColour` (commit 2e05899: whole border)
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift `borderColour` (commit 4ee85bf: 4 corners)

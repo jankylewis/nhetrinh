@@ -4,6 +4,7 @@ id: NT-PRF-001
 family: PRF
 status: FIXED
 date: 2026-11-16
+found_by: readback (R8 FAIL, app 60.0 MB)
 signature: R8 the lightness budget holds | FAIL | one simple tab (example.com): app 60.0 MB (max 40)
 source: hubs/failures/evidence/readback/_LATEST.md (R8 row)
 source: _app/_Sources/_Nhetrinh/AppDelegate.swift `setDockIcon` (sets `NSApp.applicationIconImage`)

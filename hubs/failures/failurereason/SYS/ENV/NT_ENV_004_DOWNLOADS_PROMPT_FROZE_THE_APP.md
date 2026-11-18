@@ -4,6 +4,7 @@ id: NT-ENV-004
 family: ENV
 status: FIXED
 date: 2026-11-17
+found_by: readback (R31-R34 FAIL, readback 2026-11-16 23:53-23:59)
 signature: R31 FAIL: /download/attachment: no download row (downloads []
 signature: end: the app did not quit within 5 s; the readback ended its own instance
 source: _app/_Sources/_Nhetrinh/_Browser/Page/Outside/_Downloads.swift on p5/downloads 8d7a747 (`decideDestinationUsing`)

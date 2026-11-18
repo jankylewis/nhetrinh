@@ -4,6 +4,7 @@ id: NT-TG-005
 family: GAT
 status: OPEN
 date: 2026-11-16
+found_by: readback (R26a, R26b, readbacks 22:5x)
 signature: Cannot request fullscreen in a hidden document
 signature: the camera was asked in a page WebKit counts as hidden
 source: _app/_Sources/NhetrinhReadback/_Steps/Tabs/Pages/Basics/MediaSteps.swift (R26a, R26b)

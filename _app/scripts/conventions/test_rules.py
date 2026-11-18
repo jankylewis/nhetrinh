@@ -7,9 +7,8 @@ from __future__ import annotations
 
 import unittest
 
-import folders
-import sizes
-import swift
+from rules import _folders as folders
+from rules import sizes, swift
 
 GOOD_TREE = ["a/_core.swift", "a/b.swift", "_a.md", "top.md", ".github/x.yml", ".github/y.yml"]
 

@@ -4,6 +4,7 @@ id: NT-BUG-008
 family: UIX
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P4/P6 review)
 signature: aBooleanIsNotMinutes
 source: _app/_Sources/NhetrinhCore/Prefs/_Prefs.swift on p6/memory 96130c6 (`decode`)
 source: _app/Tests/_NhetrinhCoreTests/Prefs/PrefsReviewTests.swift

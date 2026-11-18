@@ -4,6 +4,7 @@ id: NT-ENV-003
 family: ENV
 status: FIXED
 date: 2026-11-16
+found_by: development (bench runs, a slow first load after a kill)
 signature: first_load 8-10 s for one run, under 1 s for the next
 source: hubs/product/rnd/_bench/_bench.py `wait_clean`
 observed: the Chromium MVP took 8.3 s and 10.7 s to first load right after a kill, then 0.88 s once the old processes were gone

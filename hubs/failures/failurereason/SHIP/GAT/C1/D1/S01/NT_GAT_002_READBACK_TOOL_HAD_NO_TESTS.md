@@ -4,6 +4,7 @@ id: NT-GAT-002
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: development (P0 brief P0-HAR-3: the readback tool had no tests)
 signature: no testTarget depends on NhetrinhReadback
 source: P0 brief P0-HAR-3, 2026-11-16 ("The readback tool has no tests; a test that cannot fail is a defect")
 source: commit 230200c (`_app/Package.swift`: the `NhetrinhReadback` target, no test target for it)
