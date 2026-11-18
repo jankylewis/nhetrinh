@@ -5,7 +5,7 @@ family: UIX
 status: OBSERVED
 date: 2026-11-17
 source: _app/_Sources/NhetrinhCore/Shell/_ToolbarLayout.swift (`leading(zoomMaxX:toolbarMinX:)`, P8-CHROME-1)
-source: _app/_Sources/_Nhetrinh/UI/Bars/ToolbarView+Lights.swift (`placeRow`, `zoomOnScreen`, `watchFullScreen`)
+source: _app/_Sources/_Nhetrinh/UI/Bars/_Toolbar/ToolbarView+Lights.swift (`placeRow`, `zoomOnScreen`, `watchFullScreen`)
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Fix that holds

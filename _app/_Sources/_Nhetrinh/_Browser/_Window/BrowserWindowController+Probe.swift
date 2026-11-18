@@ -32,6 +32,7 @@ extension BrowserWindowController {
         case .commandClickLink: return commandClickFirstLink().map { .failed($0) } ?? .done
         case .download(let row, let item): return pressDownload(row: row, item: item)
         case .window(let item): return windowAnswer(item, menu: menu)
+        case .type, .key: return addressAnswer(request)  // P11-HISTORY: R54
         }
     }
 
@@ -68,6 +69,7 @@ extension BrowserWindowController {
         readSheet(into: &state)
         readDownloads(into: &state)
         readFonts(into: &state)
+        readSuggestions(into: &state)
         return state
     }
 

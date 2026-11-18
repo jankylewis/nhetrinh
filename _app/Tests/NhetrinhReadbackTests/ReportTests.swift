@@ -68,11 +68,11 @@ func homeFolderIsWrittenAsTilde(path: (text: String, written: String)) {
 
 /// D23 (P0-PROBE-FIX gap 4): only R2 uses Accessibility; the header must not say every step does.
 /// P1-FIX-1: it names every probe step, R9-R12 included; P2 adds R13-R18; P8-MIN-1 adds R46, P8-FONT-1 R47,
-/// P8-CHROME-1 R48, P8-GROUPS-1 R49, P8-SIDE-1 R50, P8-ATS-1 R52.
+/// P8-CHROME-1 R48, P8-GROUPS-1 R49, P8-SIDE-1 R50, P8-ATS-1 R52, P11-HISTORY R54.
 @Test func headerSaysHowEachStepActs() {
     let text = Report.text([], app: URL(fileURLWithPath: "/nowhere/nhetrinh.app"))
     #expect(!text.contains("A step acts on the app through the Accessibility API"))
-    #expect(text.contains("R1, R3-R7, R9-R43, R46-R52 act through the app's readback probe "
+    #expect(text.contains("R1, R3-R7, R9-R43, R46-R52, R54 act through the app's readback probe "
                           + "(`NHT_READBACK=1`, D23)"))
     #expect(text.contains("R2 reads the Dock through the Accessibility API") && text.contains("R8"))
 }

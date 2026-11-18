@@ -89,3 +89,26 @@ func sidebarSideAndFramesRoundTrip(side: String, sidebar: [Double], web: [Double
     #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
     #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
 }
+
+// P11-HISTORY (R54): typing and keys in the address field, and the dropdown's rows, come back as sent; a key
+// without a name is malformed; an older app's answer has no rows and no choice.
+@Test(arguments: [ProbeRequest.type("hist"), .type(""), .key("Down"), .key("Return"), .key("Shift-Delete")])
+func addressTypingRoundTrips(request: ProbeRequest) throws {
+    #expect(try ProbeCodec.decodeRequest(ProbeCodec.encode(request)) == request)
+}
+
+@Test(arguments: [#"{"op":"key"}"#, #"{"op":"key","text":""}"#, #"{"op":"type"}"#])
+func aKeyWithoutANameIsMalformed(line: String) {
+    #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
+}
+
+@Test(arguments: [([], nil), (["Alpha — http://127.0.0.1:5/a", "Beta — http://127.0.0.1:5/b — Switch to tab"], 1)]
+      as [([String], Int?)])
+func suggestionsRoundTrip(rows: [String], chosen: Int?) throws {
+    var state = ProbeState()
+    state.suggestions = rows
+    state.suggestionChosen = chosen
+    state.downloads = ["a.zip"]
+    #expect(try ProbeCodec.decodeResponse(ProbeCodec.encode(ProbeResponse.state(state))) == .state(state))
+    #expect(try ProbeCodec.decodeResponse(#"{"op":"state","state":{}}"#) == .state(ProbeState()))
+}

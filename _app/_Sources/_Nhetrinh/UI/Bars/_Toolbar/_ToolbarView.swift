@@ -3,7 +3,8 @@ import NhetrinhCore
 
 /// Toggle Sidebar, back, forward, reload and the address field. While a page loads, reload is stop and a
 /// thin line along the bottom edge shows the progress (P2). The row starts right of the window's traffic
-/// lights when they are over the toolbar (P8-CHROME-1, `ToolbarView+Lights.swift`).
+/// lights when they are over the toolbar (P8-CHROME-1, `ToolbarView+Lights.swift`). Typing opens the history
+/// dropdown under the field (P11-HISTORY, `SuggestionList`, `ToolbarView+Typing.swift`).
 final class ToolbarView: NSView {
     /// The toolbar's Toggle Sidebar button: View > Toggle Sidebar's action (P8-CHROME-1).
     var onToggleSidebar: (() -> Void)?
@@ -16,6 +17,7 @@ final class ToolbarView: NSView {
     var onZoomBadge: (() -> Void)?
 
     let address = NSTextField()
+    let suggestions = SuggestionList()
     /// The toggle's symbol: the sidebar on its side (P8-SIDE-1, `showSide`).
     var toggleSymbol = SidebarSide.left.symbol
     private lazy var toggle = makeButton(toggleSymbol, "Toggle Sidebar", #selector(tapToggle))
@@ -42,6 +44,7 @@ final class ToolbarView: NSView {
         address.focusRingType = .none
         address.target = self
         address.action = #selector(submit)
+        address.delegate = self
         address.setAccessibilityIdentifier("nhetrinh.address")
         AppFont.apply(to: textControls)
         toggle.toolTip = "Toggle Sidebar (⌘S)"
@@ -107,6 +110,7 @@ final class ToolbarView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         watchFullScreen()
+        if let main = superview { suggestions.attach(below: address, in: main) }
     }
 
     override func layout() {

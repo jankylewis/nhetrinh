@@ -46,6 +46,8 @@ public struct Prefs: Equatable, Sendable {
     public var sidebarSide = SidebarSide.left
     /// P9-REMEMBER (D28): keep session cookies (sign-ins) across a quit; a file without the key reads as on.
     public var rememberSignIns = true
+    /// P11-HISTORY (D30): keep the visited pages for the address bar; off records nothing. Missing: on.
+    public var rememberHistory = true
 
     public init() {}
 
@@ -64,6 +66,7 @@ public struct Prefs: Equatable, Sendable {
         prefs.appearance = (object["appearance"] as? String).flatMap(Appearance.init(rawValue:)) ?? .system
         prefs.sidebarSide = (object["sidebarSide"] as? String).flatMap(SidebarSide.init(rawValue:)) ?? .left
         prefs.rememberSignIns = flag(object["rememberSignIns"]) ?? true
+        prefs.rememberHistory = flag(object["rememberHistory"]) ?? true
         if let minutes = number(object["idleUnloadMinutes"]).flatMap(Int.init(exactly:)), minutes >= 1 {
             prefs.idleUnloadMinutes = minutes
         }
@@ -88,7 +91,8 @@ public struct Prefs: Equatable, Sendable {
     public func encoded() throws -> Data {
         let object: [String: Any] = ["zoom": zoom, "searchEngine": searchEngine.rawValue,
                                      "idleUnloadMinutes": idleUnloadMinutes, "appearance": appearance.rawValue,
-                                     "sidebarSide": sidebarSide.rawValue, "rememberSignIns": rememberSignIns]
+                                     "sidebarSide": sidebarSide.rawValue, "rememberSignIns": rememberSignIns,
+                                     "rememberHistory": rememberHistory]
         return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .prettyPrinted])
     }
 }

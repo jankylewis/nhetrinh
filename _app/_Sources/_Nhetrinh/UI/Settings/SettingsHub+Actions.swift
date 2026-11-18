@@ -36,6 +36,13 @@ extension SettingsHub {
         onChange? { $0.rememberSignIns = on }
     }
 
+    /// P11-HISTORY: on keeps the visited pages for the address bar; off keeps none (the kept ones stay until
+    /// Clear All) and the dropdown lists the open tabs only.
+    @objc func historyToggled() {
+        let on = keepHistory.state == .on
+        onChange? { $0.rememberHistory = on }
+    }
+
     /// Clear Website Data…: a sheet asks first. Cancel is the default button; nothing is removed without a choice.
     /// The buttons and what each removes: `ClearRange` (unit tested: R30 cannot tell them apart, F1).
     @objc func askToClear() {
@@ -52,12 +59,13 @@ extension SettingsHub {
     }
 
     /// One of the sheet's ranges: the website data since its date, and with Clear All the per-site settings and
-    /// the kept sign-ins (P9-REMEMBER).
+    /// the kept sign-ins (P9-REMEMBER) and the history (P11-HISTORY).
     func clear(_ range: ClearRange) {
         removeData(since: range.since(now: Date()))
         guard range.forgetsSiteSettings else { return }
         onChange? { $0.forgetSites() }
         onForgetSignIns?()
+        onForgetHistory?()
     }
 
     private func removeData(since date: Date) {
@@ -77,10 +85,11 @@ extension SettingsHub {
         case "Unload idle tabs after":
             minutes.stringValue = value
             return minutes.sendAction(minutes.action, to: minutes.target)
-        case Self.rememberTitle:  // "on" or "off", as a click sets the box
+        case Self.rememberTitle, Self.historyTitle:  // "on" or "off", as a click sets the box
             guard value == "on" || value == "off" else { return false }
-            remember.state = value == "on" ? .on : .off
-            return remember.sendAction(remember.action, to: remember.target)
+            let box = name == Self.rememberTitle ? remember : keepHistory
+            box.state = value == "on" ? .on : .off
+            return box.sendAction(box.action, to: box.target)
         default: return false
         }
     }

@@ -39,6 +39,11 @@ public enum ProbeRequest: Equatable, Sendable {
     case download(row: Int, item: String)
     /// The browser window: "Minimize" is Window > Minimize performed on it; "Restore" (P8-MIN-1).
     case window(String)
+    /// P11-HISTORY (R54): `text` typed into the address field as a user types it (the field takes the focus of
+    /// the window, the text replaces the field's), so the dropdown opens; nothing is submitted.
+    case type(String)
+    /// P11-HISTORY (R54): a key in the address field: "Down", "Up", "Return", "Escape" or "Shift-Delete".
+    case key(String)
 }
 
 public enum ProbeResponse: Equatable, Sendable {

@@ -77,6 +77,9 @@ public struct ProbeState: Equatable, Sendable {
     public var toggleSymbol = ""
     public var sidebarFrame: [Double] = []
     public var webFrame: [Double] = []
+    /// P11-HISTORY: the address bar's dropdown rows as they read ("title — url"; [] when closed), the chosen one.
+    public var suggestions: [String] = []
+    public var suggestionChosen: Int?
 
     public init() {}
 }
@@ -91,12 +94,11 @@ extension ProbeState {
                                      "sheetButtons": sheetButtons, "sheetsShown": sheetsShown, "handedOff": handedOff,
                                      "fullscreen": fullscreen, "active": active, "findShown": findShown,
                                      "findResult": findResult, "zoomBadge": zoomBadge, "appearance": appearance,
-                                     "hubShown": hubShown, "downloads": downloads,
-                                     "downloadStates": downloadStates, "revealed": revealed,
-                                     "minimized": minimized, "fonts": fonts, "toolbarFrames": toolbarFrames]
+                                     "hubShown": hubShown, "minimized": minimized, "fonts": fonts,
+                                     "toolbarFrames": toolbarFrames]
         if let selected { object["selected"] = selected }
         if let zoomMaxX { object["zoomMaxX"] = zoomMaxX }
-        return object.merging(groupObject) { first, _ in first }.merging(sideObject) { first, _ in first }
+        return [groupObject, sideObject, barsObject].reduce(object) { $0.merging($1) { first, _ in first } }
     }
 
     /// A field that is missing or of another type keeps its default: the readback then sees it.
@@ -125,7 +127,7 @@ extension ProbeState {
         zoomBadge = object["zoomBadge"] as? String ?? ""
         appearance = object["appearance"] as? String ?? ""
         hubShown = object["hubShown"] as? Bool ?? false
-        readDownloads(object)
+        readBars(object)
         readGroups(object)
         readSide(object)
     }
@@ -138,11 +140,5 @@ extension ProbeState {
         zoomMaxX = object["zoomMaxX"] as? Double
         sidebarWidth = object["sidebarWidth"] as? Double ?? 0
         addressShown = object["addressShown"] as? Bool ?? false
-    }
-
-    private mutating func readDownloads(_ object: [String: Any]) {
-        downloads = object["downloads"] as? [String] ?? []
-        downloadStates = object["downloadStates"] as? [String] ?? []
-        revealed = object["revealed"] as? [String] ?? []
     }
 }

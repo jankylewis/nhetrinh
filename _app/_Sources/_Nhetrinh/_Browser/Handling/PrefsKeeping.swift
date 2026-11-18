@@ -53,11 +53,13 @@ extension BrowserWindowController {
         Screen.presenter.show(hub)  // on screen only in the launched app (P8-TESTWIN-1)
     }
 
-    /// `hub` becomes the browser's: its changes are applied and saved; Clear All forgets the kept sign-ins.
+    /// `hub` becomes the browser's: its changes are applied and saved; Clear All forgets the kept sign-ins and
+    /// the history.
     func wire(_ hub: SettingsHub) {
         self.hub = hub
         hub.onChange = { [weak self] change in self?.updatePrefs(change) }
         hub.onForgetSignIns = { [weak self] in self?.signIns?.forget() }
+        hub.onForgetHistory = { [weak self] in self?.forgetHistory() }  // P11-HISTORY
         hub.show(prefs)
     }
 }

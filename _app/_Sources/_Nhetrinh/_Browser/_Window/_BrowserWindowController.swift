@@ -33,6 +33,8 @@ final class BrowserWindowController: NSWindowController {
     var sidebarWidth = Session.defaultSidebarWidth
     /// P9-REMEMBER (`../Lifecycle/SignInKeeping.swift`): this launch's sign-in keeper (nil: a measurement run).
     var signIns: SignInKeeper?
+    /// P11-HISTORY (`Chrome/AddressBar.swift`): the visited pages and the address bar's dropdown.
+    let history = HistoryKeeper()
     /// P2 (`../Handling/`): tabs to reopen, site icons, where the next background tab goes (nil: after the selected).
     var closedTabs = ClosedTabs()
     let favicons = Favicons()

@@ -27,6 +27,8 @@ public enum ProbeCodec {
         case .commandClickLink: return try line(["op": "commandClickLink"])
         case .download(let row, let item): return try line(["op": "download", "index": row, "text": item])
         case .window(let item): return try line(["op": "window", "text": item])
+        case .type(let text): return try line(["op": "type", "text": text])
+        case .key(let name): return try line(["op": "key", "text": name])
         }
     }
 
@@ -48,9 +50,7 @@ public enum ProbeCodec {
         case ("front", _, _): return .front
         case ("pressure", let text, _): return .pressure(try level(text, of: line))
         case ("find", .some(let text), _): return .find(text)
-        case ("setting", .some(let value), _):
-            guard let name = object["name"] as? String, !name.isEmpty else { throw Failure.malformed(line) }
-            return .setting(name: name, value: value)
+        case ("setting", .some(let value), _): return try setting(value, object: object, line: line)
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
         case (let op, .some(let item), .some(let row)) where ["rowMenu", "download"].contains(op) && row >= 0
             && !item.isEmpty: return op == "download" ? .download(row: row, item: item) : .rowMenu(row: row, item: item)
@@ -63,6 +63,8 @@ public enum ProbeCodec {
         case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
         case ("commandClickLink", _, _): return .commandClickLink
         case ("window", .some(let item), _) where !item.isEmpty: return .window(item)
+        case ("type", .some(let text), _): return .type(text)
+        case ("key", .some(let name), _) where !name.isEmpty: return .key(name)
         case ("menu", _, _): return .menu(try path(object, of: line))
         default: throw Failure.malformed(line)
         }
@@ -76,6 +78,11 @@ public enum ProbeCodec {
         case ("failed", _, .some(let reason)): return .failed(reason)
         default: throw Failure.malformed(line)
         }
+    }
+
+    private static func setting(_ value: String, object: [String: Any], line: String) throws -> ProbeRequest {
+        guard let name = object["name"] as? String, !name.isEmpty else { throw Failure.malformed(line) }
+        return .setting(name: name, value: value)
     }
 
     /// A menu item's path; a missing or empty one is malformed.

@@ -7,12 +7,15 @@ import Foundation
 ///   /cookie/session       sets the session cookie (no expiry) `nhetrinh_signin=readback`: "session: set" (R51)
 ///   /cookie/session/read  "session: readback", or "session: none" (R51)
 ///   /scheme        `prefers-color-scheme`, and its changes: "scheme: dark", "scheme: light" (R30a)
+///   /history/alpha, /history/beta   two pages with a title of their own for the history dropdown (R54)
 enum ToolPages {
     static let findTitle = "find test"
     static let cookieSetTitle = "cookie: set"
     static let cookieTitle = "cookie: nhetrinh=readback"
     static let noCookieTitle = "cookie: none"
     static let sessionSetTitle = "session: set"
+    /// R54's pages: their titles, by path.
+    static let historyPages = ["/history/alpha": "nhetrinh history alpha", "/history/beta": "nhetrinh history beta"]
 
     /// What /cookie/session/read shows: whether the session cookie is there (R51).
     static func sessionTitle(kept: Bool) -> String { "session: \(kept ? "readback" : "none")" }
@@ -21,6 +24,9 @@ enum ToolPages {
 
     static func reply(path: String) -> TestPageContent.Reply? {
         switch path {
+        case let path where historyPages[path] != nil:
+            let title = historyPages[path] ?? ""
+            return TestPageContent.html("<title>\(title)</title><p>\(title)</p>")
         case "/find": return TestPageContent.html("<title>\(findTitle)</title><p>Example words for the find bar</p>")
         case "/cookie/set":
             return script("document.cookie = 'nhetrinh=readback; max-age=3600; path=/'; "

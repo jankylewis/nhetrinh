@@ -6,6 +6,7 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {  // force: WebKit's signature
         Bench.reportFirstLoad()
         findIcon(of: webView)
+        recordVisit(in: webView, navigation: navigation)  // P11-HISTORY
     }
 
     /// A page committed: its host's zoom (P4).

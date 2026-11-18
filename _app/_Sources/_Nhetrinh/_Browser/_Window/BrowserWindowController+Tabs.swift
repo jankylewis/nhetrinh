@@ -8,6 +8,7 @@ extension BrowserWindowController {
     func openInitialTabs() {
         defer { Bench.startPolling { [weak self] in self?.current } }
         loadPrefs(from: Self.sessionFolder())
+        keepHistory(in: Self.sessionFolder())  // P11-HISTORY: the profile's folder once P10 lands
         if let folder = Self.sessionFolder(), let home = Self.homeURL {
             openSavedSession(in: folder, home: home)
             return
@@ -125,6 +126,7 @@ extension BrowserWindowController {
         let tab = tabs[selected]
         tab.url = url
         tab.savedState = nil  // a new address replaces the history kept at unload
+        markTyped()  // P11-HISTORY: typed or picked in the address bar
         if let webView = tab.webView {
             webView.load(URLRequest(url: url))
         } else {

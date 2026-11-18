@@ -12,7 +12,7 @@ extension BrowserWindowController {
         guard ErrorPage.shows(error) else { return }
         let html = ErrorPage.html(for: error)
         if let url = ErrorPage.failingURL(of: error) {
-            webView.loadSimulatedRequest(URLRequest(url: url), responseHTML: html)
+            errorPageLoads(webView.loadSimulatedRequest(URLRequest(url: url), responseHTML: html))  // never kept
         } else {
             webView.loadHTMLString(html, baseURL: nil)
         }

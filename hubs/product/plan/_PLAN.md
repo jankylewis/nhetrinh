@@ -90,7 +90,7 @@ accepts a new number (recorded in `DECISIONS.md`).
 
 ## Not in v1 (only when the headmate asks)
 
-Bookmarks, history list, address-bar suggestions, extensions, sync, password manager,
+Bookmarks, history list, extensions, sync, password manager,
 private window, more than one window, reader mode, content blocker, Intel build, notarization.
 
 ## How this plan changes
