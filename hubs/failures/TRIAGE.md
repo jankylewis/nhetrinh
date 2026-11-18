@@ -59,3 +59,4 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-NAV-011 | development | `isRunning(entry)` | OBSERVED | A cancel while the name is chosen? P5-FIX-1 (p5/review) |
 | NT-NAV-012 | development | `sameFileIgnoresCaseAndNormalization` | OBSERVED | Two spellings of one name? P5-FIX-1 (p5/review) |
 | NT-NAV-013 | readback | `aDownloadSaysWhereItCameFrom` | OBSERVED | Finder's "Where from" blank? Is `com.apple.metadata:kMDItemWhereFroms` on the file? The quarantine drops its URLs on this macOS (P5-FIX-2) |
+| NT-BLD-005 | headmate | `NSURLErrorDomain -1022` | OBSERVED | No `NSAppTransportSecurity` in the built Info.plist? ATS refuses plain http but localhost and IP addresses (unqualified and `.local` names too: recalled, not proven) |
