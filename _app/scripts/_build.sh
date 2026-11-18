@@ -16,10 +16,11 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/Nhetrinh" "$APP/Contents/MacOS/nhetrinh"
 strip -x "$APP/Contents/MacOS/nhetrinh"
-EXPORTS=$(nm -gU "$APP/Contents/MacOS/nhetrinh" | wc -l | tr -d ' ')
+# Every Mach-O executable carries __mh_execute_header; older linkers list it as exported.
+EXPORTS=$(nm -gU "$APP/Contents/MacOS/nhetrinh" | grep -vc ' __mh_execute_header$' || true)
 if (( EXPORTS != 0 )); then
   echo "error: the app exports $EXPORTS symbols; 0 expected (NT-PRF-005):" >&2
-  nm -gU "$APP/Contents/MacOS/nhetrinh" >&2
+  nm -gU "$APP/Contents/MacOS/nhetrinh" | grep -v ' __mh_execute_header$' >&2
   exit 1
 fi
 cp assets/_icon/bundle/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
