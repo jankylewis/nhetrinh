@@ -48,3 +48,10 @@ grid drawn at 1024 equals the master; it fails on the old iconset (`icon_128x128
 16, 32, 64: 4 of 4 pixel-identical to the old files. `_DockIcon.png`: byte-identical, unchanged.
 `AppIcon.icns` 343577 -> 147081 B; bundle (`du -sk`, release build) 792 -> 600 KB.
 The look changes at 128, 256 and 512 px only: hard pixels like the 1024 master, no longer blurred.
+
+## CI, 2026-11-18: one export on the macos-15 runner
+
+PR #7 CI failed: `the app exports 1 symbols`. The check now names them: `T __mh_execute_header`,
+the Mach-O header every executable carries. The macos-15 linker lists it as exported, the local
+toolchain (Swift 6.4.2) does not. It is not an API we export, so `_build.sh` leaves that one
+symbol out of the count and prints any other export by name.
