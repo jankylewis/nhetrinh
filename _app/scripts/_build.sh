@@ -5,13 +5,24 @@ cd "${0:A:h}/.."
 VERSION=$(cat scripts/VERSION)
 # The commit this build comes from; "+" marks files changed since that commit (the readback reports it).
 COMMIT="$(git rev-parse --short HEAD)$(git diff --quiet HEAD -- . || echo +)"
-swift build -c release --arch arm64 --product Nhetrinh
+# Size (NT-PRF-005): -Osize, and no exported symbols (an app has no plugins: NhetrinhCore's `public`
+# API need not be exported). SwiftPM's release link already passes -dead_strip. NHT_OPT=-O compares.
+OPT=${NHT_OPT:--Osize}
+[[ "$OPT" == "-Osize" || "$OPT" == "-O" ]] || { echo "error: NHT_OPT is -Osize or -O, not $OPT" >&2; exit 1; }
+swift build -c release --arch arm64 --product Nhetrinh -Xswiftc "$OPT" -Xlinker -no_exported_symbols
 BIN=$(swift build -c release --arch arm64 --show-bin-path)
 APP=build/nhetrinh.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/Nhetrinh" "$APP/Contents/MacOS/nhetrinh"
 strip -x "$APP/Contents/MacOS/nhetrinh"
+# Every Mach-O executable carries __mh_execute_header; older linkers list it as exported.
+EXPORTS=$(nm -gU "$APP/Contents/MacOS/nhetrinh" | grep -vc ' __mh_execute_header$' || true)
+if (( EXPORTS != 0 )); then
+  echo "error: the app exports $EXPORTS symbols; 0 expected (NT-PRF-005):" >&2
+  nm -gU "$APP/Contents/MacOS/nhetrinh" | grep -v ' __mh_execute_header$' >&2
+  exit 1
+fi
 cp assets/_icon/bundle/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 # The app decodes this PNG for the Dock at launch: 1024 px cost 33 MB, 256 px nothing (NT-PRF-001).
 DOCK=assets/_icon/bundle/_DockIcon.png

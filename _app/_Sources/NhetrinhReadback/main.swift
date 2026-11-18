@@ -1,7 +1,7 @@
 import Foundation
 
 // nhetrinh-readback: use the installed app as its end user and say what happened, step by step.
-// R1, R3-R7 and R9-R26b go through the app's readback probe (D23) and need no permission: they run from any
+// R1, R3-R7 and R9-R30a go through the app's readback probe (D23) and need no permission: they run from any
 // terminal. R2 reads the Dock: it needs Accessibility and Screen Recording (NT-TG-003).
 //
 //   swift run nhetrinh-readback                     every step, on ~/Applications/nhetrinh.app;
@@ -31,7 +31,7 @@ if let log = Options.logPath(CommandLine.arguments) {
     dup2(handle.fileDescriptor, STDERR_FILENO)
     setvbuf(stdout, nil, _IOLBF, 0)
 }
-let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicSteps.all
+let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicSteps.all + ToolSteps.all
 let options: Options
 do {
     options = try Options(CommandLine.arguments, known: Set(allSteps.map(\.id)))
@@ -46,6 +46,7 @@ guard FileManager.default.fileExists(atPath: options.app.path) else {
 }
 // Every run starts without a saved session of the readback profile (P1), so R1 sees one home tab.
 LifecycleSteps.forgetSession()
+ToolSteps.forgetPrefs()  // and without its prefs (P4): no zoom, engine or look of an earlier run
 let kept = options.keepsEvidence ? options.evidence ?? evidenceFolder() : nil
 let session = AppSession(appURL: options.app)
 session.keepCapture = options.keepCapture

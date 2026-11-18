@@ -8,6 +8,11 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
         findIcon(of: webView)
     }
 
+    /// A page committed: its host's zoom (P4).
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {  // force: WebKit's signature
+        applySavedZoom(to: webView)
+    }
+
     /// ⌘-click on a link: the page stays, the link opens in a background tab (P2).
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {

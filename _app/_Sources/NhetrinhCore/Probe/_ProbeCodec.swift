@@ -23,6 +23,10 @@ public enum ProbeRequest: Equatable, Sendable {
     case sheetField(index: Int, text: String)
     /// Bring nhetrinh to the front and take the focus: only R26a and R26b, only with `--allow-focus` (D25).
     case front
+    /// The find bar's field: `text` typed, then Return, as a user searches (P4, R27).
+    case find(String)
+    /// The Settings Hub's control `name` set to `value` as a user picks it ("Search engine", "DuckDuckGo") (P4).
+    case setting(name: String, value: String)
     /// A middle click on a sidebar row (R13).
     case middleClick(row: Int)
     /// A ⌘-click on the first link in the selected page (R17).
@@ -55,6 +59,8 @@ public enum ProbeCodec {
         case .sheetButton(let label): return try line(["op": "sheetButton", "text": label])
         case .sheetField(let index, let text): return try line(["op": "sheetField", "index": index, "text": text])
         case .front: return try line(["op": "front"])
+        case .find(let text): return try line(["op": "find", "text": text])
+        case .setting(let name, let value): return try line(["op": "setting", "name": name, "text": value])
         case .middleClick(let row): return try line(["op": "middleClick", "index": row])
         case .commandClickLink: return try line(["op": "commandClickLink"])
         }
@@ -76,6 +82,10 @@ public enum ProbeCodec {
         case ("newTab", _, _): return .newTab
         case ("closeTab", _, _): return .closeTab
         case ("front", _, _): return .front
+        case ("find", .some(let text), _): return .find(text)
+        case ("setting", .some(let value), _):
+            guard let name = object["name"] as? String, !name.isEmpty else { throw Failure.malformed(line) }
+            return .setting(name: name, value: value)
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
         case ("rowMenu", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
             return .rowMenu(row: row, item: item)

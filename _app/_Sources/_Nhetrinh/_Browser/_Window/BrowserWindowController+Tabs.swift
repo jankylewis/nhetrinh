@@ -7,6 +7,7 @@ extension BrowserWindowController {
     /// The saved session (P1), or with NHT_BENCH_URLS the seeded tabs (no session read or written).
     func openInitialTabs() {
         defer { Bench.startPolling { [weak self] in self?.current } }
+        loadPrefs(from: Self.sessionFolder())
         if let folder = Self.sessionFolder(), let home = Self.homeURL {
             openSavedSession(in: folder, home: home)
             return
@@ -59,6 +60,7 @@ extension BrowserWindowController {
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        webView.allowsMagnification = true  // pinch (P4); not kept per site, View > Zoom is
         if #available(macOS 13.3, *) { webView.isInspectable = true }  // Safari's Develop menu (DECISIONS.md Q3)
         tab.webView = webView
         observe(webView, for: tab)
@@ -113,7 +115,8 @@ extension BrowserWindowController {
 
     /// Address bar text: go to the URL, or search for the words.
     func navigate(_ text: String) {
-        guard let url = AddressParser.url(from: text), tabs.indices.contains(selected) else { return }
+        guard let url = AddressParser.url(from: text, engine: prefs.searchEngine),
+              tabs.indices.contains(selected) else { return }
         let tab = tabs[selected]
         tab.url = url
         tab.savedState = nil  // a new address replaces the history kept at unload

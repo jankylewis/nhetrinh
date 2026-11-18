@@ -8,11 +8,20 @@ final class ToolbarView: NSView {
     var onReload: (() -> Void)?
     var onStop: (() -> Void)?
     var onSubmit: ((String) -> Void)?
+    /// The zoom badge pressed: back to 100 % (P4).
+    var onZoomBadge: (() -> Void)?
 
     let address = NSTextField()
     private lazy var back = makeButton("chevron.left", "Back", #selector(tapBack))
     private lazy var forward = makeButton("chevron.right", "Forward", #selector(tapForward))
     private lazy var reload = makeButton("arrow.clockwise", "Reload", #selector(tapReload))
+    private lazy var zoomBadge: NSButton = {
+        let badge = NSButton(title: "", target: self, action: #selector(tapZoomBadge))
+        badge.bezelStyle = .inline
+        badge.isHidden = true
+        badge.toolTip = "Actual Size"
+        return badge
+    }()
     private let progressLine = NSView()
     private var loading = false
     private var progress = 0.0
@@ -26,7 +35,7 @@ final class ToolbarView: NSView {
         address.action = #selector(submit)
         address.setAccessibilityIdentifier("nhetrinh.address")
 
-        let row = NSStackView(views: [back, forward, reload, address])
+        let row = NSStackView(views: [back, forward, reload, address, zoomBadge])
         row.spacing = 6
         row.translatesAutoresizingMaskIntoConstraints = false
         addSubview(row)
@@ -52,6 +61,16 @@ final class ToolbarView: NSView {
         }
     }
 
+    /// The zoom badge in the address bar: "125 %"; hidden at 100 % (nil).
+    func showZoom(_ badge: String?) {
+        zoomBadge.title = badge ?? ""
+        zoomBadge.isHidden = badge == nil
+    }
+
+    /// The badge as it reads; "" when hidden.
+    var zoomText: String { zoomBadge.isHidden ? "" : zoomBadge.title }
+
+    @objc private func tapZoomBadge() { onZoomBadge?() }
     @objc private func tapBack() { onBack?() }
     @objc private func tapForward() { onForward?() }
     /// The reload button's label as it reads now: "Reload", or "Stop" while the page loads.
