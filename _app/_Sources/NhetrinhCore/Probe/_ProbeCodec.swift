@@ -15,6 +15,14 @@ public enum ProbeRequest: Equatable, Sendable {
     case linkMenu(item: String)
     /// A toolbar button by its label ("Stop"), pressed (R18).
     case button(String)
+    /// A left click on the first element the CSS selector finds in the selected page (P3).
+    case click(String)
+    /// The window's sheet: press its button `label` (P3: a page dialog, the open or print panel).
+    case sheetButton(String)
+    /// The window's sheet: type `text` into its text field `index` (0 first), as a user replaces it (P3).
+    case sheetField(index: Int, text: String)
+    /// Bring nhetrinh to the front and take the focus: only R26a and R26b, only with `--allow-focus` (D25).
+    case front
     /// A middle click on a sidebar row (R13).
     case middleClick(row: Int)
     /// A ⌘-click on the first link in the selected page (R17).
@@ -43,6 +51,10 @@ public enum ProbeCodec {
         case .rowMenu(let row, let item): return try line(["op": "rowMenu", "index": row, "text": item])
         case .linkMenu(let item): return try line(["op": "linkMenu", "text": item])
         case .button(let label): return try line(["op": "button", "text": label])
+        case .click(let selector): return try line(["op": "click", "text": selector])
+        case .sheetButton(let label): return try line(["op": "sheetButton", "text": label])
+        case .sheetField(let index, let text): return try line(["op": "sheetField", "index": index, "text": text])
+        case .front: return try line(["op": "front"])
         case .middleClick(let row): return try line(["op": "middleClick", "index": row])
         case .commandClickLink: return try line(["op": "commandClickLink"])
         }
@@ -63,11 +75,16 @@ public enum ProbeCodec {
         case ("navigate", .some(let text), _): return .navigate(text)
         case ("newTab", _, _): return .newTab
         case ("closeTab", _, _): return .closeTab
+        case ("front", _, _): return .front
         case ("select", _, .some(let index)) where index >= 0: return .select(index)
         case ("rowMenu", .some(let item), .some(let row)) where row >= 0 && !item.isEmpty:
             return .rowMenu(row: row, item: item)
         case ("linkMenu", .some(let item), _) where !item.isEmpty: return .linkMenu(item: item)
         case ("button", .some(let label), _) where !label.isEmpty: return .button(label)
+        case ("click", .some(let selector), _) where !selector.isEmpty: return .click(selector)
+        case ("sheetButton", .some(let label), _) where !label.isEmpty: return .sheetButton(label)
+        case ("sheetField", .some(let text), .some(let index)) where index >= 0:
+            return .sheetField(index: index, text: text)
         case ("middleClick", _, .some(let row)) where row >= 0: return .middleClick(row: row)
         case ("commandClickLink", _, _): return .commandClickLink
         case ("menu", _, _):

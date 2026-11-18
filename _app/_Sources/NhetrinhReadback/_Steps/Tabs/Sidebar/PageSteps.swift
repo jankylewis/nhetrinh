@@ -4,7 +4,7 @@ import NhetrinhCore
 /// R16 to R18: the site icon in its row, a link in a background tab (menu and ⌘-click), Stop.
 enum PageSteps {
     /// A fresh start, then `path` of the test pages typed in the address bar; waits for `title` if given.
-    private static func openTest(_ app: AppSession, _ path: String, title: String?) throws -> String {
+    static func openTest(_ app: AppSession, _ path: String, title: String?) throws -> String {
         let url = try LifecycleSteps.pages().url(path)
         try LifecycleSteps.freshStart(app)
         try app.act(.navigate(url), "address bar: \(path), Return")

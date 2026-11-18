@@ -32,6 +32,7 @@ extension BrowserWindowController {
     func select(_ index: Int) {
         guard tabs.indices.contains(index) else { return }
         if tabs.indices.contains(selected) {
+            if selected != index { endSheets(of: tabs[selected].webView) }  // a page's sheet ends with it (S1)
             tabs[selected].webView?.removeFromSuperview()
             tabs[selected].lastActive = Date()  // idle from the moment it is left
         }
@@ -58,6 +59,7 @@ extension BrowserWindowController {
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
+        if #available(macOS 13.3, *) { webView.isInspectable = true }  // Safari's Develop menu (DECISIONS.md Q3)
         tab.webView = webView
         observe(webView, for: tab)
         guard adopted == nil else { return }
@@ -92,6 +94,7 @@ extension BrowserWindowController {
     func close(at index: Int) {
         guard tabs.indices.contains(index) else { return }
         let tab = tabs[index]
+        endSheets(of: tab.webView)  // S1
         tab.unload()
         if let url = tab.url { closedTabs.push(ClosedTab(url: url, title: tab.title, index: index)) }
         tabs.remove(at: index)

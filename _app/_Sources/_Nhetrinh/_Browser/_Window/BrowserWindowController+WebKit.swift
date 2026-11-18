@@ -1,7 +1,7 @@
 import WebKit
 
-/// WebKit callbacks: page events, popups, links for a background tab, and failures (logged; the error
-/// page comes with P3).
+/// WebKit callbacks: page events, popups, links for a background tab, links to other apps, failures.
+/// P3's dialogs, panels, sign-in and error page are in `../Page/`.
 extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {  // force: WebKit's signature
         Bench.reportFirstLoad()
@@ -11,6 +11,10 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     /// ⌘-click on a link: the page stays, the link opens in a background tab (P2).
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        let followed = action.navigationType == .linkActivated || action.targetFrame?.isMainFrame != false
+        if let url = action.request.url, leaves(url, from: webView, asked: followed) {
+            return decisionHandler(.cancel)
+        }
         if action.navigationType == .linkActivated, action.modifierFlags.contains(.command),
            let url = action.request.url, Self.opensInBackground(url) {
             decisionHandler(.cancel)
@@ -23,11 +27,13 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!,  // force: WebKit's
                  withError error: Error) {
         Log.web.error("load failed before the page started: \(error.localizedDescription, privacy: .public)")
+        showErrorPage(for: error, in: webView)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!,  // force: WebKit's signature
                  withError error: Error) {
         Log.web.error("load failed: \(error.localizedDescription, privacy: .public)")
+        showErrorPage(for: error, in: webView)
     }
 
     /// target=_blank and window.open become a new tab that adopts the web view WebKit asks for.
@@ -35,6 +41,7 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
     /// loads when it is first selected, so WebKit gets no web view (P2).
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for action: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if let url = action.request.url, leaves(url, from: webView, asked: true) { return nil }
         let menuAsked = (webView as? BrowserWebView)?.takesBackgroundOpen() ?? false
         if menuAsked || action.modifierFlags.contains(.command), let url = action.request.url,
            Self.opensInBackground(url) {

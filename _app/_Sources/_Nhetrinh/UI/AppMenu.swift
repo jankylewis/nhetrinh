@@ -21,6 +21,8 @@ enum AppMenu {
             item("Reopen Closed Tab", #selector(BrowserWindowController.reopenClosedTab(_:)), "T", browser),
             item("Close Tab", #selector(BrowserWindowController.closeTab(_:)), "w", browser),
             item("Open Location", #selector(BrowserWindowController.focusAddress(_:)), "l", browser),
+            .separator(),
+            item("Print…", #selector(BrowserWindowController.printPage(_:)), "p", browser),
         ])
     }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-/// What the readback's local test server answers (R9-R18): never a site on the Internet.
+/// What the readback's local test server answers (R9-R26b): never a site on the Internet.
 ///   /page/<n>      a page titled "nhetrinh test <n>"
 ///   /play          a page that plays /silence.wav in a loop; its title says when it plays
 ///   /silence.wav   2 s of silence (digital zero: nothing is heard on the shared machine)
@@ -9,6 +9,7 @@ import Foundation
 ///   /noicon        a page whose `<link rel="icon">` is /missing.png, which answers 404: no icon (R16)
 ///   /links         a page with one link, to /page/5 (R17)
 ///   /slow          a page that answers after 30 s, so it is still loading when R18 presses Stop
+///   P3 pages (R19-R26b): `BasicPages`
 enum TestPageContent {
     struct Reply: Equatable {
         var status = "200 OK"
@@ -31,7 +32,8 @@ enum TestPageContent {
     static func title(page: Int) -> String { "nhetrinh test \(page)" }
 
     /// The reply to `GET path` with an optional `Range: bytes=a-b` (WebKit asks media by range).
-    static func reply(path: String, range: String? = nil) -> Reply {
+    static func reply(path: String, range: String? = nil, authorization: String? = nil) -> Reply {
+        if let basic = BasicPages.reply(path: path, authorization: authorization) { return basic }
         if path.hasPrefix("/page/"), let page = Int(path.dropFirst(6)) {
             return html("<title>\(title(page: page))</title><p>nhetrinh readback test page \(page)</p>")
         }
@@ -59,7 +61,7 @@ enum TestPageContent {
         </script>
         """
 
-    private static func html(_ body: String) -> Reply {
+    static func html(_ body: String) -> Reply {
         Reply(body: Data(("<!doctype html><meta charset=\"utf-8\">" + body).utf8))
     }
 

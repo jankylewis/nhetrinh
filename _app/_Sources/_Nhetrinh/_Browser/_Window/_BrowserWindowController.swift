@@ -23,6 +23,8 @@ final class BrowserWindowController: NSWindowController {
     var closedTabs = ClosedTabs()
     let favicons = Favicons()
     var backgroundSlot: Int?
+    /// P3 (`../Page/`): the sheets a page asks for, site permissions, links handed to other apps.
+    let sheets = Sheets()
 
     init() {
         let window = NSWindow(

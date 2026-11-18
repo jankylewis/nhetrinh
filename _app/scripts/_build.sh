@@ -34,6 +34,10 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHighResolutionCapable</key><true/>
+  <key>NSCameraUsageDescription</key>
+  <string>A website asks to use the camera. nhetrinh asks you first, for each site.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>A website asks to use the microphone. nhetrinh asks you first, for each site.</string>
 </dict></plist>
 PLIST
 codesign --force --sign - "$APP"

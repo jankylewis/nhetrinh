@@ -4,7 +4,7 @@ id: NT-BUG-001
 family: NAV
 status: FIXED
 date: 2026-11-16
-source: _app/_Sources/NhetrinhCore/_AddressParser.swift `queryValueAllowed`
+source: _app/_Sources/NhetrinhCore/_Navigation/_AddressParser.swift `queryValueAllowed`
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Change

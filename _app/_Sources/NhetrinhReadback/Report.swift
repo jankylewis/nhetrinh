@@ -4,7 +4,9 @@ import Foundation
 /// hubs/failures/evidence/readback/_LATEST.md after a full run on the installed app.
 enum Report {
     /// `ending`: how the run's own app instance ended (NT-TG-004); nil says nothing about it.
-    static func text(_ results: [StepResult], app: URL, ending: QuitOutcome? = nil) -> String {
+    /// `allowFocus`: the run had `--allow-focus` (D25); the header says so.
+    static func text(_ results: [StepResult], app: URL, ending: QuitOutcome? = nil,
+                     allowFocus: Bool = false) -> String {
         let failed = results.filter { $0.verdict == .fail }.count
         let skipped = results.filter { $0.verdict == .notReadBack }.count
         let passed = results.count - failed - skipped
@@ -21,10 +23,12 @@ enum Report {
                 + "built from commit \(plist(app, "NHTCommit"))",
             "verdict: \(verdict)", "",
             "Each step acts on the app as a user would and says what it saw. "
-                + "R1, R3-R7 and R9-R18 act through the app's readback probe (`NHT_READBACK=1`, D23), "
+                + "R1, R3-R7 and R9-R26b act through the app's readback probe (`NHT_READBACK=1`, D23), "
                 + "along the user's own paths;",
             "R2 reads the Dock through the Accessibility API; R8 measures a normal launch, without the probe.",
-            "NOT READ BACK means the step could not run. It is never counted as passed.", "",
+            "NOT READ BACK means the step could not run. It is never counted as passed.",
+            allowFocus ? "focus: R26a, R26b may take the focus (--allow-focus, D25); each says so on its line"
+                : "focus: never taken (D18); R26a, R26b need --allow-focus (D25)", "",
             "| Step | Verdict | What the readback did and saw |", "|---|---|---|",
         ]
         lines += results.map { "| \($0.id) \($0.name) | \($0.verdict.rawValue) | \(tilde($0.detail)) |" }

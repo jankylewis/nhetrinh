@@ -18,6 +18,13 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     state.progressShown = true
     state.reloadButton = "Stop"
     state.webMenu = ["Open Link in New Tab", "Copy Link"]
+    state.sheet = "Allow 127.0.0.1 to use your microphone?"
+    state.sheetKind = "alert"
+    state.sheetButtons = ["Allow", "Don't Allow"]
+    state.sheetsShown = 3
+    state.handedOff = 1
+    state.fullscreen = true
+    state.active = true
     return state
 }
 
@@ -34,6 +41,11 @@ private func shown(_ rows: [String], selected: Int?) -> ProbeState {
     .rowMenu(row: 2, item: "Close Tab"),
     .linkMenu(item: "Open Link in New Tab"),
     .button("Stop"),
+    .click("#confirm"),
+    .sheetButton("Cancel"),
+    .sheetField(index: 1, text: "secret \"x\""),
+    .sheetField(index: 0, text: ""),
+    .front,
     .middleClick(row: 0),
     .middleClick(row: 3),
     .commandClickLink,
@@ -61,6 +73,9 @@ func responseRoundTrips(response: ProbeResponse) throws {
                   "{\"op\":\"menu\",\"path\":\"Tabs > Back\"}", "{\"op\":\"rowMenu\",\"text\":\"Close Tab\"}",
                   "{\"op\":\"rowMenu\",\"index\":-1,\"text\":\"Close Tab\"}", "{\"op\":\"rowMenu\",\"index\":0}",
                   "{\"op\":\"linkMenu\"}", "{\"op\":\"button\"}", "{\"op\":\"button\",\"text\":\"\"}",
+                  "{\"op\":\"click\"}", "{\"op\":\"click\",\"text\":\"\"}", "{\"op\":\"sheetButton\"}",
+                  "{\"op\":\"sheetField\",\"text\":\"x\"}", "{\"op\":\"sheetField\",\"index\":-1,\"text\":\"x\"}",
+                  "{\"op\":\"sheetField\",\"index\":0}",
                   "{\"op\":\"middleClick\"}", "{\"op\":\"middleClick\",\"index\":-1}"])
 func malformedRequestThrows(line: String) {
     #expect(throws: ProbeCodec.Failure.self) { try ProbeCodec.decodeRequest(line) }
