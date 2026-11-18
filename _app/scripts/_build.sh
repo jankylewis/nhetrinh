@@ -17,7 +17,11 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/Nhetrinh" "$APP/Contents/MacOS/nhetrinh"
 strip -x "$APP/Contents/MacOS/nhetrinh"
 EXPORTS=$(nm -gU "$APP/Contents/MacOS/nhetrinh" | wc -l | tr -d ' ')
-(( EXPORTS == 0 )) || { echo "error: the app exports $EXPORTS symbols; 0 expected (NT-PRF-005):" >&2; nm -gU "$APP/Contents/MacOS/nhetrinh" >&2; exit 1; }
+if (( EXPORTS != 0 )); then
+  echo "error: the app exports $EXPORTS symbols; 0 expected (NT-PRF-005):" >&2
+  nm -gU "$APP/Contents/MacOS/nhetrinh" >&2
+  exit 1
+fi
 cp assets/_icon/bundle/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 # The app decodes this PNG for the Dock at launch: 1024 px cost 33 MB, 256 px nothing (NT-PRF-001).
 DOCK=assets/_icon/bundle/_DockIcon.png
