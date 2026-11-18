@@ -9,11 +9,7 @@ extension BrowserWindowController {
     func probeAnswer(_ request: ProbeRequest, menu: NSMenu? = NSApp.mainMenu) -> ProbeResponse {
         switch request {
         case .state: return .state(probeState(menu: menu))
-        case .navigate(let text):
-            let field = toolbar.address
-            field.stringValue = text
-            let sent = field.sendAction(field.action, to: field.target)
-            return sent ? .done : .failed("the address field did not submit")
+        case .navigate(let text): return submitAddress(text)
         case .newTab: return Self.perform(["File", "New Tab"], in: menu)
         case .closeTab: return Self.perform(["File", "Close Tab"], in: menu)
         case .select(let row):
@@ -29,12 +25,21 @@ extension BrowserWindowController {
         case .sheetButton(let label): return pressSheetButton(label)
         case .sheetField(let index, let text): return typeInSheet(field: index, text)
         case .front: return comeToFront()
+        case .pressure(let level): return simulatePressure(level)
         case .find, .setting: return toolAnswer(request)
         case .middleClick(let row):
             return sidebar.middleClick(row) ? .done : .failed("the sidebar has no row \(row)")
         case .commandClickLink: return commandClickFirstLink().map { .failed($0) } ?? .done
         case .download(let row, let item): return pressDownload(row: row, item: item)
         }
+    }
+
+    /// The address typed into the field and submitted, as Return does.
+    private func submitAddress(_ text: String) -> ProbeResponse {
+        let field = toolbar.address
+        field.stringValue = text
+        let sent = field.sendAction(field.action, to: field.target)
+        return sent ? .done : .failed("the address field did not submit")
     }
 
     func probeState(menu: NSMenu?) -> ProbeState {
@@ -78,7 +83,7 @@ extension BrowserWindowController {
     /// Every item with a shortcut, by its path: "File > New Tab" -> "⌘T".
     private static func shortcuts(in menu: NSMenu, path: [String]) -> [String: String] {
         var found: [String: String] = [:]
-        for item in menu.items {
+        for item in menu.items where !item.isHidden {  // as the menu shows it: not ⌘= (F9)
             let here = path + [item.title]
             if let submenu = item.submenu {
                 found.merge(shortcuts(in: submenu, path: here)) { first, _ in first }

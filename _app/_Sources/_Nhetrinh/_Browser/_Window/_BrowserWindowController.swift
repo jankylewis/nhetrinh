@@ -15,6 +15,8 @@ final class BrowserWindowController: NSWindowController {
     let webContainer = NSView()
     let split = NSSplitViewController()
     var unloadTimer: Timer?
+    /// P6 (`../Lifecycle/MemoryGuard.swift`): macOS memory pressure unloads background tabs.
+    var memoryGuard: MemoryGuard?
     /// Session restore (`../Lifecycle/`): the pending save, where it goes (nil: off), the last sidebar width.
     var saveTimer: Timer?
     var sessionFolder: URL?
@@ -47,6 +49,7 @@ final class BrowserWindowController: NSWindowController {
         buildLayout()
         wireCallbacks()
         startIdleUnloading()
+        startMemoryGuard()
     }
 
     required init?(coder: NSCoder) { return nil }

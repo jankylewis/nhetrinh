@@ -3,7 +3,7 @@
 After M3 nhetrinh stays light under memory pressure, has tab folders, and has a released
 build that anyone can download. The gate is in `_PLAN.md`.
 
-## P6 — Memory guard (0.7.0, size S, status TODO)
+## P6 — Memory guard (0.7.0, size S, status DOING)
 
 Goal: when macOS is short of memory, nhetrinh gives memory back at once.
 
@@ -23,8 +23,10 @@ Tests: the `UnloadPolicy` table grows by the pressure level.
 Readback adds:
 - R36 3 loaded tabs, simulate a warning: 1 page process is left. Click an unloaded tab: it
   loads again with its history.
-- R37 a playing tab is still loaded after a warning.
-- R38 the budget with 2 unloaded tabs.
+- R37 a playing tab is still loaded after a warning; a critical level then unloads a fresh silent
+  background tab (the control) and keeps the playing one (NT-GAT-011).
+- R38 the budget with 2 unloaded tabs. It loads example.com, .org and .net: like R8 it needs the
+  Internet, and a slow network can fail it (P4/P6 review, F11).
 
 Exit: the gate, R1-R38 PASS.
 

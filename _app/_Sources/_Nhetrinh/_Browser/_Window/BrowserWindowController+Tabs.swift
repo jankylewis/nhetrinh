@@ -39,6 +39,7 @@ extension BrowserWindowController {
         }
         selected = index
         backgroundSlot = nil
+        findBar.show(found: nil)  // the answer belongs to the page that was searched (F5)
         let tab = tabs[index]
         tab.lastActive = Date()
         load(tab)

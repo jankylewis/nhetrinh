@@ -33,10 +33,10 @@ enum UnloadSteps {
             + "and playing 10 s past that"
     }
 
-    /// A fresh start with the short limit; row 1 plays the test audio (its title says so).
-    private static func startAudio(_ app: AppSession) throws {
+    /// A fresh start with `env` (the short limit; none for R37); row 1 plays the test audio (its title says so).
+    static func startAudio(_ app: AppSession, env: [String: String] = shortLimit) throws {
         let audio = try LifecycleSteps.pages().url("/play")
-        try LifecycleSteps.freshStart(app, env: shortLimit)
+        try LifecycleSteps.freshStart(app, env: env)
         try app.act(.navigate(audio), "address bar: the test audio page, Return")
         let started = waitUntil(15) { (try? app.state().rows.first) == TestPageContent.playingTitle }
         guard started else {
