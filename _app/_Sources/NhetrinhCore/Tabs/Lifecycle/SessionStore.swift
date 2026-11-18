@@ -46,7 +46,7 @@ public enum SessionStore {
     }
 
     /// Move the bad file aside (an older bad file is replaced) and say what happened.
-    private static func keepBad(_ file: URL, in folder: URL) -> String {
+    static func keepBad(_ file: URL, in folder: URL) -> String {
         let bad = folder.appendingPathComponent(badFileName)
         do {
             if FileManager.default.fileExists(atPath: bad.path) { try FileManager.default.removeItem(at: bad) }

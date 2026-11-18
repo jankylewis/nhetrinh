@@ -51,7 +51,8 @@ extension BrowserWindowController {
     func openIncoming(_ urls: [URL]) {
         let web = urls.filter { ["http", "https"].contains($0.scheme?.lowercased() ?? "") }
         guard !web.isEmpty else { return }
-        web.forEach { tabs.append(Tab(url: $0)) }  // F3: added unloaded; only the last is shown and loads
+        // At the root's end, the folders stay (P7); added unloaded, only the last is shown and loads (F3).
+        web.forEach { tree.insert(Tab(url: $0), atFlat: tabs.count) }
         select(tabs.count - 1)
     }
 

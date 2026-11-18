@@ -7,11 +7,16 @@ public struct ClosedTab: Equatable, Sendable {
     public let url: URL
     public let title: String
     public let index: Int
+    /// P7: where it was in the tree, and the name of its folder (nil: a root tab), for `Tree.reinsert`.
+    public let path: TabPath?
+    public let folder: String?
 
-    public init(url: URL, title: String, index: Int) {
+    public init(url: URL, title: String, index: Int, path: TabPath? = nil, folder: String? = nil) {
         self.url = url
         self.title = title
         self.index = index
+        self.path = path
+        self.folder = folder
     }
 }
 

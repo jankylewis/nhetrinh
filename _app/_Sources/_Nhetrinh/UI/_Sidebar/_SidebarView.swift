@@ -1,9 +1,10 @@
 import AppKit
 import NhetrinhCore
 
-/// The vertical tab list. One row per tab (`TabRowView`): icon, title, close button on hover; a tab
-/// that is not loaded is dimmed. A row's menu and a middle click close it; a drag reorders (P2).
-final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
+/// The vertical tab list, an outline (P7): root tabs and folders, a folder's tabs under it. One row per tab
+/// (`TabRowView`): icon, title, close button on hover; a tab that is not loaded is dimmed. A row's menu
+/// and a middle click close it (P2); a drag moves a tab or a folder (`+Drag`); folders: `+Folders`.
+final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate {
     struct Row {
         let title: String
         let loaded: Bool
@@ -15,14 +16,14 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
     var onSelect: ((Int) -> Void)?
     var onClose: ((Int) -> Void)?
     var onNewTab: (() -> Void)?
-    /// A row dragged from `from` to `to` (its index once moved).
-    var onMove: ((Int, Int) -> Void)?
+    /// A folder action or a drop (P7).
+    var onAction: ((SidebarAction) -> Void)?
 
     let table = TabTable()
     /// P5: the footer's download rows (`../Bars/DownloadsBar.swift`), below the tabs.
     let downloads = DownloadsBar()
     private var rows: [Row] = []
-    private var updating = false
+    private(set) var updating = false
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -36,8 +37,14 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
 
     required init?(coder: NSCoder) { return nil }
 
+    /// The outline's root nodes, made new at every update (P7).
+    var nodes: [SidebarNode] = []
+
     private func configureTable() {
-        table.addTableColumn(NSTableColumn(identifier: .init("tab")))
+        let column = NSTableColumn(identifier: .init("tab"))
+        table.addTableColumn(column)
+        table.outlineTableColumn = column
+        table.indentationPerLevel = 10
         table.headerView = nil
         table.style = .sourceList
         table.rowHeight = 28
@@ -47,11 +54,8 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         table.setAccessibilityIdentifier("nhetrinh.sidebar")
         table.registerForDraggedTypes([Self.rowType])
         table.setDraggingSourceOperationMask(.move, forLocal: true)
-        table.onMiddleClick = { [weak self] row in self?.onClose?(row) }
-        let close = NSMenuItem(title: "Close Tab", action: #selector(closeFromMenu), keyEquivalent: "")
-        close.target = self
-        table.menu = NSMenu()
-        table.menu?.addItem(close)
+        table.onMiddleClick = { [weak self] row in self?.closeRow(row) }
+        table.menuForRow = { [weak self] row in self?.menu(forRow: row) }
     }
 
     private func makeNewTabButton() -> NSButton {
@@ -82,47 +86,45 @@ final class SidebarView: NSView, NSTableViewDataSource, NSTableViewDelegate {
         ])
     }
 
-    func update(_ rows: [Row], selected: Int) {
-        self.rows = rows
+    /// Show `items`; `selected` is the controller's flat tab index. A tab in a collapsed folder has no row
+    /// to select: then no row is selected, and its folder is marked.
+    func update(_ items: [SidebarItem], selected: Int) {
+        nodes = SidebarNode.nodes(items)
+        rows = nodes.flatMap { $0.isFolder ? $0.children.map(\.row) : [$0.row] }
         updating = true
         table.reloadData()
-        if selected >= 0 { table.selectRowIndexes([selected], byExtendingSelection: false) }
+        for node in nodes where node.isFolder {
+            node.collapsed ? table.collapseItem(node) : table.expandItem(node)
+        }
+        let row = tabNode(flat: selected).map { table.row(forItem: $0) } ?? -1
+        if row >= 0 { table.selectRowIndexes([row], byExtendingSelection: false) } else { table.deselectAll(nil) }
         updating = false
     }
 
-    /// The rows as the table shows them, and the selected row (-1: none). Read by the probe (D23).
-    var shownRows: [String] { Array(rows.map(\.title).prefix(table.numberOfRows)) }
+    /// The rows as the outline shows them (a folder row reads its name), and per row whether its tab is
+    /// loaded (a folder: no); the selected row (-1: none). Read by the probe (D23).
+    var shownRows: [String] { shownNodes.map(\.row.title) }
+    var shownLoaded: [Bool] { shownNodes.map(\.row.loaded) }
     var selectedRow: Int { table.selectedRow }
 
-    /// Select a row as a click does: the table reports the change, and `onSelect` shows that tab.
+    private var shownNodes: [SidebarNode] { (0..<table.numberOfRows).compactMap(node(atRow:)) }
+
+    func node(atRow row: Int) -> SidebarNode? { table.item(atRow: row) as? SidebarNode }
+
+    func tabNode(flat: Int) -> SidebarNode? {
+        nodes.lazy.flatMap { $0.isFolder ? $0.children : [$0] }.first { $0.flat == flat }
+    }
+
+    /// Select a tab's row as a click does: the outline reports the change, and `onSelect` shows that tab.
+    /// A folder's row is not selected by a click.
     func selectAsClick(_ row: Int) -> Bool {
-        guard row >= 0, row < table.numberOfRows else { return false }
+        guard node(atRow: row)?.isFolder == false else { return false }
         table.selectRowIndexes([row], byExtendingSelection: false)
         return true
     }
 
-    // MARK: - Table
-
-    func numberOfRows(in tableView: NSTableView) -> Int { rows.count }
-
-    func tableView(_ tableView: NSTableView, viewFor column: NSTableColumn?, row: Int) -> NSView? {
-        let cell = tableView.makeView(withIdentifier: TabRowView.identifier, owner: nil) as? TabRowView ?? TabRowView()
-        cell.show(rows[row])
-        cell.onClose = { [weak self, weak cell] in
-            guard let self, let cell else { return }
-            let index = self.table.row(for: cell)
-            if index >= 0 { self.onClose?(index) }
-        }
-        return cell
-    }
-
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        guard !updating, table.selectedRow >= 0 else { return }
-        onSelect?(table.selectedRow)
-    }
-
-    @objc private func closeFromMenu() {
-        if table.menuRow >= 0 { onClose?(table.menuRow) }
+    func closeRow(_ row: Int) {
+        if let flat = node(atRow: row)?.flat { onClose?(flat) }
     }
 
     @objc private func newClicked() { onNewTab?() }

@@ -59,7 +59,7 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
         let popup = BrowserWebView(frame: .zero, configuration: configuration)
         let tab = Tab(url: action.request.url)
         load(tab, adopting: popup)
-        tabs.append(tab)
+        tree.insert(tab, atFlat: tabs.count)
         select(tabs.count - 1)
         return popup
     }

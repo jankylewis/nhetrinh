@@ -1,6 +1,6 @@
-# NT-BUG-013 — A finished download disappears
+# NT-BUG-017 — A finished download disappears
 
-id: NT-BUG-013
+id: NT-BUG-017
 family: NAV
 status: OBSERVED
 date: 2026-11-17

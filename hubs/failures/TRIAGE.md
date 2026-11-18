@@ -17,6 +17,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-NAV-003 | `aSiteIsAnOrigin` | OBSERVED | Camera answer for another port or scheme? Keys are `SitePermissions.site(scheme:host:port:)` |
 | NT-NAV-004 | `isMainFrame != false` | OBSERVED | A page asking to open another app in a loop? Ruling pending: ask only for a click |
 | NT-TAB-002 | `ask selects the asking tab` | OBSERVED | A background tab pulling the user to it? Ruling pending: hold its question |
+| NT-TAB-003 | `aLinkFromAnotherAppKeepsTheFolders` | OBSERVED | Folders gone after a new tab? A mutation of the flat `tabs` rebuilds the tree: insert through `tree` |
 | NT-UIX-003 | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-ENV-001 | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
@@ -50,3 +51,4 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-NAV-010 | `race.txt.download` | OBSERVED | A partial download under its final name? P5-FIX-1 (p5/review) |
 | NT-NAV-011 | `isRunning(entry)` | OBSERVED | A cancel while the name is chosen? P5-FIX-1 (p5/review) |
 | NT-NAV-012 | `sameFileIgnoresCaseAndNormalization` | OBSERVED | Two spellings of one name? P5-FIX-1 (p5/review) |
+| NT-NAV-013 | `aDownloadSaysWhereItCameFrom` | OBSERVED | Finder's "Where from" blank? Is `com.apple.metadata:kMDItemWhereFroms` on the file? The quarantine drops its URLs on this macOS (P5-FIX-2) |

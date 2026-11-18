@@ -51,6 +51,10 @@ public struct ProbeState: Equatable, Sendable {
     public var downloads: [String] = []
     public var downloadStates: [String] = []
     public var revealed: [String] = []
+    /// P7: every folder, root first: its name, its tabs' titles, whether it is collapsed.
+    public var folders: [String] = []
+    public var folderTabs: [[String]] = []
+    public var collapsedFolders: [Bool] = []
 
     public init() {}
 }
@@ -66,7 +70,8 @@ extension ProbeState {
                                      "fullscreen": fullscreen, "active": active, "findShown": findShown,
                                      "findResult": findResult, "zoomBadge": zoomBadge, "appearance": appearance,
                                      "hubShown": hubShown, "downloads": downloads,
-                                     "downloadStates": downloadStates, "revealed": revealed]
+                                     "downloadStates": downloadStates, "revealed": revealed, "folders": folders,
+                                     "folderTabs": folderTabs, "collapsedFolders": collapsedFolders]
         if let selected { object["selected"] = selected }
         return object
     }
@@ -100,11 +105,19 @@ extension ProbeState {
         appearance = object["appearance"] as? String ?? ""
         hubShown = object["hubShown"] as? Bool ?? false
         readDownloads(object)
+        readFolders(object)
     }
 
     private mutating func readDownloads(_ object: [String: Any]) {
         downloads = object["downloads"] as? [String] ?? []
         downloadStates = object["downloadStates"] as? [String] ?? []
         revealed = object["revealed"] as? [String] ?? []
+    }
+
+    /// P7's fields.
+    private mutating func readFolders(_ object: [String: Any]) {
+        folders = object["folders"] as? [String] ?? []
+        folderTabs = object["folderTabs"] as? [[String]] ?? []
+        collapsedFolders = object["collapsedFolders"] as? [Bool] ?? []
     }
 }

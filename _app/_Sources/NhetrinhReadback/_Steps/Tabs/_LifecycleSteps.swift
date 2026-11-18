@@ -66,7 +66,7 @@ enum LifecycleSteps {
         guard let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
         else { return false }
         let folder = SessionStore.folder(applicationSupport: support, profile: AppSession.profile)
-        for name in [SessionStore.fileName, SessionStore.badFileName] {
+        for name in [SessionStore.fileName, SessionStore.badFileName, TreeSessionStore.backupFileName] {
             try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
         }
         return !FileManager.default.fileExists(atPath: folder.appendingPathComponent(SessionStore.fileName).path)

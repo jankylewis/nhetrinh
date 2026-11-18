@@ -4,10 +4,16 @@ import AppKit
 /// to the table as the user's clicks reach it, and the icons the rows show (P2, R13, R16).
 extension SidebarView {
     /// The probe's R13: a right click at the row's centre asks the table for its menu (`menu(for:)`, the
-    /// path of the user's right click, with its hit test), and `item` is pressed.
+    /// path of the user's right click, with its hit test), and `item` is pressed. P7: an item of a submenu
+    /// is named by its path, "Move to Folder > work".
     func pressRowMenu(_ row: Int, item: String) -> Bool {
-        guard let click = table.rightClick(onRow: row), let menu = table.menu(for: click),
-              let index = menu.items.firstIndex(where: { $0.title == item }) else { return false }
+        guard let click = table.rightClick(onRow: row), var menu = table.menu(for: click) else { return false }
+        let path = item.components(separatedBy: " > ")
+        for title in path.dropLast() {
+            guard let submenu = menu.item(withTitle: title)?.submenu else { return false }
+            menu = submenu
+        }
+        guard let index = menu.items.firstIndex(where: { $0.title == path.last }) else { return false }
         menu.performActionForItem(at: index)
         return true
     }
