@@ -23,3 +23,4 @@ Grep the signature in the report or log.
 | NT-BUG-016 | `moveTabStepsOneRow` | OBSERVED | Did Move use the flat index? It must be `Tree.step` on the path |
 | NT-BUG-017 | `aCancelNeverRemovesTheNextDownloadsFile` | OBSERVED | A finished download gone after a cancel of the same name? The name is free only after WebKit confirms the cancel (NT-NAV-005) |
 | NT-BUG-018 | `theLeftButtonsClearTheTrafficLights` | OBSERVED | Sidebar hidden and the toolbar's buttons under the traffic lights? `placeRow` must read the real zoom button (NT-UIX-005) |
+| NT-BUG-019 | `NSURLErrorDomain -1022` | OBSERVED | Plain http fails but not on localhost? Does the built Info.plist have `NSAllowsArbitraryLoadsInWebContent` (NT-BLD-005) |

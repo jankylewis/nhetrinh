@@ -11,6 +11,7 @@ enum Reason: String, CaseIterable {
     case nameNotFound = "No site has this name"
     case certificate = "The certificate of this site is not valid"
     case timeout = "The site took too long to answer"
+    case insecure = "This site needs a secure connection"
     case unknown = "This page could not be loaded"
 }
 
@@ -31,6 +32,9 @@ let failureCases = [
     FailureCase(domain: NSURLErrorDomain, code: NSURLErrorServerCertificateHasUnknownRoot, reason: .certificate),
     FailureCase(domain: NSURLErrorDomain, code: NSURLErrorSecureConnectionFailed, reason: .certificate),
     FailureCase(domain: NSURLErrorDomain, code: NSURLErrorTimedOut, reason: .timeout),
+    // NT-BUG-019: a plain http page App Transport Security refused (-1022) says so, not "could not be loaded".
+    FailureCase(domain: NSURLErrorDomain, code: NSURLErrorAppTransportSecurityRequiresSecureConnection,
+                reason: .insecure),
     FailureCase(domain: NSURLErrorDomain, code: 12_345, reason: .unknown),
     FailureCase(domain: "WebKitErrorDomain", code: NSURLErrorTimedOut, reason: .unknown),
 ]
