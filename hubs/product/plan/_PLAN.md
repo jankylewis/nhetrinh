@@ -17,20 +17,20 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 - Local, not committed: the `_app/` scaffold, `hubs/`, the folder checker.
 - Open hub items: NT-BUG-001, NT-BUG-002, NT-ENV-001, NT-TAB-001, NT-BLD-002, NT-TG-001, NT-TG-002.
 - Order fixed by the headmate: the harness (P0) is finished before any feature work (D14).
-- No readback has run yet. Nothing below is "done" until its readback passes.
+- Nothing below is "done" until its readback passes. P0-P7 are merged (2026-11-18); P8 waits on R2 and the icon ruling.
 
 ## Phases
 
 | Phase | Version | Size | What the headmate gets | Status | Detail |
 |---|---|---|---|---|---|
 | P0 Foundation | 0.1.0 | L | conventions checked by tool, agent harness, readback tool, open bugs closed | DONE (readback 8/8, 2026-11-16 21:24, `hubs/failures/evidence/readback/_LATEST.md`) | `M1_DAILY_DRIVER.md` |
-| P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | DOING (readback 22:13: R1, R3-R12 PASS in `_LATEST.md`, R2 PASS from the readback app; PR to come) | `M1_DAILY_DRIVER.md` |
-| P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | DOING (readback 22:34: R1, R3-R18 PASS in `_LATEST.md`, R2 PASS from the readback app; build eac0ce9+, not committed) | `M1_DAILY_DRIVER.md` |
-| P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | TODO | `M2_REAL_SITES_WORK.md` |
-| P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | TODO | `M2_REAL_SITES_WORK.md` |
-| P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | DOING (P5-BUILD-1 on p5/downloads: readback 00:08 35 PASS, R2, R26a, R26b not read back) | `M2_REAL_SITES_WORK.md` |
-| P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DOING (P6-BUILD-1 on p6/memory: built, tests green, not read back) | `M3_V1_RELEASE.md` |
-| P7 Tab groups | 0.8.0 | L | collapsible tab groups in the sidebar | DOING (P7-BUILD-1 on p7/prep: built, tests green, not read back) | `M3_V1_RELEASE.md` |
+| P1 Tab lifecycle | 0.2.0 | M | tabs come back after quit; a playing tab is never unloaded | DONE (merged #4, tag v0.2.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M1_DAILY_DRIVER.md` |
+| P2 Sidebar and tabs | 0.3.0 | M | close on hover, reorder, reopen, favicons, stop, background tabs | DONE (merged #5, tag v0.3.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M1_DAILY_DRIVER.md` |
+| P3 Page basics | 0.4.0 | L | dialogs, file upload, error page, sign-in, camera, print, app links | DONE (merged #6, tag v0.4.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M2_REAL_SITES_WORK.md` |
+| P4 Find, zoom, tools | 0.5.0 | M | find in page, zoom per site, search engine choice, clear data | DONE (merged #7, tag v0.5.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M2_REAL_SITES_WORK.md` |
+| P5 Downloads, app links | 0.6.0 | M | files to ~/Downloads; links from other apps open here | DONE (merged #8, tag v0.6.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M2_REAL_SITES_WORK.md` |
+| P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DONE (merged #9, tag v0.7.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M3_V1_RELEASE.md` |
+| P7 Tab groups | 0.8.0 | L | collapsible tab groups in the sidebar | DONE (merged #10, tag v0.8.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M3_V1_RELEASE.md` |
 | P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; P8-FONT-1: the interface in Menlo, R47, tests green, not read back; P8-CHROME-1: toolbar Toggle Sidebar, toolbar clears the traffic lights (NT-BUG-018), R48, tests green, not read back; P8-GROUPS-1: nested tab groups, 4 levels, full CRUD, session v3, R49, tests green, not read back; P8-SIDE-1: the sidebar on the left or the right (Settings Hub > Sidebar position), R50, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
 
 Size is relative effort (S, M, L). No dates: a phase ends when its gate passes, not on a day.
