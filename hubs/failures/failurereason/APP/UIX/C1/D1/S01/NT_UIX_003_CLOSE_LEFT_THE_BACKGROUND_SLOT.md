@@ -4,6 +4,7 @@ id: NT-UIX-003
 family: UIX
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P2-REVIEW F1)
 signature: closingARowKeepsTheBackgroundSlotInPlace
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift on p2/sidebar cc8affe (`close(at:)`)
 source: _app/_Sources/_Nhetrinh/_Browser/Handling/_TabHandling.swift (`openInBackground`, `backgroundSlot`)

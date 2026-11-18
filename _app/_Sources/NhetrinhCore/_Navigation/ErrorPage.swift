@@ -23,6 +23,8 @@ public enum ErrorPage {
             return "You are not connected to the internet"
         case NSURLErrorCannotFindHost, NSURLErrorDNSLookupFailed: return "No site has this name"
         case NSURLErrorTimedOut: return "The site took too long to answer"
+        case NSURLErrorAppTransportSecurityRequiresSecureConnection:  // NT-BUG-019: refused by ATS, never sent
+            return "This site needs a secure connection"
         case NSURLErrorSecureConnectionFailed, NSURLErrorServerCertificateHasBadDate,
              NSURLErrorServerCertificateUntrusted, NSURLErrorServerCertificateHasUnknownRoot,
              NSURLErrorServerCertificateNotYetValid, NSURLErrorClientCertificateRejected:

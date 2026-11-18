@@ -4,6 +4,7 @@ id: NT-UIX-001
 family: UIX
 status: FIXED
 date: 2026-11-16
+found_by: readback (R5, R6 FAIL, readback 2026-11-16 18:57)
 signature: after New Tab the sidebar has 1 rows, not 2
 source: readback 2026-11-16 18:57, app 0.1.0 from commit 0d00e08 (`hubs/failures/evidence/readback/_LATEST.md` on branch `p0/harness-docs`)
 source: _app/_Sources/_Nhetrinh/UI/AppMenu.swift at commit 0d00e08 (browser items made with no target)

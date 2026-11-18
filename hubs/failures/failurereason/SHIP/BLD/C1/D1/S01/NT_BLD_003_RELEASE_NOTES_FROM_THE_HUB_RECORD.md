@@ -4,6 +4,7 @@ id: NT-BLD-003
 family: BLD
 status: OBSERVED
 date: 2026-11-17
+found_by: development (REVIEW_P8 R1, R2)
 signature: test_the_real_notes_do_not_contradict_themselves
 source: REVIEW_P8.md R1, R2 (reviewer seat, outside the repository: its tests are in 2fde920)
 source: _app/scripts/install/test_release_notes.py (`ReviewP8Tests`, red on 41fc9df + p7/prep)

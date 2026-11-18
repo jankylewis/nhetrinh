@@ -4,6 +4,7 @@ id: NT-BLD-002
 family: BLD
 status: FIXED
 date: 2026-11-16
+found_by: self-test (`_build.sh` copy step failed, P0-HAR-1 seat, 2026-11-16)
 signature: cp: .build/arm64-apple-macosx/release/Nhetrinh: No such file or directory
 source: _app/scripts/_build.sh:9 (`BIN=$(swift build -c release --arch arm64 --show-bin-path)`)
 observed: 2026-11-16, P0-HAR-1 seat: `swift build -c release --arch arm64 --show-bin-path` printed `_app/.build/out/Products/Release`, not the hard-coded folder

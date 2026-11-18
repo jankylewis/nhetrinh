@@ -4,6 +4,7 @@ id: NT-GAT-008
 family: GAT
 status: OPEN
 date: 2026-11-16
+found_by: readback (R1, R3-R7 NOT READ BACK, readback 20:07)
 signature: window "nhetrinh", 2 children, first roles [AXApplication, AXMenuBar], read error 0
 source: `hubs/failures/evidence/readback/_LATEST.md` (20:07, commit 663acba): R1, R3-R7 NOT READ BACK with the signature
 source: `_app/_Sources/NhetrinhReadback/Driver/AppSession.swift` `window()` (commit 3d35e8d: `app.windows.first`, any role)

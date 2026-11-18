@@ -4,6 +4,7 @@ id: NT-GAT-007
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: readback (R2 FAIL, readback 19:40)
 signature: R2 FAIL: the Dock item does not show the bare icon: silhouette agreement 76 %, icon at 84 % of the Dock item
 source: _app/_Sources/NhetrinhReadback/Driver/IconMatch.swift `measure`, `ringColour` (commit 5f2592e: the whole item scored, one ring colour)
 source: _app/_Sources/NhetrinhReadback/Driver/DockIcon.swift `capture` (commit 5f2592e: the item clamped to the capture)

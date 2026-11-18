@@ -4,6 +4,7 @@ id: NT-UIX-005
 family: UIX
 status: OBSERVED
 date: 2026-11-17
+found_by: headmate (cause of NT-BUG-018, P8-CHROME-1 brief, 2026-11-17)
 signature: theLeftButtonsClearTheTrafficLights
 source: _app/_Sources/_Nhetrinh/UI/Bars/_ToolbarView.swift on e626a4d (`row.leadingAnchor ... constant: 8`)
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/_BrowserWindowController.swift on e626a4d (`.fullSizeContentView`, `titlebarAppearsTransparent`)

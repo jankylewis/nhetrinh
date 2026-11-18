@@ -4,6 +4,7 @@ id: NT-GAT-001
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: self-test (plain `swift test` red in 2 of 4 runs, P0-HAR-1)
 signature: error: plugin for module 'TestingMacros' not found
 source: _app/scripts/test.sh (header comment, the `-external-plugin-path` line)
 source: matemaster brief P0-HAR-1, 2026-11-16 (the run counts below)

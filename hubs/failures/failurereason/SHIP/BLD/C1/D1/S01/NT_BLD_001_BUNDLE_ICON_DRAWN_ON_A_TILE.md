@@ -4,6 +4,7 @@ id: NT-BLD-001
 family: BLD
 status: FIXED
 date: 2026-11-16
+found_by: headmate (2026-11-16 Dock report, NT-BUG-002)
 signature: icon on a tile
 source: headmate report 2026-11-16 (Dock screenshot, NT-BUG-002)
 source: `NSWorkspace.icon(forFile:)` render of four apps (rnd check, 2026-11-16)

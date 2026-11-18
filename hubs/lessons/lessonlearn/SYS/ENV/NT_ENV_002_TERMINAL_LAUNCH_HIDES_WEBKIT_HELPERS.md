@@ -4,6 +4,7 @@ id: NT-ENV-002
 family: ENV
 status: FIXED
 date: 2026-11-16
+found_by: development (bench measurement, memsum found 1 process)
 links: fix=yes lesson=yes evidence=no toolgap=none
 
 ## Believed

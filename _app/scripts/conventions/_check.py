@@ -4,6 +4,7 @@ Folders (dot folders exempt): exactly one `_` entry per folder, at most 5 entrie
 Files: .md at most 100 lines; code at most 150 lines and 120 characters a line.
 Swift and Python: function at most 30 lines and 5 parameters.
 Swift: no force unwrap, try! or as!; Package.swift has no dependency.
+Hubs: every bug, failure, tool gap and lesson entry has `found_by:`; both TRIAGE tables a Found by column.
 
 Prints one line per violation and exits 1.   Usage: python3 _app/scripts/conventions/_check.py
 """
@@ -14,9 +15,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-import folders
-import sizes
-import swift
+from rules import _folders as folders
+from rules import hubs, sizes, swift
 
 TEXT_SUFFIXES = {".md"} | sizes.CODE_SUFFIXES
 
@@ -34,6 +34,7 @@ def all_violations(root: str) -> tuple[int, list[str]]:
             continue
         text = (Path(root) / path).read_text(encoding="utf-8")
         found += sizes.violations(path, text)
+        found += hubs.violations(path, text)
         if path.endswith(".swift"):
             found += swift.violations(path, text)
     return len(paths), found

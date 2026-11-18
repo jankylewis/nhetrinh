@@ -4,6 +4,7 @@ id: NT-GAT-006
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: readback (R6 NOT READ BACK, readback 19:27)
 signature: R6 NOT READ BACK: cannot set AXSelected (accessibility error -25202)
 source: _app/_Sources/NhetrinhReadback/_Steps/_BaseSteps.swift `selectingRowShowsTab` (commit 4d3902f: rows read once, then set twice)
 source: _app/_Sources/_Nhetrinh/_Browser/_Window/BrowserWindowController+Tabs.swift `observe(_:for:)` (title, url, canGoBack, canGoForward call `refreshChrome`)

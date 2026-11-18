@@ -4,6 +4,7 @@ id: NT-TAB-002
 family: TAB
 status: OBSERVED
 date: 2026-11-16
+found_by: development (P3-REVIEW P2)
 signature: ask selects the asking tab
 source: _app/_Sources/_Nhetrinh/_Browser/Page/_Sheets.swift (`ask`: `select(index)` before the sheet)
 links: fix=no lesson=no evidence=no toolgap=none

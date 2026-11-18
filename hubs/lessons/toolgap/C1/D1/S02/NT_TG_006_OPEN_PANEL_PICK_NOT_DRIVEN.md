@@ -4,6 +4,7 @@ id: NT-TG-006
 family: GAT
 status: OPEN
 date: 2026-11-16
+found_by: development (P3-REVIEW P4)
 signature: picking a file in the panel: not read back
 source: _app/_Sources/NhetrinhReadback/_Steps/Tabs/Pages/Basics/PanelSteps.swift (`fileInput`, R22)
 source: hubs/product/plan/M2_REAL_SITES_WORK.md R22 (before the ruling: "pick a fixture file; the page shows its name")

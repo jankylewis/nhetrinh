@@ -4,6 +4,7 @@ id: NT-GAT-012
 family: GAT
 status: OBSERVED
 date: 2026-11-17
+found_by: headmate (2026-11-17, a browser window on screen during a test run, P8-SIDE review brief)
 signature: noTestWindowIsEverVisible
 source: nhetrinh_wt/REVIEW_P8_SIDE.md, part (b): the tests that attached sheets or showed the Settings Hub
 source: _app/Tests/NhetrinhTests/Page/_SheetGapsTests.swift (`NoWindowOnScreenTests`)

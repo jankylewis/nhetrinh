@@ -53,6 +53,8 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <string>A website asks to use the microphone. nhetrinh asks you first, for each site.</string>
   <key>NSDownloadsFolderUsageDescription</key>
   <string>nhetrinh saves the files you download in your Downloads folder.</string>
+  <key>NSAppTransportSecurity</key>
+  <dict><key>NSAllowsArbitraryLoadsInWebContent</key><true/></dict>
   <key>CFBundleURLTypes</key>
   <array><dict>
     <key>CFBundleURLName</key><string>Web site URL</string>
@@ -61,6 +63,14 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   </dict></array>
 </dict></plist>
 PLIST
+# NT-BUG-019: without this key ATS refuses plain http (-1022) to every name but localhost (and, as recalled from
+# Apple's docs, not proven: unqualified and .local names); IP addresses pass.
+# Web content only: the app's own loads stay under ATS, and nothing else in the dict is relaxed.
+ATS=$(plutil -extract NSAppTransportSecurity json -o - "$APP/Contents/Info.plist" 2>/dev/null || true)
+[[ "$ATS" == '{"NSAllowsArbitraryLoadsInWebContent":true}' ]] || {
+  echo "error: Info.plist NSAppTransportSecurity is '$ATS'; NSAllowsArbitraryLoadsInWebContent only (NT-BUG-019)" >&2
+  exit 1
+}
 # Signature (P9-REMEMBER, NT-BLD-006): the local identity of install/signing.sh when it exists, so the next build
 # reads the Keychain sign-ins the last one kept (an ad-hoc signature is new every build); else ad hoc (GitHub CI).
 SIGN=$(scripts/install/signing.sh identity)  # SHA-1, or empty

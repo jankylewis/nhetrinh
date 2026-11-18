@@ -4,6 +4,7 @@ id: NT-BUG-013
 family: TAB
 status: OBSERVED
 date: 2026-11-17
+found_by: development (P7 review)
 signature: reopenPutsTheTabBackWhereItWas
 source: _app/_Sources/_Nhetrinh/_Browser/Handling/_TabHandling.swift on p7/prep e0b91ff (`reopenClosedTab`: `insert(atFlat:)`)
 observed: found by the P7 adversarial review (code read, then a test); no user report

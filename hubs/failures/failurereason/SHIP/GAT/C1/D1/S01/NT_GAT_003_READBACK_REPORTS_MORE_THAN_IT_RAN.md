@@ -4,6 +4,7 @@ id: NT-GAT-003
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: development (P0 cross-review, red tests 4ee85bf, 90b8cab, 88a9953)
 signature: verdict: PASS (0 of 0)
 source: _app/_Sources/NhetrinhReadback/main.swift `Options` and the step filter (commit 2e05899)
 source: _app/_Sources/NhetrinhReadback/Report.swift `text`, `exitCode`, `tilde` (commit 2e05899)

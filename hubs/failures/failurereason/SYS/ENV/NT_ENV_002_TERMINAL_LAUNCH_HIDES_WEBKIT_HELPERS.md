@@ -4,6 +4,7 @@ id: NT-ENV-002
 family: ENV
 status: FIXED
 date: 2026-11-16
+found_by: development (bench measurement, memsum found 1 process)
 signature: memsum procs=1 for a WebKit app
 source: hubs/product/rnd/_bench/measure/_memsum.c (`responsibility_get_pid_responsible_for_pid`)
 source: hubs/product/rnd/_bench/_bench.py `launch` (uses `open -n -F`)

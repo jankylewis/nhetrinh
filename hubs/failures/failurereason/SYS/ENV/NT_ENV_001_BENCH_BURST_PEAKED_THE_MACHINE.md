@@ -4,6 +4,7 @@ id: NT-ENV-001
 family: ENV
 status: OBSERVED
 date: 2026-11-16
+found_by: headmate (2026-11-16, "dont make my machine peak!", Activity Monitor screenshot)
 signature: whole machine at ~80% CPU during the bench
 source: hubs/product/rnd/_bench/_bench.py scenario `tabs30` (`NHT_BENCH_LOADALL=1` with 30 URLs; removed since P0)
 source: headmate report 2026-11-16 ("dont make my machine peak!", Activity Monitor screenshot)

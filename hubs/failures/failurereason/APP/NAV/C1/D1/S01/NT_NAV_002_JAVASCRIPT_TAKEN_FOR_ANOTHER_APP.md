@@ -4,6 +4,7 @@ id: NT-NAV-002
 family: NAV
 status: OBSERVED
 date: 2026-11-16
+found_by: self-test (P2's `commandClickOpensABackgroundTab` red on the P3-FIX-1 merge)
 signature: commandClickOpensABackgroundTab ... link → "javascript:void(0)"
 source: _app/_Sources/NhetrinhCore/_Navigation/ExternalScheme.swift on p3/pages 1d391d9 (`staying`)
 source: _app/Tests/NhetrinhTests/Tabs/RowAndLinkTests.swift `commandClickOpensABackgroundTab` (P2)

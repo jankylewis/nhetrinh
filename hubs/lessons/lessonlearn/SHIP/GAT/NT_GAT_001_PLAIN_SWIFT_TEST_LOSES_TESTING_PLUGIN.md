@@ -4,6 +4,7 @@ id: NT-GAT-001
 family: GAT
 status: FIXED
 date: 2026-11-16
+found_by: self-test (plain `swift test` red in 2 of 4 runs, P0-HAR-1)
 links: fix=yes lesson=yes evidence=no toolgap=none
 
 ## Believed

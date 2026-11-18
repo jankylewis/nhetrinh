@@ -4,6 +4,7 @@ id: NT-GAT-010
 family: GAT
 status: OBSERVED
 date: 2026-11-16
+found_by: readback (R20 FAIL, readback 2026-11-16 22:50)
 signature: the confirm sheet's buttons are ["Cancel", "OK"]
 source: readback run of P3-BUILD-1, 2026-11-16 22:50 (`--steps R19-R26`), build 93f693e+, R20 FAIL
 source: _app/_Sources/_Nhetrinh/_Browser/Page/SheetProbe.swift (`readSheet`)

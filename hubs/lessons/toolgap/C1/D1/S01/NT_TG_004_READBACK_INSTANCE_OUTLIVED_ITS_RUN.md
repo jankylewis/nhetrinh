@@ -4,6 +4,7 @@ id: NT-TG-004
 family: GAT
 status: OPEN
 date: 2026-11-16
+found_by: readback (P1 close-out R2 run 22:13)
 source: P1 close-out R2 run, 2026-11-16 22:13 (`open -W -n ~/Applications/nhetrinh-readback.app --args --steps R2 --log <tmp>`)
 source: _app/_Sources/NhetrinhReadback/Driver/AppSession.swift (`quit`, `Ending.end`, `QuitOutcome`)
 source: _app/Tests/NhetrinhReadbackTests/Steps/QuitTests.swift (`finalQuitEndsOnlyItsOwnInstance`, 3 cases)

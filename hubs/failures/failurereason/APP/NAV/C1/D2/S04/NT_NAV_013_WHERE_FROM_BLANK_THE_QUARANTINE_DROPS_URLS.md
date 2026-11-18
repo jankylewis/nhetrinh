@@ -4,6 +4,7 @@ id: NT-NAV-013
 family: NAV
 status: OBSERVED
 date: 2026-11-17
+found_by: readback (R31's file, readback 01:15, its attribute read by the P5-VERIFY seat)
 signature: aDownloadSaysWhereItCameFrom
 source: _app/_Sources/NhetrinhCore/_Navigation/Downloads/Quarantine.swift on p7/prep 5c025ee (`mark`)
 source: hubs/failures/evidence/readback/_LATEST.md (readback 01:15; R31's attribute read by the P5-VERIFY seat)

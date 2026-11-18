@@ -4,6 +4,7 @@ id: NT-PRF-003
 family: PRF
 status: OBSERVED
 date: 2026-11-16
+found_by: development (REVIEW_P2 F2)
 signature: anIconOfHugePixelSizeIsRefusedBeforeItIsDecoded
 source: _app/_Sources/_Nhetrinh/_Browser/Handling/Favicons.swift on p2/sidebar cc8affe (`small`, `largest`)
 source: _app/Tests/NhetrinhTests/Tabs/ReviewGapsTests.swift `anIconOfHugePixelSizeIsRefusedBeforeItIsDecoded`

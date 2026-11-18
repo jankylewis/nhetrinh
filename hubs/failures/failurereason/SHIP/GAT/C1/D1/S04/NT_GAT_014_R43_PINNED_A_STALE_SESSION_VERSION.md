@@ -4,6 +4,7 @@ id: NT-GAT-014
 family: GAT
 status: OBSERVED
 date: 2026-11-17
+found_by: readback (R43 FAIL, full readback 2026-11-17 13:19)
 signature: R43 FAIL the save at quit is not version 2
 source: hubs/failures/evidence/readback/_LATEST.md (full run 13:19, build c751b08: R43 FAIL)
 source: _app/_Sources/NhetrinhReadback/_Steps/Tabs/Sidebar/Groups/VersionOneStep.swift:33 at c751b08 (`text.contains("\"version\":2")`)

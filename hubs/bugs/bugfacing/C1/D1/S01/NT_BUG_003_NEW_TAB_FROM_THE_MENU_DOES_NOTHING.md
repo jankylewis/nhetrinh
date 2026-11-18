@@ -4,6 +4,7 @@ id: NT-BUG-003
 family: UIX
 status: FIXED
 date: 2026-11-16
+found_by: readback (R5, R6 FAIL, readback 2026-11-16 18:57)
 signature: after New Tab the sidebar has 1 rows, not 2
 source: readback 2026-11-16 18:57, app 0.1.0 from commit 0d00e08 (`hubs/failures/evidence/readback/_LATEST.md` on branch `p0/harness-docs`)
 observed: R5 FAIL "after New Tab the sidebar has 1 rows, not 2"; R6 FAIL "the sidebar has 1 row(s); 2 are needed"

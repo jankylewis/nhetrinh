@@ -4,6 +4,7 @@ id: NT-TG-001
 family: UIX
 status: OPEN
 date: 2026-11-16
+found_by: development (no tool for the NT-BUG-002 Dock check)
 source: NT-BUG-002 readback attempt (2026-11-16)
 links: fix=no lesson=no evidence=no toolgap=NT-TG-001
 
