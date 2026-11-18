@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import NhetrinhReadback
 
-// R9-R30a use the readback's own local pages. The server is tested here, with no app.
+// R9-R35 use the readback's own local pages. The server is tested here, with no app.
 
 @Test(arguments: [("/page/1", "200 OK", "nhetrinh test 1"), ("/page/12", "200 OK", "nhetrinh test 12"),
                   ("/play", "200 OK", TestPageContent.waitingTitle), ("/page/x", "404 Not Found", ""),

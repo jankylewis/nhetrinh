@@ -29,6 +29,8 @@ DOCK=assets/_icon/bundle/_DockIcon.png
 SIDE=$(sips -g pixelWidth "$DOCK" | awk '/pixelWidth/ {print $2}')
 (( SIDE <= 256 )) || { echo "error: $DOCK is $SIDE px; the Dock icon is at most 256 px (NT-PRF-001)" >&2; exit 1; }
 cp "$DOCK" "$APP/Contents/Resources/AppIcon.png"
+# P5: http and https make nhetrinh a possible default browser (links from other apps open as tabs);
+# the build never makes it the default. macOS asks once for ~/Downloads with the text below.
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -49,6 +51,14 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <string>A website asks to use the camera. nhetrinh asks you first, for each site.</string>
   <key>NSMicrophoneUsageDescription</key>
   <string>A website asks to use the microphone. nhetrinh asks you first, for each site.</string>
+  <key>NSDownloadsFolderUsageDescription</key>
+  <string>nhetrinh saves the files you download in your Downloads folder.</string>
+  <key>CFBundleURLTypes</key>
+  <array><dict>
+    <key>CFBundleURLName</key><string>Web site URL</string>
+    <key>CFBundleTypeRole</key><string>Viewer</string>
+    <key>CFBundleURLSchemes</key><array><string>http</string><string>https</string></array>
+  </dict></array>
 </dict></plist>
 PLIST
 codesign --force --sign - "$APP"

@@ -33,6 +33,7 @@ extension BrowserWindowController {
         case .middleClick(let row):
             return sidebar.middleClick(row) ? .done : .failed("the sidebar has no row \(row)")
         case .commandClickLink: return commandClickFirstLink().map { .failed($0) } ?? .done
+        case .download(let row, let item): return pressDownload(row: row, item: item)
         }
     }
 
@@ -54,6 +55,7 @@ extension BrowserWindowController {
         state.reloadButton = toolbar.reloadLabel
         state.webMenu = (current as? BrowserWebView)?.lastMenu ?? []
         readSheet(into: &state)
+        readDownloads(into: &state)
         return state
     }
 

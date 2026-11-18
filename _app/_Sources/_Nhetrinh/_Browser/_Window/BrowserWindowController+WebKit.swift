@@ -20,6 +20,9 @@ extension BrowserWindowController: WKNavigationDelegate, WKUIDelegate {
         if let url = action.request.url, leaves(url, from: webView, asked: followed) {
             return decisionHandler(.cancel)
         }
+        if action.shouldPerformDownload {  // `<a download>` (P5), past 5 without a click: asked (F2)
+            return admitDownload(from: webView) { decisionHandler($0 ? .download : .cancel) }
+        }
         if action.navigationType == .linkActivated, action.modifierFlags.contains(.command),
            let url = action.request.url, Self.opensInBackground(url) {
             decisionHandler(.cancel)
