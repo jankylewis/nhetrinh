@@ -61,5 +61,17 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   </dict></array>
 </dict></plist>
 PLIST
-codesign --force --sign - "$APP"
+# Signature (P9-REMEMBER, NT-BLD-006): the local identity of install/signing.sh when it exists, so the next build
+# reads the Keychain sign-ins the last one kept (an ad-hoc signature is new every build); else ad hoc (GitHub CI).
+SIGN=$(scripts/install/signing.sh identity)  # SHA-1, or empty
+codesign --force --sign "${SIGN:--}" "$APP"
+SIGNED=$(codesign -dvv "$APP" 2>&1)
+if [[ -n "$SIGN" ]]; then
+  grep -qx 'Authority=nhetrinh local signing' <<<"$SIGNED" \
+    || { echo "error: not signed by the local identity" >&2; exit 1; }
+  echo "signed with the local identity 'nhetrinh local signing' ($SIGN)"
+else
+  grep -qx 'Signature=adhoc' <<<"$SIGNED" || { echo "error: no identity, yet the signature is not ad hoc" >&2; exit 1; }
+  echo "signed ad hoc (no local identity: install/signing.sh); Keychain sign-ins may not survive the next build"
+fi
 echo "$APP $(du -sh "$APP" | cut -f1)"

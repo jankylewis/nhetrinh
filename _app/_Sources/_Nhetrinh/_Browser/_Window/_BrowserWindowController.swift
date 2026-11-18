@@ -31,6 +31,8 @@ final class BrowserWindowController: NSWindowController {
     var saveTimer: Timer?
     var sessionFolder: URL?
     var sidebarWidth = Session.defaultSidebarWidth
+    /// P9-REMEMBER (`../Lifecycle/SignInKeeping.swift`): this launch's sign-in keeper (nil: a measurement run).
+    var signIns: SignInKeeper?
     /// P2 (`../Handling/`): tabs to reopen, site icons, where the next background tab goes (nil: after the selected).
     var closedTabs = ClosedTabs()
     let favicons = Favicons()

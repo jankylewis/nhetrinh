@@ -44,6 +44,8 @@ public struct Prefs: Equatable, Sendable {
     public var appearance = Appearance.system
     /// P8-SIDE-1: the side of the window the tab sidebar sits on.
     public var sidebarSide = SidebarSide.left
+    /// P9-REMEMBER (D28): keep session cookies (sign-ins) across a quit; a file without the key reads as on.
+    public var rememberSignIns = true
 
     public init() {}
 
@@ -61,6 +63,7 @@ public struct Prefs: Equatable, Sendable {
         prefs.searchEngine = (object["searchEngine"] as? String).flatMap(SearchEngine.init(rawValue:)) ?? .google
         prefs.appearance = (object["appearance"] as? String).flatMap(Appearance.init(rawValue:)) ?? .system
         prefs.sidebarSide = (object["sidebarSide"] as? String).flatMap(SidebarSide.init(rawValue:)) ?? .left
+        prefs.rememberSignIns = flag(object["rememberSignIns"]) ?? true
         if let minutes = number(object["idleUnloadMinutes"]).flatMap(Int.init(exactly:)), minutes >= 1 {
             prefs.idleUnloadMinutes = minutes
         }
@@ -73,13 +76,19 @@ public struct Prefs: Equatable, Sendable {
         return number.doubleValue
     }
 
+    /// A JSON boolean; nil for anything else, a number too.
+    static func flag(_ value: Any?) -> Bool? {
+        guard let number = value as? NSNumber, CFGetTypeID(number) == CFBooleanGetTypeID() else { return nil }
+        return number.boolValue
+    }
+
     /// Clear All (F6 ruling): the per-site settings go (the zoom per host); the app-wide ones stay.
     public mutating func forgetSites() { zoom = [:] }
 
     public func encoded() throws -> Data {
         let object: [String: Any] = ["zoom": zoom, "searchEngine": searchEngine.rawValue,
                                      "idleUnloadMinutes": idleUnloadMinutes, "appearance": appearance.rawValue,
-                                     "sidebarSide": sidebarSide.rawValue]
+                                     "sidebarSide": sidebarSide.rawValue, "rememberSignIns": rememberSignIns]
         return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .prettyPrinted])
     }
 }

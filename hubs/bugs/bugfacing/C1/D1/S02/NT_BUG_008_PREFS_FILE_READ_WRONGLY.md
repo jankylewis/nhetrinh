@@ -6,7 +6,7 @@ status: OBSERVED
 date: 2026-11-17
 signature: aBooleanIsNotMinutes
 source: _app/_Sources/NhetrinhCore/Prefs/_Prefs.swift on p6/memory 96130c6 (`decode`)
-source: _app/Tests/_NhetrinhCoreTests/Prefs/PrefsReviewTests.swift
+source: _app/Tests/_NhetrinhCoreTests/Prefs/Store/PrefsReviewTests.swift
 observed: found by the P4/P6 adversarial review (code read, then a test); no user report
 links: fix=yes lesson=no evidence=no toolgap=none
 cause: no failure reason filed: the mechanism is in the fix entry

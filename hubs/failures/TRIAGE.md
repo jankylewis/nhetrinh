@@ -9,6 +9,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-BLD-002 | `cp: .build/arm64-apple-macosx/release/Nhetrinh: No such file or directory` | FIXED | Script asks SwiftPM for the path (`--show-bin-path`), never hard-codes it |
 | NT-BLD-003 | `test_the_real_notes_do_not_contradict_themselves` | OBSERVED | Old or internal words in the notes? Edit the Release note column of the older rows (`-` leaves a row out) |
 | NT-BLD-004 | `test_a_feature_row_of_the_wrong_shape_is_an_error` | OBSERVED | A feature row with a missing column? `release_notes.py` must stop with its line number |
+| NT-BLD-006 | `keychain status -25293` | OBSERVED | A Keychain item made by another signature? Was the build signed ad hoc (`_build.sh` prints it)? Sign with the local identity; interaction off, a refused delete empties the item |
 | NT-GAT-001 | `error: plugin for module 'TestingMacros' not found` | FIXED | Was it plain `swift test`? Run `_app/scripts/test.sh`; compare `swift test -v` compile commands |
 | NT-GAT-002 | `no testTarget depends on NhetrinhReadback` | FIXED | Does `_app/Package.swift` have `NhetrinhReadbackTests`? |
 | NT-TAB-001 | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`IdleUnload.swift`); R11 PASS 22:09, red on P0 not run |

@@ -4,7 +4,7 @@ id: NT-BUG-008
 family: UIX
 status: OBSERVED
 date: 2026-11-17
-source: _app/Tests/_NhetrinhCoreTests/Prefs/PrefsReviewTests.swift (P4P6-FIX-1)
+source: _app/Tests/_NhetrinhCoreTests/Prefs/Store/PrefsReviewTests.swift (P4P6-FIX-1)
 links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Change

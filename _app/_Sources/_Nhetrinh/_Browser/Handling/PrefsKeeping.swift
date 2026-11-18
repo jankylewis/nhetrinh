@@ -33,6 +33,7 @@ extension BrowserWindowController {
         if old == nil { startIdleUnloading() }
         if let old, old.zoom != prefs.zoom { applyZoomToLoadedTabs() }
         if old?.sidebarSide != prefs.sidebarSide { placeSidebar(prefs.sidebarSide) }  // P8-SIDE-1, at once
+        if old?.rememberSignIns == true, !prefs.rememberSignIns { signIns?.forget() }  // P9-REMEMBER: off, gone
         hub?.show(prefs)
     }
 
@@ -48,9 +49,15 @@ extension BrowserWindowController {
     /// nhetrinh > Settings Hub… (⌘,): the one settings window (D19).
     @objc func showSettingsHub(_ sender: Any?) {
         let hub = self.hub ?? SettingsHub(store: WebConfig.shared.websiteDataStore)
+        wire(hub)
+        Screen.presenter.show(hub)  // on screen only in the launched app (P8-TESTWIN-1)
+    }
+
+    /// `hub` becomes the browser's: its changes are applied and saved; Clear All forgets the kept sign-ins.
+    func wire(_ hub: SettingsHub) {
         self.hub = hub
         hub.onChange = { [weak self] change in self?.updatePrefs(change) }
+        hub.onForgetSignIns = { [weak self] in self?.signIns?.forget() }
         hub.show(prefs)
-        Screen.presenter.show(hub)  // on screen only in the launched app (P8-TESTWIN-1)
     }
 }
