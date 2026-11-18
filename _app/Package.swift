@@ -22,7 +22,7 @@ let package = Package(
         .testTarget(name: "NhetrinhCoreTests", dependencies: ["NhetrinhCore"], path: "Tests/_NhetrinhCoreTests"),
         // The pure parts of the readback tool: icon match, report, options.
         .testTarget(name: "NhetrinhReadbackTests", dependencies: ["NhetrinhReadback"],
-                    path: "Tests/NhetrinhReadbackTests"),
+                    path: "Tests/NhetrinhReadbackTests", exclude: ["Fixtures"]),
         // The app's AppKit wiring that needs no running app: the menu reaches the browser (NT-UIX-001).
         .testTarget(name: "NhetrinhTests", dependencies: ["Nhetrinh"], path: "Tests/NhetrinhTests"),
     ],

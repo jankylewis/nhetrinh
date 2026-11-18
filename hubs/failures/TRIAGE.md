@@ -38,7 +38,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-GAT-012 | `noTestWindowIsEverVisible` | OBSERVED | A window on screen during test.sh? Does a sheet or window skip `Screen.presenter`? |
 | NT-GAT-013 | `aDownloadIsPartialUntilDoneThenQuarantined` | OBSERVED | A wait on a clock, or two reads of one folder? Wait for the event (the row's rename), read once |
 | NT-GAT-014 | `the save at quit is not version 2` | OBSERVED | Does a step pin a number the app writes? Read it from the app's constant (`TreeSession.version`) |
-| NT-GAT-015 | `R2 FAIL` agreement 90 %, icon at 94 %, build c751b08 | OPEN | Cause not proven; investigated by another seat |
+| NT-GAT-015 | `R2 FAIL` agreement 90 % (13:19), 80 % (13:57), build c751b08 | OBSERVED | Neighbours in the ring on a 20 pt Dock? R2 now reads only the item's own frame; the FAIL line names item and capture |
 | NT-PRF-001 | `R8 ... app 60.0 MB (max 40)` | FIXED | `footprint -p`: a large `CG Image` row? The runtime Dock icon must be at most 256 px |
 | NT-PRF-002 | `com.apple.WebKit.GPU above 40 MB` | OPEN | A 1-3 s GPU burst of ~100 MB? R8: median total of 9, a rise in the last 4, the highest app sample |
 | NT-PRF-003 | `anIconOfHugePixelSizeIsRefusedBeforeItIsDecoded` | OBSERVED | A small icon file of huge pixel size? `Favicons.fits` reads the size before any decode |

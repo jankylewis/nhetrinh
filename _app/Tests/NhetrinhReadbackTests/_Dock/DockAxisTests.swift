@@ -5,25 +5,30 @@ import Testing
 /// NT-GAT-007. The 19:40 capture (kept outside the repository, never copied in): the Dock on the
 /// left, 34 pt wide; the item 34 x 22 pt, wider than the icon and past the Dock's visible edge;
 /// the bare icon, no tile. R2 failed at 76 %: the item took in a lighter strip past the Dock's
-/// edge, and the square icon was stretched over a 34 x 22 item. Drawn here at 2x, same geometry:
-/// neighbour tiles before and after the item along the Dock, the running dot on the screen-edge
-/// side, the lighter strip on the other side.
+/// edge, and the square icon was stretched over a 34 x 22 item. Drawn here at 2x, same geometry,
+/// on a left, a bottom and a right Dock: the running dot on the screen-edge side, the lighter strip
+/// on the other side, and neighbour tiles touching the item along the Dock, as on a 20 pt Dock with
+/// magnification (NT-GAT-015: at 13:57 they filled the ring R2 read the Dock's colour from).
 enum AxisCase: String, CaseIterable {
     case bareLeft = "left Dock: the bare icon"
     case tiledLeft = "left Dock: the icon on a dark tile"
     case bareBottom = "bottom Dock: the bare icon"
     case tiledBottom = "bottom Dock: the icon on a dark tile"
+    case bareRight = "right Dock: the bare icon"
+    case tiledRight = "right Dock: the icon on a dark tile"
 
-    var axis: DockAxis { self == .bareLeft || self == .tiledLeft ? .vertical : .horizontal }
-    var tiled: Bool { self == .tiledLeft || self == .tiledBottom }
+    var axis: DockAxis { self == .bareBottom || self == .tiledBottom ? .horizontal : .vertical }
+    var tiled: Bool { self == .tiledLeft || self == .tiledBottom || self == .tiledRight }
+    var mirrored: Bool { self != .bareLeft && self != .tiledLeft }  // across 0 at the right or the bottom
 }
 
 /// A rect given along the Dock and across it (across 0 is the screen edge), in pixels, top left.
-private func place(_ along: ClosedRange<Double>, _ across: ClosedRange<Double>, _ axis: DockAxis) -> CGRect {
+private func place(_ along: ClosedRange<Double>, _ across: ClosedRange<Double>, _ shape: AxisCase) -> CGRect {
     let width = along.upperBound - along.lowerBound, depth = across.upperBound - across.lowerBound
-    return axis == .vertical
-        ? CGRect(x: across.lowerBound, y: along.lowerBound, width: depth, height: width)
-        : CGRect(x: along.lowerBound, y: 68 - across.upperBound, width: width, height: depth)  // 68: Dock depth
+    let start = shape.mirrored ? 68 - across.upperBound : across.lowerBound  // 68: Dock depth
+    return shape.axis == .vertical
+        ? CGRect(x: start, y: along.lowerBound, width: depth, height: width)
+        : CGRect(x: along.lowerBound, y: start, width: width, height: depth)
 }
 
 /// Fill `rect` (top-left pixels) in a bitmap `high` pixels tall: AppKit draws from the bottom left.
@@ -40,20 +45,20 @@ func axisCapture(_ shape: AxisCase) -> (image: NSBitmapImageRep, item: CGRect) {
     let axis = shape.axis
     let wide = axis == .vertical ? 68 : 66, high = axis == .vertical ? 66 : 68
     let image = bitmap(wide: wide, high: high) { _ in
-        fill(place(0...66, 0...68, axis), white: 0.30, high: high)  // the Dock
+        fill(place(0...66, 0...68, shape), white: 0.30, high: high)  // the Dock
         for step in 0..<5 {  // the lighter, uneven strip past the Dock's visible edge
-            fill(place(0...66, Double(58 + 2 * step)...Double(60 + 2 * step), axis), white: 0.42 + 0.02 * CGFloat(step),
-                 high: high)
+            let across = Double(58 + 2 * step)...Double(60 + 2 * step)
+            fill(place(0...66, across, shape), white: 0.42 + 0.02 * CGFloat(step), high: high)
         }
-        fill(place(-20...4, 8...40, axis), white: 0.08, high: high, round: true)  // neighbour before
-        fill(place(60...90, 8...40, axis), white: 0.08, high: high, round: true)  // neighbour after
-        fill(place(28...36, 0...4, axis), white: 0.80, high: high, round: true)  // the running dot
-        let square = place(10...54, 19...63, axis)  // the icon's square, centred on the item
+        fill(place(-20...10, 8...44, shape), white: 0.08, high: high, round: true)  // neighbour before, touching
+        fill(place(54...90, 8...44, shape), white: 0.08, high: high, round: true)  // neighbour after, touching
+        fill(place(28...36, 0...4, shape), white: 0.80, high: high, round: true)  // the running dot
+        let square = place(10...54, 19...63, shape)  // the icon's square, centred on the item
         if shape.tiled { fill(square, white: 0.08, high: high, round: true) }
         let icon = square.insetBy(dx: square.width * 0.12, dy: square.height * 0.12)
         drawIcon(in: NSRect(x: icon.minX, y: CGFloat(high) - icon.maxY, width: icon.width, height: icon.height))
     }
-    return (image, place(10...54, 7...75, axis))
+    return (image, place(10...54, 7...75, shape))
 }
 
 @Test(arguments: AxisCase.allCases)
@@ -86,7 +91,7 @@ func r2JudgesTheIconNotItsNeighbours(shape: AxisCase) {
                   CGRect(x: 13.6, y: 967, width: 34, height: 22), CGRect(x: 4, y: 600, width: 50, height: 22)])
 func narrowLeftDockCaptureStaysInTheFrame(item: CGRect) {
     let dock = CGRect(x: 10, y: 219, width: 34, height: 770)
-    guard let rect = DockIcon.captureRect(around: item, dock: dock) else {
+    guard let rect = DockIcon.captureRect(of: item, dock: dock) else {
         Issue.record("an item on the Dock has a capture")
         return
     }
@@ -108,4 +113,16 @@ func cutSquareIsScoredInsideTheCapture(shape: AxisCase) {
     let match = IconMatch.measure(capture: capture, icon: icon, item: drawn.item, axis: .vertical)
     #expect(match.showsBareIcon == !shape.tiled,
             "\(shape.rawValue): agreement \(match.agreement), scale \(match.scale)")
+}
+
+/// NT-GAT-015: only the item's own frame, never a ring: at 13:57 the ring held the neighbours.
+@Test func captureIsTheItemInsideTheDock() {
+    let bottom = CGRect(x: 300, y: 716, width: 400, height: 80)
+    #expect(DockIcon.captureRect(of: CGRect(x: 400, y: 724, width: 64, height: 64), dock: bottom)
+            == CGRect(x: 400, y: 724, width: 64, height: 64))
+    #expect(DockIcon.captureRect(of: CGRect(x: 690, y: 700, width: 64, height: 120), dock: bottom)
+            == CGRect(x: 690, y: 716, width: 10, height: 80))
+    let left = CGRect(x: 10, y: 197, width: 34, height: 814)  // 13:57: the item past the Dock's far side
+    #expect(DockIcon.captureRect(of: CGRect(x: 13.6, y: 467, width: 34, height: 22), dock: left)
+            == CGRect(x: 14, y: 467, width: 30, height: 22))
 }

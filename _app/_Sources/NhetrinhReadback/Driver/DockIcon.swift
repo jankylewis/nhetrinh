@@ -1,5 +1,12 @@
 import AppKit
 
+/// The Dock's long axis: its items sit one after another along it (NT-GAT-007).
+enum DockAxis {
+    case horizontal, vertical
+
+    static func of(_ dock: CGRect) -> DockAxis { dock.width >= dock.height ? .horizontal : .vertical }
+}
+
 /// One Dock item and the Dock list that holds it (screen points, origin top left), whether its app
 /// runs (`AXIsApplicationRunning`) and the bundle it stands for (`AXURL`; nil for a separator).
 struct DockItem {
@@ -10,8 +17,8 @@ struct DockItem {
 }
 
 /// The app's item in the Dock: where it is, and a picture of it.
-/// Only the item and a ring of at most 6 pt around it are captured, clamped to the Dock's own
-/// frame: no pixel outside the Dock, never the screen. The Dock is always on top, so no window of
+/// Only the item's own frame is captured, clamped to the Dock's own frame: no neighbour item
+/// (NT-GAT-015), no pixel outside the Dock, never the screen. The Dock is always on top, so no window of
 /// another app can be inside it (NT-TG-002). The picture is a temporary file, deleted at once.
 enum DockIcon {
     /// Every Dock item on screen, each with the frame of the Dock list that holds it.
@@ -63,15 +70,12 @@ enum DockIcon {
         return NSScreen.screens.contains { $0.frame.contains(flipped) }
     }
 
-    /// R2 reads the Dock's colour from a ring this wide around the item (NT-GAT-004).
-    static let ringPoints: CGFloat = 6
-
-    /// The item grown by `ringPoints` on each side, clamped to the Dock's frame: where the item
-    /// touches the Dock's edge, the ring there is smaller. Rounded inward to whole points, because
+    /// The item clamped to the Dock's frame: never a ring around it, which on a 20 pt Dock held the
+    /// items before and after it (NT-GAT-015). Rounded inward to whole points, because
     /// `screencapture -R` takes whole points: rounding outward could pass the Dock's edge (P0-REV-2).
     /// Nil when nothing is left inside the Dock.
-    static func captureRect(around item: CGRect, dock: CGRect) -> CGRect? {
-        let rect = item.insetBy(dx: -ringPoints, dy: -ringPoints).intersection(dock)
+    static func captureRect(of item: CGRect, dock: CGRect) -> CGRect? {
+        let rect = item.intersection(dock)
         guard !rect.isNull else { return nil }
         let minX = rect.minX.rounded(.up), minY = rect.minY.rounded(.up)
         let width = rect.maxX.rounded(.down) - minX, height = rect.maxY.rounded(.down) - minY
@@ -83,7 +87,7 @@ enum DockIcon {
     /// the Dock's frame, and its icon is centred on the whole item: NT-GAT-007); and the PNG's
     /// bytes, which R2 writes out only with `--keep-capture`, never into a repository.
     static func capture(_ item: DockItem) throws -> (image: NSBitmapImageRep, item: CGRect, png: Data) {
-        guard let frame = captureRect(around: item.frame, dock: item.dock) else {
+        guard let frame = captureRect(of: item.frame, dock: item.dock) else {
             throw StepError.cannotDrive("the Dock item is outside the Dock's frame")
         }
         let file = FileManager.default.temporaryDirectory.appendingPathComponent("nhetrinh-r2-\(UUID().uuidString).png")
@@ -108,10 +112,16 @@ enum DockIcon {
     static func note(_ match: IconMatch, item: DockItem) -> String {
         let rect = { (r: CGRect) in String(format: "x %.1f y %.1f w %.1f h %.1f", r.minX, r.minY, r.width, r.height) }
         let colour = match.background.map { String(Int($0.rounded())) }.joined(separator: " ")
-        let captured = captureRect(around: item.frame, dock: item.dock).map(rect) ?? "none"
+        let captured = captureRect(of: item.frame, dock: item.dock).map(rect) ?? "none"
         return String(format: "agreement: %.3f\nscale: %.2f\n", match.agreement, match.scale)
             + "background (sRGB 0-255): \(colour.isEmpty ? "none" : colour)\n"
             + "item: \(rect(item.frame))\ndock: \(rect(item.dock))\ncapture: \(captured)\n"
+    }
+
+    /// What R2 measured, for its FAIL line: the item's frame in points, the capture in pixels.
+    static func geometry(_ item: CGRect, capture: NSBitmapImageRep) -> String {
+        String(format: "item x %.1f y %.1f w %.1f h %.1f pt, ", item.minX, item.minY, item.width, item.height)
+            + "capture \(capture.pixelsWide) x \(capture.pixelsHigh) px"
     }
 
     static func keepFile(_ data: Data, as name: String, in folder: URL) throws {

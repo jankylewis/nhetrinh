@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import Testing
 @testable import NhetrinhReadback
 
@@ -50,6 +50,13 @@ func keepCaptureMisuseIsAUsageError(arguments: [String]) {
     #expect(note.contains("background (sRGB 0-255): 30 31 36\n"))
     #expect(note.contains("item: x 100.0 y 1000.0 w 64.0 h 64.0\n"))
     #expect(note.contains("dock: x 0.0 y 990.0 w 800.0 h 80.0\n"))
-    #expect(note.contains("capture: x 94.0 y 994.0 w 76.0 h 76.0\n"))
+    #expect(note.contains("capture: x 100.0 y 1000.0 w 64.0 h 64.0\n"))
     #expect(!note.contains("/"))
+}
+
+/// NT-GAT-015: a FAIL line says what was measured: the item's frame (points) and the capture (pixels).
+@Test func failLineNamesTheItemAndTheCapture() {
+    let image = bitmap(wide: 60, high: 44) { _ in }
+    let line = DockIcon.geometry(CGRect(x: 13.6, y: 467, width: 34, height: 22), capture: image)
+    #expect(line == "item x 13.6 y 467.0 w 34.0 h 22.0 pt, capture 60 x 44 px")
 }

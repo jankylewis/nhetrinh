@@ -45,3 +45,5 @@ Not proven: R2 on the installed app. Not rebuilt or read back yet (one batched r
 ## Proof on master (0f99aee)
 
 Red-first tests green in CI run 43885459211 (PR #1, head 402adec, the same tree as master 0f99aee); `hubs/failures/evidence/readback/_LATEST.md` (2026-11-16 21:24, PASS 8 of 8; app 0.1.0 built from fba7d9e, whose app sources equal master 0f99aee), R2 on a left Dock (kept capture: dock x 10 w 34 h 748): `silhouette agreement 98 %, icon at 92 % of the Dock item`.
+
+Superseded in part by NT-GAT-015: the ring and `lineColours` are gone; the Dock colour is read inside the item.

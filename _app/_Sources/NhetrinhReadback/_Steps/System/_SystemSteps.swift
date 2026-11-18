@@ -20,9 +20,10 @@ enum SystemSteps {
         let seen = String(format: "silhouette agreement %.0f %%, icon at %.0f %% of the Dock item",
                           match.agreement * 100, match.scale * 100)
             + kept(capture.png, DockIcon.note(match, item: item), in: app)
-        try expect(match.showsBareIcon, "the Dock item does not show the bare icon: \(seen)")
+        let measured = DockIcon.geometry(item.frame, capture: capture.image)  // NT-GAT-015
+        try expect(match.showsBareIcon, "the Dock item does not show the bare icon: \(seen); \(measured)")
         let size = "\(Int(item.frame.width)) x \(Int(item.frame.height)) pt"
-        return "captured the Dock item (\(size)) and a ring inside the Dock, "
+        return "captured the Dock item (\(size)) inside the Dock, "
             + (app.keepCapture == nil ? "not kept: " : "") + seen
     }
 

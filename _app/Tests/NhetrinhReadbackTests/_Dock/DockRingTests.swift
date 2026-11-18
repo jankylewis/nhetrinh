@@ -62,24 +62,17 @@ let dockItems: [CGRect] = [
     CGRect(x: 690, y: 700, width: 64, height: 120), CGRect(x: 100, y: 724, width: 64, height: 64),
 ]
 
-/// No pixel outside the Dock is ever captured (NT-TG-002): the ring is clamped to the Dock's frame.
+/// No pixel outside the Dock is ever captured (NT-TG-002): the item is clamped to the Dock's frame.
 @Test(arguments: dockItems)
 func ringNeverLeavesTheDock(item: CGRect) {
-    guard let rect = DockIcon.captureRect(around: item, dock: dock) else {
+    guard let rect = DockIcon.captureRect(of: item, dock: dock) else {
         #expect(item.intersection(dock).isNull, "only an item outside the Dock has no capture")
         return
     }
     #expect(dock.contains(rect), "\(rect) leaves the Dock \(dock)")
 }
 
-/// The ring is 6 pt on each side inside the Dock, and smaller where the item touches its edge.
-@Test func ringIsSmallerAtTheDocksEdge() {
-    #expect(DockIcon.captureRect(around: CGRect(x: 400, y: 724, width: 64, height: 64), dock: dock)
-            == CGRect(x: 394, y: 718, width: 76, height: 76))
-    #expect(DockIcon.captureRect(around: CGRect(x: 300, y: 732, width: 64, height: 64), dock: dock)
-            == CGRect(x: 300, y: 726, width: 70, height: 70))
-}
-
+/// No Dock beside the icon inside the item: the Dock's colour is unknown.
 @Test func noRingIsNeverAPass() {
     let drawn = bitmap(side: 128) { drawIcon(in: $0.insetBy(dx: 6, dy: 6)) }
     let icon = bitmap(side: 256) { drawIcon(in: $0) }
@@ -95,7 +88,7 @@ func ringNeverLeavesTheDock(item: CGRect) {
 @Test(arguments: [CGRect(x: 300.5, y: 724.25, width: 64, height: 64), CGRect(x: 635.5, y: 724, width: 64, height: 64)])
 func ringIsWholePointsInsideTheDock(item: CGRect) {
     let halfPointDock = CGRect(x: 300.5, y: 716.25, width: 399, height: 79.5)
-    guard let rect = DockIcon.captureRect(around: item, dock: halfPointDock) else {
+    guard let rect = DockIcon.captureRect(of: item, dock: halfPointDock) else {
         Issue.record("an item inside the Dock has a capture")
         return
     }
