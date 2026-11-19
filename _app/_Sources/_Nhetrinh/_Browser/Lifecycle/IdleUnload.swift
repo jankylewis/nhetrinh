@@ -29,9 +29,17 @@ extension BrowserWindowController {
         let idle = UnloadPolicy.tabsToUnload(policyStates(playing: []), selected: selected, now: now,
                                              idleLimit: unloadAfter, pressure: pressure).map { tabs[$0] }
         guard !idle.isEmpty else { return }
+        let asked = Set(idle.map(ObjectIdentifier.init))
+        askPlaying(idle) { [weak self] playing in
+            self?.unload(asked: asked, playing: playing, pressure: pressure)
+        }
+    }
+
+    /// Ask WebKit whether each of `tabs` plays; `then` gets the playing ones, on the main queue, once all answered.
+    func askPlaying(_ tabs: [Tab], then: @escaping (Set<ObjectIdentifier>) -> Void) {
         let playing = PlayingTabs()
         let answers = DispatchGroup()
-        for tab in idle {
+        for tab in tabs {
             guard let webView = tab.webView else { continue }
             let id = ObjectIdentifier(tab)
             answers.enter()
@@ -40,10 +48,7 @@ extension BrowserWindowController {
                 answers.leave()
             }
         }
-        let asked = Set(idle.map(ObjectIdentifier.init))
-        answers.notify(queue: .main) { [weak self] in
-            self?.unload(asked: asked, playing: playing.ids, pressure: pressure)
-        }
+        answers.notify(queue: .main) { then(playing.ids) }
     }
 
     /// The policy again, on the tabs as they are now: a tab selected meanwhile is kept, and a tab
@@ -60,7 +65,7 @@ extension BrowserWindowController {
         refreshChrome()
     }
 
-    private func policyStates(playing: Set<ObjectIdentifier>) -> [UnloadPolicy.TabState] {
+    func policyStates(playing: Set<ObjectIdentifier>) -> [UnloadPolicy.TabState] {
         tabs.map { tab in
             UnloadPolicy.TabState(lastActive: tab.lastActive, isLoaded: tab.isLoaded,
                                   isPlaying: playing.contains(ObjectIdentifier(tab)), isCapturing: capturing(tab))

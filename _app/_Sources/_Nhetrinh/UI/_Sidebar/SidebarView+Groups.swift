@@ -1,13 +1,16 @@
 import AppKit
 import NhetrinhCore
 
-/// A row's menu (P7; groups since P8-GROUPS-1). A tab's: Duplicate Tab, Close Tab, New Group from Selected
-/// Tab…, Move Tab to Group ▸ (every group, as a path "MBing > FE"), Move Out of Group. A group's: Rename
-/// Group…, Collapse / Expand Group, New Group Inside…, Move Group to ▸ (Top Level, every group; one it cannot
-/// go into is off, its tooltip says why), Ungroup, Close Group…. Every menu: New Group… at the top level,
-/// after the row's top item; off the rows only that. The readback presses these as a user does (no drag, D18).
+/// A row's menu (P7; groups since P8-GROUPS-1). A tab's: Duplicate Tab, Put Tab to Idle, Put Other Tabs to
+/// Idle, Close Tab, New Group from Selected Tab…, Move Tab to Group ▸ (every group, as a path "MBing > FE"),
+/// Move Out of Group. A group's: Rename Group…, Collapse / Expand Group, New Group Inside…, Move Group to ▸
+/// (Top Level, every group; one it cannot go into is off, its tooltip says why), Ungroup, Close Group…. Every
+/// menu: New Group… at the top level, after the row's top item; off the rows only that. The readback presses
+/// these as a user does (no drag, D18).
 extension SidebarView {
     static let duplicateTab = "Duplicate Tab"
+    static let idleTab = "Put Tab to Idle"
+    static let idleOtherTabs = "Put Other Tabs to Idle"
     static let newGroup = "New Group…"
     static let newGroupInside = "New Group Inside…"
     static let newGroupFromTab = "New Group from Selected Tab…"
@@ -51,6 +54,8 @@ extension SidebarView {
         let from = node.path
         var items = [
             actionItem(Self.duplicateTab) { [weak self] in node.flat.map { self?.onDuplicate?($0) } },
+            actionItem(Self.idleTab) { [weak self] in node.flat.map { self?.onIdle?($0, false) } },
+            actionItem(Self.idleOtherTabs) { [weak self] in node.flat.map { self?.onIdle?($0, true) } },
             actionItem("Close Tab") { [weak self] in node.flat.map { self?.onClose?($0) } },
             actionItem(Self.newGroupFromTab) { [weak self] in self?.onAction?(.groupTab(from)) },
         ]

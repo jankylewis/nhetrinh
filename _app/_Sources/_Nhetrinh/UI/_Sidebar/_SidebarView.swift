@@ -17,6 +17,8 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
     var onSelect: ((Int) -> Void)?
     var onClose: ((Int) -> Void)?
     var onDuplicate: ((Int) -> Void)?
+    /// Put Tab to Idle (false) / Put Other Tabs to Idle (true), for the flat index of the row clicked.
+    var onIdle: ((Int, Bool) -> Void)?
     var onNewTab: (() -> Void)?
     /// A group action or a drop (P7).
     var onAction: ((SidebarAction) -> Void)?

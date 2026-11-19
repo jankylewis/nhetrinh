@@ -50,4 +50,13 @@ public enum UnloadPolicy {
             return index != selected && tab.isLoaded && !tab.isPlaying && !tab.isCapturing && idle
         }
     }
+
+    /// Put Tab to Idle / Put Other Tabs to Idle (headmate, 2026-11-19): `chosen` alone, or every tab but `chosen`;
+    /// idle time does not count. Only loaded tabs that neither play nor capture (NT-TAB-001, F3 ruling).
+    public static func tabsToIdle(_ tabs: [TabState], chosen: Int, others: Bool) -> [Int] {
+        tabs.indices.filter { index in
+            let tab = tabs[index]
+            return (others ? index != chosen : index == chosen) && tab.isLoaded && !tab.isPlaying && !tab.isCapturing
+        }
+    }
 }

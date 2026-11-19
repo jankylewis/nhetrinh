@@ -66,3 +66,16 @@ func unloadPolicyEdges(loaded: Bool, playing: Bool, expected: [Int]) {
     let tested = UnloadPolicy.TabState(lastActive: now - 86_400, isLoaded: loaded, isPlaying: playing)
     #expect(UnloadPolicy.tabsToUnload([control, tested], selected: nil, now: now, idleLimit: limit) == expected)
 }
+
+/// Put Tab to Idle / Put Other Tabs to Idle (headmate, 2026-11-19): idle time does not count, the user asks now.
+/// Tabs: 0 and 5 loaded and silent, 1 loaded, 2 playing, 3 already idle, 4 holding the microphone.
+@Test(arguments: [(chosen: 0, others: false, expected: [0]), (chosen: 2, others: false, expected: []),
+                  (chosen: 3, others: false, expected: []), (chosen: 4, others: false, expected: []),
+                  (chosen: 1, others: true, expected: [0, 5]), (chosen: 0, others: true, expected: [1, 5])])
+func tabsToIdleTakesOnlyLoadedSilentTabs(chosen: Int, others: Bool, expected: [Int]) {
+    func tab(loaded: Bool = true, playing: Bool = false, capturing: Bool = false) -> UnloadPolicy.TabState {
+        UnloadPolicy.TabState(lastActive: now, isLoaded: loaded, isPlaying: playing, isCapturing: capturing)
+    }
+    let tabs = [tab(), tab(), tab(playing: true), tab(loaded: false), tab(capturing: true), tab()]
+    #expect(UnloadPolicy.tabsToIdle(tabs, chosen: chosen, others: others) == expected)
+}

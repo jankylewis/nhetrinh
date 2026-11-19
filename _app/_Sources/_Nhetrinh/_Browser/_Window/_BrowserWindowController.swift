@@ -114,6 +114,7 @@ final class BrowserWindowController: NSWindowController {
         sidebar.onSelect = { [weak self] index in self?.select(index) }
         sidebar.onClose = { [weak self] index in self?.close(at: index) }
         sidebar.onDuplicate = { [weak self] index in self?.duplicate(at: index) }
+        sidebar.onIdle = { [weak self] index, others in self?.putToIdle(index, others: others) }
         sidebar.onNewTab = { [weak self] in self?.newTab(nil) }
         sidebar.onAction = { [weak self] action in self?.sidebarAction(action) }
         sidebar.moveRefusal = { [weak self] in self?.moveRefusal(from: $0, into: $1, at: $2) }
