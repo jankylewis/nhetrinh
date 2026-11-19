@@ -27,3 +27,4 @@ Grep the signature in the report or log.
 | NT-BUG-020 | headmate | `sign-ins: restored 0` | OBSERVED | Signed out after a relaunch? Was the quit clean (no `running.marker`) and Remember sign-ins on? (after a reinstall: was the build signed with the local identity? NT-BLD-006) |
 | NT-BUG-021 | headmate | `typing https shows nothing` | OBSERVED | Does the address field show visited pages and open tabs below it while typing? P11-HISTORY; R54 not read back |
 | NT-BUG-022 | headmate | `dark dropdown, black text` | FIXED | Text unreadable on a coloured surface? A layer colour set outside drawing must resolve in the view's `effectiveAppearance` |
+| NT-BUG-023 | headmate | `address field gone, ⌘L does nothing` | FIXED | Toolbar without the address field? Is the row's layout ambiguous (`hasAmbiguousLayout`)? (NT-UIX-006) |

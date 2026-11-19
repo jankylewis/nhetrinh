@@ -48,9 +48,10 @@ final class ToolbarView: NSView {
         address.setAccessibilityIdentifier("nhetrinh.address")
         AppFont.apply(to: textControls)
         toggle.toolTip = "Toggle Sidebar (⌘S)"
-
         let row = NSStackView(views: [toggle, back, forward, reload, address, zoomBadge])
         row.spacing = 6
+        row.distribution = .fill  // NT-BUG-023: the row is filled, and only the field stretches
+        address.setContentHuggingPriority(.init(1), for: .horizontal)
         row.translatesAutoresizingMaskIntoConstraints = false
         addSubview(row)
         progressLine.wantsLayer = true

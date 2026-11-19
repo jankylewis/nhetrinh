@@ -6,3 +6,4 @@ Index of this folder; `_SCHEMA.md` has the rules.
 |---|---|
 | `NT_BUG_021_NO_ADDRESS_SUGGESTIONS.md` | OBSERVED |
 | `NT_BUG_022_DROPDOWN_TEXT_INVISIBLE.md` | FIXED |
+| `NT_BUG_023_ADDRESS_FIELD_GONE.md` | FIXED |

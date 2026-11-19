@@ -22,6 +22,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TAB-003 | self-test | `aLinkFromAnotherAppKeepsTheFolders` | OBSERVED | Folders gone after a new tab? A mutation of the flat `tabs` rebuilds the tree: insert through `tree` |
 | NT-UIX-003 | development | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-UIX-005 | headmate | `theLeftButtonsClearTheTrafficLights` | OBSERVED | A toolbar control at a fixed x under the title bar? Place it from `standardWindowButton(.zoomButton)`'s frame, on every layout |
+| NT-UIX-006 | headmate | `theFieldFillsTheRowAndIsNotAmbiguous` | FIXED | A view in a stack row lost its width? Default gravity areas + equal hugging = ambiguous: use `.fill` and the lowest hugging on the view that stretches |
 | NT-ENV-001 | headmate | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |
 | NT-ENV-002 | development | `memsum procs=1` for a WebKit app | FIXED | Was the app launched from a terminal? Launch via `open` |
 | NT-ENV-003 | development | `first_load` 8-10 s for one run, under 1 s for the next | FIXED | Did the previous instance's helpers still run? Wait until all are gone |
