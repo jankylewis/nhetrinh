@@ -8,7 +8,7 @@ found_by: headmate (2026-11-17, a browser window on screen during a test run, P8
 signature: noTestWindowIsEverVisible
 source: nhetrinh_wt/REVIEW_P8_SIDE.md, part (b): the tests that attached sheets or showed the Settings Hub
 source: _app/Tests/NhetrinhTests/Page/_SheetGapsTests.swift (`NoWindowOnScreenTests`)
-source: _app/_Sources/_Nhetrinh/Support/Screen.swift (P8-TESTWIN-1)
+source: _app/_Sources/_Nhetrinh/Support/Seams/_Screen.swift (P8-TESTWIN-1; was Support/Screen.swift)
 observed: the headmate saw a browser window with tab t1 selected on screen while unit tests ran
 links: fix=no lesson=yes evidence=no toolgap=none
 

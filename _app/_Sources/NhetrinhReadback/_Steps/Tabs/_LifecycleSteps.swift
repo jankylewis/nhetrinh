@@ -63,13 +63,15 @@ enum LifecycleSteps {
     /// The readback profile's own saved session, removed so a step starts from one home tab.
     @discardableResult
     static func forgetSession() -> Bool {
-        guard let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        else { return false }
-        let folder = SessionStore.folder(applicationSupport: support, profile: AppSession.profile)
-        for name in [SessionStore.fileName, SessionStore.badFileName, TreeSessionStore.backupFileName] {
-            try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
+        let folders = AppSession.folders()  // its own and P9's old one (P10-PROFILE)
+        for folder in folders {
+            for name in [SessionStore.fileName, SessionStore.badFileName, TreeSessionStore.backupFileName] {
+                try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
+            }
         }
-        return !FileManager.default.fileExists(atPath: folder.appendingPathComponent(SessionStore.fileName).path)
+        return !folders.isEmpty && folders.allSatisfy {
+            !FileManager.default.fileExists(atPath: $0.appendingPathComponent(SessionStore.fileName).path)
+        }
     }
 
     /// Quit, forget the readback session, launch with the probe (and `env`): one home tab.

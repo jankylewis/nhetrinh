@@ -20,6 +20,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-NAV-004 | development | `isMainFrame != false` | OBSERVED | A page asking to open another app in a loop? Ruling pending: ask only for a click |
 | NT-TAB-002 | development | `ask selects the asking tab` | OBSERVED | A background tab pulling the user to it? Ruling pending: hold its question |
 | NT-TAB-003 | self-test | `aLinkFromAnotherAppKeepsTheFolders` | OBSERVED | Folders gone after a new tab? A mutation of the flat `tabs` rebuilds the tree: insert through `tree` |
+| NT-TAB-004 | development | `aNameThatCollidesOrEscapesIsRefused` | OBSERVED | `NHT_PROFILE=default` (any case)? It shared the default profile's Keychain item; refused since P10-PROFILE |
 | NT-UIX-003 | development | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-UIX-005 | headmate | `theLeftButtonsClearTheTrafficLights` | OBSERVED | A toolbar control at a fixed x under the title bar? Place it from `standardWindowButton(.zoomButton)`'s frame, on every layout |
 | NT-ENV-001 | headmate | `whole machine at ~80% CPU during the bench` | OBSERVED | Does a scenario start many engine processes at once? Load one at a time |

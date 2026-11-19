@@ -1,20 +1,11 @@
 import Foundation
 
-/// Reads and writes `session.json` in a folder (the app passes `folder(applicationSupport:profile:)`).
+/// Reads and writes `session.json` in a folder (the app passes its profile's folder: `ProfileLayout`, D29).
 /// A file that cannot be read (corrupt, or from a newer version) is renamed `session.bad.json`,
 /// and the app starts with one home tab: no crash, no silent loss.
 public enum SessionStore {
     public static let fileName = "session.json"
     public static let badFileName = "session.bad.json"
-
-    /// `<Application Support>/nhetrinh`; with a profile (NHT_PROFILE), a folder of that profile's own,
-    /// so a readback run (profile "readback") never reads or writes the user's session.
-    public static func folder(applicationSupport: URL, profile: String?) -> URL {
-        let base = applicationSupport.appendingPathComponent("nhetrinh", isDirectory: true)
-        guard let profile, !profile.isEmpty else { return base }
-        return base.appendingPathComponent("profiles", isDirectory: true)
-            .appendingPathComponent(Profile.identifier(for: profile).uuidString, isDirectory: true)
-    }
 
     /// Atomic: the folder holds the old file or the new one, never half of one.
     public static func save(_ session: Session, in folder: URL) throws {

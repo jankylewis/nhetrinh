@@ -4,7 +4,7 @@ import WebKit
 
 /// The Settings Hub (D19): one small native window, nhetrinh > Settings Hub… (⌘,). Appearance, Sidebar
 /// position (P8-SIDE-1), Search engine, Unload idle tabs after N minutes, Remember sign-ins after quit
-/// (P9-REMEMBER), Clear Website Data…. Every change
+/// (P9-REMEMBER), Clear Website Data…, Profile: Show data folder and Reset profile… (P10-PROFILE). Every change
 /// applies at once; the browser keeps it (`PrefsKeeping`). Actions and the readback probe's presses:
 /// `SettingsHub+Actions`.
 final class SettingsHub: NSWindowController {
@@ -12,10 +12,18 @@ final class SettingsHub: NSWindowController {
     static let clearTitle = "Clear Website Data…"
     static let positionTitle = "Sidebar position"
     static let rememberTitle = "Remember sign-ins after quit"
+    static let showFolderTitle = "Show data folder"
+    static let resetTitle = "Reset profile…"
     /// The browser applies and saves a change.
     var onChange: (((inout Prefs) -> Void) -> Void)?
     /// Clear All: the browser deletes the kept sign-ins (P9-REMEMBER).
     var onForgetSignIns: (() -> Void)?
+    /// P10-PROFILE: the browser shows its profile's folder in Finder; resets its profile (confirmed first).
+    var onShowFolder: (() -> Void)?
+    var onResetProfile: (() -> Void)?
+    let profileName = NSTextField(labelWithString: ProfileLayout.defaultName)
+    lazy var showFolder = NSButton(title: Self.showFolderTitle, target: self, action: #selector(showFolderPressed))
+    lazy var reset = NSButton(title: Self.resetTitle, target: self, action: #selector(askToReset))
     let store: WKWebsiteDataStore
     let appearance = NSPopUpButton()
     let engine = NSPopUpButton()
@@ -29,7 +37,7 @@ final class SettingsHub: NSWindowController {
 
     init(store: WKWebsiteDataStore) {
         self.store = store
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 240),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 480, height: 280),
                               styleMask: [.titled, .closable], backing: .buffered, defer: false)
         window.title = Self.title
         window.isReleasedWhenClosed = false
@@ -70,6 +78,7 @@ final class SettingsHub: NSWindowController {
             [label("Appearance"), appearance], [label(Self.positionTitle), position], [label("Search engine"), engine],
             [label("Unload idle tabs after"), idle], [label("Sign-ins"), remember],
             [NSGridCell.emptyContentView, clear],
+            [label("Profile"), NSStackView(views: [profileName, showFolder, reset])],
         ])
         grid.rowSpacing = 12
         grid.column(at: 0).xPlacement = .trailing

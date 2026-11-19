@@ -50,7 +50,7 @@ struct SessionKeepingTests {
     func sessionFolderFollowsTheLaunch(env: [String: String], on: Bool, own: Bool) {
         let folder = BrowserWindowController.sessionFolder(env)
         #expect((folder != nil) == on)
-        #expect(folder.map { $0.lastPathComponent == "nhetrinh" } ?? false == own)
+        #expect(folder.map { $0.lastPathComponent == "Default" } ?? false == own)  // P10-PROFILE (D29)
     }
 
     /// The probe's menu op finds the item now and performs it after the answer, so Quit can answer.

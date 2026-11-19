@@ -5,22 +5,29 @@ import WebKit
 enum WebConfig {
     static let shared: WKWebViewConfiguration = {
         let config = WKWebViewConfiguration()
-        config.websiteDataStore = dataStore()
+        let layout = BrowserWindowController.profileLayout(ProcessInfo.processInfo.environment)
+        config.websiteDataStore = choose(layout?.webStore, standard: { .default() }, none: { .nonPersistent() },
+                                         identified: identified)
         // A Safari-like user agent tail, so sites treat nhetrinh as Safari.
         config.applicationNameForUserAgent = "Version/18.0 Safari/605.1.15"
         config.preferences.isElementFullscreenEnabled = true  // fullscreen video (P3)
         return config
     }()
 
-    /// NHT_PROFILE=<name> selects a separate profile. The readback runs in the profile "readback",
-    /// so a test run never reads or writes the cookies and cache of the user's real browsing.
-    private static func dataStore() -> WKWebsiteDataStore {
-        guard let name = ProcessInfo.processInfo.environment["NHT_PROFILE"], !name.isEmpty else {
-            return .default()
+    /// P10-PROFILE (D29), HARD RULE: `Default` (no NHT_PROFILE) keeps WebKit's default store, where every cookie
+    /// and sign-in of the headmate is; another profile its own (`readback`: never the user's). A refused name
+    /// (`ProfileLayout.refusal`) keeps nothing. Generic, so a test checks the choice without making a store.
+    static func choose<Store>(_ store: WebStore?, standard: () -> Store, none: () -> Store,
+                              identified: (UUID) -> Store) -> Store {
+        switch store {
+        case .standard: return standard()
+        case .identifier(let id): return identified(id)
+        case nil: return none()
         }
-        if #available(macOS 14.0, *) {
-            return WKWebsiteDataStore(forIdentifier: Profile.identifier(for: name))
-        }
+    }
+
+    private static func identified(_ id: UUID) -> WKWebsiteDataStore {
+        if #available(macOS 14.0, *) { return WKWebsiteDataStore(forIdentifier: id) }
         return .nonPersistent()
     }
 }
