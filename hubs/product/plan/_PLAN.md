@@ -9,15 +9,12 @@ owner: the agent (repo owner by headmate grant, see `DECISIONS.md` D6)
 A very small macOS browser: browse sites, a vertical tab sidebar, the basics.
 Lightness first, speed second. After 1.0, features are added only when the headmate asks.
 
-## Where we are (2026-11-16)
+## Where we are (2026-11-19)
 
-- Engine chosen by measurement: WebKit. Numbers: `hubs/product/rnd/_bench/results/_RESULTS.md`.
-- On `master` (`b07f437`): the two R&D MVPs, the benchmark and the icon.
-- Features of the WebKit MVP, NT-FEAT-001 to 008: `../features/S01.md`.
-- Local, not committed: the `_app/` scaffold, `hubs/`, the folder checker.
-- Open hub items: NT-BUG-001, NT-BUG-002, NT-ENV-001, NT-TAB-001, NT-BLD-002, NT-TG-001, NT-TG-002.
-- Order fixed by the headmate: the harness (P0) is finished before any feature work (D14).
-- Nothing below is "done" until its readback passes. P0-P7 are merged (2026-11-18); P8 waits on R2 and the icon ruling.
+- `master`: P0-P7 merged (2026-11-18). P8 (1.0) waits on R2 and the icon ruling.
+- After 1.0, by headmate request, on branches (none merged, none read back): P9 `p9/remember`, P10
+  `p10/profile`, P11 `p11/history` (holds P9; the installed build). Merge order: P9, P10, P11.
+- Nothing below is "done" until its readback passes.
 
 ## Phases
 
@@ -32,6 +29,9 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P6 Memory guard | 0.7.0 | S | memory given back at once under pressure | DONE (merged #9, tag v0.7.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M3_V1_RELEASE.md` |
 | P7 Tab groups | 0.8.0 | L | collapsible tab groups in the sidebar | DONE (merged #10, tag v0.8.0; its steps PASS in the full readback of 2026-11-17 13:19 and 13:57, `_LATEST.md`; R2 is open on P8 as NT-GAT-015) | `M3_V1_RELEASE.md` |
 | P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; P8-FONT-1: the interface in Menlo, R47, tests green, not read back; P8-CHROME-1: toolbar Toggle Sidebar, toolbar clears the traffic lights (NT-BUG-018), R48, tests green, not read back; P8-GROUPS-1: nested tab groups, 4 levels, full CRUD, session v3, R49, tests green, not read back; P8-SIDE-1: the sidebar on the left or the right (Settings Hub > Sidebar position), R50, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
+| P9 Remember sign-ins | - | M | sign-ins survive quit and update (D28; P9-REMEMBER-2: one Keychain item per signing kind) | DOING (`p9/remember` 786a582, tests green; R51 not read back) | `DECISIONS.md` D28 |
+| P10 Profile folders | - | M | one folder per profile; Show data folder, Reset profile (D29) | DOING (`p10/profile` 40d0cbf, tests green; R53 not read back) | `DECISIONS.md` D29 |
+| P11 History | - | M | address-bar dropdown from history and open tabs (D30); Duplicate Tab, Put Tab to Idle | DOING (`p11/history`, installed; R54 not read back) | `DECISIONS.md` D30 |
 
 Size is relative effort (S, M, L). No dates: a phase ends when its gate passes, not on a day.
 Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it.
@@ -58,7 +58,7 @@ A step the readback cannot drive is reported as "not read back". It is never cou
 |---|---|---|
 | App process, one simple tab | 40 MB | 34.5 MB |
 | App + all helper processes, one simple tab | 110 MB | 95.7 MB |
-| `nhetrinh.app` on disk | 1 MB | 516 KB |
+| `nhetrinh.app` on disk | 1 MB | 1,032 KB (2026-11-19, P11: over; cut or new number, headmate) |
 | Idle CPU, tabs open, nothing playing | 2 % | 1.3 % (10 sites) |
 | 3 tabs opened, 2 unloaded (P6, R38): app, and app + helpers | one-tab budget + 15 MB (55 MB, 125 MB) | not measured yet |
 
