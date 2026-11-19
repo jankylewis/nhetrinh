@@ -12,15 +12,20 @@ enum SignInSeams {
     static var jar: () -> CookieJar = { HeldJar() }
 }
 
-/// The login Keychain: ONE generic-password item per profile (service per profile, account `signins`), never
-/// synchronized, so a new build signed by the same identity reads what the last one kept (`_build.sh` signs with
-/// the local identity of `signing.sh` when it exists). An item another signature made (an ad-hoc build) can
-/// be neither read nor deleted, only overwritten (NT-BLD-006): a write updates in place, a refused delete
-/// empties the item. Every call runs with user interaction off: one that would ask fails at once with its
-/// status. Outside the launched app it refuses with no Keychain call, whatever a caller passes (guard test).
+/// The login Keychain: ONE generic-password item per profile and signing kind (service per profile, account
+/// `signins.signed` or `signins.adhoc`), never synchronized, so a new build signed by the same identity reads what
+/// the last one kept (`_build.sh` signs with the local identity of `signing.sh` when it exists). An item another
+/// signature made can be neither read nor deleted, only overwritten (NT-BLD-006): an ad-hoc build and a signed one
+/// therefore never share an item; a write updates in place, a refused delete empties the item. Every call runs
+/// with user interaction off: one that would ask fails at once with its status. Outside the launched app it
+/// refuses with no Keychain call, whatever a caller passes (guard test).
 final class KeychainSecrets: SecretStore {
     static let appBundleID = "io.github.jankylewis.nhetrinh"
-    static let account = "signins"
+    /// The account of a build's signing kind: an item first kept ad hoc is unreadable by a signed build forever.
+    static func account(adHoc: Bool) -> String { adHoc ? "signins.adhoc" : "signins.signed" }
+    /// The account of the builds before the split: a signed build reads it once, then deletes it, so an update
+    /// keeps the sign-ins the build before it kept (no sign-in again after the install).
+    static let oldAccount = "signins"
     /// How many in this process can reach the Keychain: 0 in every unit test (guard test).
     private(set) static var reachable = 0
     let calls: KeychainCalls
@@ -41,14 +46,23 @@ final class KeychainSecrets: SecretStore {
         return body()
     }
 
-    private func query(_ service: String) throws -> [String: Any] {
+    private func query(_ service: String, account: String? = nil) throws -> [String: Any] {
         guard calls.reachesKeychain else { throw SecretsError.notLaunched }
         return [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service,
-                kSecAttrAccount as String: Self.account]
+                kSecAttrAccount as String: account ?? Self.account(adHoc: calls.adHoc)]
     }
 
+    /// This build's item; none, and signed: the old account's item once (read, then deleted). An old item this
+    /// build may not read (an ad-hoc build's, NT-BLD-006) counts as none.
     func read(service: String) throws -> Data? {
-        var match = try query(service)
+        if let data = try copy(service) { return data }
+        guard !calls.adHoc, let old = (try? copy(service, account: Self.oldAccount)) ?? nil else { return nil }
+        deleteOld(service)
+        return old
+    }
+
+    private func copy(_ service: String, account: String? = nil) throws -> Data? {
+        var match = try query(service, account: account)
         match[kSecReturnData as String] = true
         match[kSecMatchLimit as String] = kSecMatchLimitOne
         let (status, data) = quietly { calls.copy(match) }
@@ -80,6 +94,13 @@ final class KeychainSecrets: SecretStore {
             return calls.update(match, to: [kSecValueData as String: Data()])
         }
         guard status == errSecSuccess || status == errSecItemNotFound else { throw SecretsError.status(status) }
+        if !calls.adHoc { deleteOld(service) }
+    }
+
+    /// The old account's item gone, if this build may delete it; any other answer leaves it (best effort).
+    private func deleteOld(_ service: String) {
+        guard let match = try? query(service, account: Self.oldAccount) else { return }
+        _ = quietly { calls.delete(match) }
     }
 }
 

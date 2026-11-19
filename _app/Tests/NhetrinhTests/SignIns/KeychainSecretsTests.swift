@@ -17,10 +17,13 @@ final class RecordedCalls: KeychainCalls {
     }
 
     let reachesKeychain = true
+    var adHoc = false
     var interactionAllowed: Bool
     var calls: [Call] = []
     var statuses: [String: OSStatus] = [:]
     var stored = Data("kept".utf8)
+    /// Accounts with no item: a copy of one answers errSecItemNotFound, whatever `statuses` says.
+    var missing: Set<String> = []
 
     init(interaction: Bool) { interactionAllowed = interaction }
 
@@ -32,7 +35,8 @@ final class RecordedCalls: KeychainCalls {
     }
 
     func copy(_ query: [String: Any]) -> (OSStatus, Data?) {
-        let status = record("copy", query)
+        var status = record("copy", query)
+        if missing.contains(query[kSecAttrAccount as String] as? String ?? "") { status = errSecItemNotFound }
         return (status, status == errSecSuccess ? stored : nil)
     }
 
@@ -57,9 +61,10 @@ struct KeychainSecretsTests {
         ("delete", [:]), ("delete", ["delete": errSecItemNotFound]), ("delete", ["delete": errSecInvalidOwnerEdit]),
     ]
 
-    private func run(_ operation: String, _ statuses: [String: OSStatus], interaction: Bool = true) -> RecordedCalls {
+    private func run(_ operation: String, _ statuses: [String: OSStatus], interaction: Bool = true,
+                     adHoc: Bool = false) -> RecordedCalls {
         let fake = RecordedCalls(interaction: interaction)
-        fake.statuses = statuses
+        (fake.statuses, fake.adHoc) = (statuses, adHoc)
         let secrets = KeychainSecrets(calls: fake)
         switch operation {
         case "read": _ = try? secrets.read(service: Self.service)
@@ -80,16 +85,20 @@ struct KeychainSecretsTests {
         }
     }
 
-    /// ONE item per profile: every call names the profile's service and the one account, never a wider query
-    /// (no service-wide update: nothing piles up), whatever build or signature runs.
-    @Test func everyCallIsTheProfilesOneItem() {
+    /// ONE item per profile and signing kind: every call names the profile's service and the account of its
+    /// kind, never a wider query (no service-wide update: nothing piles up). An ad-hoc build and an identity-signed
+    /// one never share an item: one first kept ad hoc is unreadable by a signed build forever (RECHECK round 2).
+    @Test(arguments: [(adHoc: false, account: "signins.signed"), (adHoc: true, account: "signins.adhoc")])
+    func everyCallIsTheProfilesOneItemOfItsSigningKind(adHoc: Bool, account: String) {
         for (operation, statuses) in Self.runs {
-            for call in run(operation, statuses).calls {
-                #expect(call.service == Self.service && call.account == KeychainSecrets.account,
+            for call in run(operation, statuses, adHoc: adHoc).calls {
+                let old = !adHoc && call.account == KeychainSecrets.oldAccount && call.kind != "add"
+                    && call.kind != "update"  // a signed build reads and deletes the old item, never writes it
+                #expect(call.service == Self.service && (call.account == account || old),
                         "\(operation) \(statuses): \(call.kind) on \(call.service ?? "-") / \(call.account ?? "-")")
             }
         }
-        #expect(KeychainSecrets.account == "signins")
+        #expect(KeychainSecrets.account(adHoc: adHoc) == account)
     }
 
     /// Write updates the item in place (allowed whatever signature made it); only a missing item is added.
@@ -102,12 +111,33 @@ struct KeychainSecretsTests {
     }
 
     /// Delete removes the item; one this signature may not delete (another signer's) is emptied in place.
-    @Test(arguments: [(delete: errSecSuccess, kinds: ["delete"]), (delete: errSecItemNotFound, kinds: ["delete"]),
-                      (delete: errSecInvalidOwnerEdit, kinds: ["delete", "update"])])
+    /// A signed build then deletes the old account's item too (the last delete).
+    @Test(arguments: [(delete: errSecSuccess, kinds: ["delete", "delete"]),
+                      (delete: errSecItemNotFound, kinds: ["delete", "delete"]),
+                      (delete: errSecInvalidOwnerEdit, kinds: ["delete", "update", "delete"])])
     func deleteRemovesOrEmptiesTheOneItem(delete: OSStatus, kinds: [String]) {
         let fake = run("delete", ["delete": delete])
         #expect(fake.calls.map(\.kind) == kinds)
-        if kinds.contains("update") { #expect(fake.calls.last?.data == Data()) }
+        #expect(fake.calls.last?.account == KeychainSecrets.oldAccount)
+        if kinds.contains("update") { #expect(fake.calls.first { $0.kind == "update" }?.data == Data()) }
+    }
+
+    /// An update keeps the sign-ins: a signed build with no item of its own reads the old account's item once,
+    /// then deletes it. An ad-hoc build never touches it; with no item anywhere nothing is deleted.
+    @Test(arguments: [
+        (adHoc: false, missing: ["signins.signed"], read: true, calls: ["copy signins.signed", "copy signins",
+                                                                          "delete signins"]),
+        (adHoc: false, missing: ["signins.signed", "signins"], read: false,
+         calls: ["copy signins.signed", "copy signins"]),
+        (adHoc: true, missing: ["signins.adhoc"], read: false, calls: ["copy signins.adhoc"]),
+        (adHoc: false, missing: [], read: true, calls: ["copy signins.signed"]),
+    ] as [(Bool, Set<String>, Bool, [String])])
+    func anUpdateReadsTheOldItemOnce(adHoc: Bool, missing: Set<String>, read: Bool, calls: [String]) throws {
+        let fake = RecordedCalls(interaction: false)
+        (fake.adHoc, fake.missing) = (adHoc, missing)
+        let data = try KeychainSecrets(calls: fake).read(service: Self.service)
+        #expect((data == fake.stored) == read)
+        #expect(fake.calls.map { "\($0.kind) \($0.account ?? "-")" } == calls)
     }
 
     /// An item this signature may not read (an ad-hoc build after a signed one) is an error by its status,

@@ -16,7 +16,8 @@ next launch sets them back before the first tab and deletes them. Review fixes (
 Keychain calls run with user interaction off; round 2 (RECHECK_P9_REMEMBER.md): one item per profile again and
 the build signed with the local identity, so sign-ins survive a reinstall (NT-BLD-006); the cookie-store seam
 refuses outside the app; a quit while the cookies are still being set is clean and keeps the item; R51 claims
-no count it does not read.
+no count it does not read. P9-REMEMBER-2: ad-hoc and signed builds on their own accounts; a run refused
+the item at launch writes nothing at quit (NT-BLD-006).
 
 ## Proof
 

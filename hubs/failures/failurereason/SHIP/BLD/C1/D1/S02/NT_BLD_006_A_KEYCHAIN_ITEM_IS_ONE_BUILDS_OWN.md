@@ -23,7 +23,8 @@ can never delete or replace it. `LAContext.interactionNotAllowed` covers LocalAu
 
 After an update: with interaction on, a Keychain dialog at launch, on the main thread before the tabs open
 (not run: no dialog may reach the headmate's screen); with it off, `restored 0` at every launch and a quit
-that cannot write, while the old build's cookies stay in the Keychain.
+that cannot write, while the old build's cookies stay in the Keychain. With one account for every build
+(round 2): an item first kept ad hoc is overwritten by every signed quit and read by no signed launch (-25293; RECHECK_P9_REMEMBER.md round 2).
 
 ## Fix
 

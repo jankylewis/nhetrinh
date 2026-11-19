@@ -6,6 +6,8 @@ import Security
 protocol KeychainCalls: AnyObject {
     /// Whether these calls may reach a Keychain at all. The real ones: only inside the launched app.
     var reachesKeychain: Bool { get }
+    /// Whether this build is signed ad hoc (GitHub CI, no local identity) rather than with an identity.
+    var adHoc: Bool { get }
     var interactionAllowed: Bool { get set }
     func copy(_ query: [String: Any]) -> (OSStatus, Data?)
     func add(_ item: [String: Any]) -> OSStatus
@@ -17,6 +19,17 @@ protocol KeychainCalls: AnyObject {
 /// `KeychainSecrets.query`: nothing here runs in a unit test, whatever the test passes.
 final class SecurityCalls: KeychainCalls {
     let reachesKeychain = KeychainSecrets.allowed(Bundle.main.bundleIdentifier)
+    /// From this process's own signature, read once; unknown counts as ad hoc (its own account, never shared).
+    let adHoc: Bool = {
+        var code: SecCode?
+        var staticCode: SecStaticCode?
+        var info: CFDictionary?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code,
+              SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode,
+              SecCodeCopySigningInformation(staticCode, [], &info) == errSecSuccess,
+              let flags = (info as? [String: Any])?[kSecCodeInfoFlags as String] as? UInt32 else { return true }
+        return flags & SecCodeSignatureFlags.adhoc.rawValue != 0
+    }()
 
     // Deprecated since macOS 10.10, yet the only switch for the file-based login Keychain's access prompt:
     // LAContext's interactionNotAllowed does not cover it (NT-BLD-006).

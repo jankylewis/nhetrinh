@@ -69,6 +69,26 @@ struct SignInKeeperTests {
         if problem == "error" { #expect(rig.lines.contains { $0.contains("keychain status -25308") }) }
     }
 
+    /// A launch that may not read the item (another signature's, NT-BLD-006): the quit of that run writes nothing,
+    /// so it never keeps feeding an item no launch can read, and says why with counts only. Any other error: kept.
+    @Test(arguments: [(status: Int32(-25293), writes: false), (status: -25308, writes: false),
+                      (status: -25243, writes: false), (status: -26276, writes: true)])
+    func aQuitAfterAnAccessRefusedReadWritesNothing(status: Int32, writes: Bool) throws {
+        let rig = try Rig()
+        rig.secrets.failure = .status(status)
+        let keeper = rig.keeper()
+        _ = rig.count { keeper.launch(remember: true, done: $0) }
+        rig.secrets.failure = nil
+        let deletes = rig.secrets.deletes
+        rig.jar.cookies = (0..<2).compactMap { fakeCookie("name-\($0)", session: true) }
+        #expect(rig.count { keeper.quit(remember: true, done: $0) } == (writes ? 2 : 0))
+        #expect((rig.item != nil) == writes && (rig.secrets.deletes == deletes || writes))
+        if !writes {
+            #expect(rig.lines.last == "sign-ins: the item cannot be read (keychain status \(status)), kept 0 of 2")
+        }
+        for secret in ["name-", "fake-1", "example.test"] { #expect(!rig.lines.joined().contains(secret)) }
+    }
+
     @Test func logsHoldCountsNeverACookie() throws {
         let rig = try Rig()
         rig.jar.cookies = (0..<2).compactMap { fakeCookie("name-\($0)", session: true) }
