@@ -50,6 +50,16 @@ struct HistoryStoreTests {
         #expect(try HistoryStore(folder: folder).entry(url: "https://example.test/kept")?.title == "Kept")
     }
 
+    /// Sign-in steps kept before the rule (headmate, 2026-11-19) go when the store opens; other pages stay.
+    @Test func signInStepsKeptBeforeGoAtTheNextOpen() throws {
+        let folder = try HistoryRig.folder()
+        let step = "https://id.example.test/authorize?client_id=a&response_type=code"
+        try HistoryRig.visit(try HistoryStore(folder: folder), step, title: "Sign in")
+        try HistoryRig.visit(try HistoryStore(folder: folder), "https://example.test/kept", title: "Kept")
+        let reopened = try HistoryStore(folder: folder)
+        #expect(try reopened.entry(url: step) == nil && reopened.count == 1)
+    }
+
     @Test func removeTakesOnlyThatPage() throws {
         let store = try HistoryRig.store()
         try HistoryRig.visit(store, "https://example.test/one", title: "one")

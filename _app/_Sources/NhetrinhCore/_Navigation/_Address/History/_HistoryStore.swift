@@ -31,6 +31,16 @@ public final class HistoryStore {
             CREATE TABLE IF NOT EXISTS pages (url TEXT PRIMARY KEY, title TEXT NOT NULL, visits INTEGER NOT NULL,
               typed INTEGER NOT NULL, last_visit REAL NOT NULL, words TEXT NOT NULL, bare TEXT NOT NULL)
             """)
+        try? forgetSignInSteps()  // best effort: a failure here never keeps the history closed
+    }
+
+    /// Sign-in steps an earlier build kept (`HistoryRules.isSignInStep`, headmate 2026-11-19) go; the rest stay.
+    func forgetSignInSteps() throws {
+        var steps: [String] = []
+        try database.rows("SELECT url FROM pages", []) { row in
+            if let url = URL(string: row.text(0)), HistoryRules.isSignInStep(url) { steps.append(row.text(0)) }
+        }
+        for url in steps { try remove(url: url) }
     }
 
     public var count: Int {

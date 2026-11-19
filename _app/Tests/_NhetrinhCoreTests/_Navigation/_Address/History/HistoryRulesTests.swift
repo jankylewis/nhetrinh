@@ -57,4 +57,25 @@ struct HistoryRulesTests {
         prefs.forgetSites()
         #expect(prefs.rememberHistory == false)
     }
+
+    /// A sign-in step is never kept (headmate, 2026-11-19: the dropdown offered identity-provider pages): a URL
+    /// carrying a token or a SAML message, an authorize request (client_id with redirect_uri or response_type), or
+    /// a callback (code with state), in the query or the fragment, any case. A page with only one of a pair stays.
+    @Test(arguments: [
+        (url: "https://id.example.test/authorize?client_id=a&redirect_uri=https%3A%2F%2Fb.test", kept: false),
+        (url: "https://id.example.test/oauth2/v1/authorize?client_id=a&response_type=code", kept: false),
+        (url: "https://app.example.test/callback?code=x&state=y", kept: false),
+        (url: "https://app.example.test/#id_token=x&state=y", kept: false),
+        (url: "https://app.example.test/#Access_Token=x", kept: false),
+        (url: "https://sso.example.test/saml?SAMLRequest=x", kept: false),
+        (url: "https://app.example.test/acs?samlresponse=x", kept: false),
+        (url: "https://app.example.test/?refresh_token=x", kept: false),
+        (url: "https://code.example.test/search?code=swift", kept: true),
+        (url: "https://app.example.test/settings?state=open", kept: true),
+        (url: "https://docs.example.test/oauth?client_id=a", kept: true),
+    ])
+    func signInStepsAreNeverKept(url: String, kept: Bool) {
+        let rules = HistoryRules(remember: true, probeOn: false, profile: nil)
+        #expect(rules.records(URL(string: url), errorPage: false) == kept)
+    }
 }
