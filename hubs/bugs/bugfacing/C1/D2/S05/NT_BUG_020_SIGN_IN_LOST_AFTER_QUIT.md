@@ -25,6 +25,8 @@ nothing across a quit. Not proven in the repository: a run on the installed app 
 
 ## Observed again (2026-11-19, found_by: headmate)
 
-After the reinstall of d826c82 the headmate's work site asked to pick an account again. The Keychain holds no
-saved sign-ins item for the default profile (`security find-generic-password` exit 44): nothing was ever kept.
-Cause not proven; the info-level log lines were not persisted.
+After the reinstall of d826c82 the headmate's work site asked to pick an account again. The Keychain check that
+followed found no item, but it ran after the next launch, which restores the item and deletes it: it proved
+nothing. On 2026-11-19 (b3d0e32) the item was there after the headmate's quit (exit 0) and gone after the launch
+(exit 44): the save and the restore both ran. Cause of the account picker not proven (not every sign-in is a
+session cookie; restore counts are not persisted in the log).
