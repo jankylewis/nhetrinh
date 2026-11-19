@@ -60,21 +60,3 @@ func badFileIsReported(bytes: String, reported: Bool) throws {
     _ = SessionStore.load(from: folder, home: home) { heard.append($0) }
     #expect(heard.isEmpty == !reported)
 }
-
-private let support = URL(fileURLWithPath: "/Support")
-
-/// No profile: the user's own folder. A profile ("readback"): a folder of its own, the same every time.
-@Test(arguments: [(profile: nil as String?, own: true), ("", true), ("readback", false), ("other", false)])
-func sessionFolderPerProfile(profile: String?, own: Bool) {
-    let folder = SessionStore.folder(applicationSupport: support, profile: profile)
-    let base = support.appendingPathComponent("nhetrinh", isDirectory: true)
-    #expect((folder == base) == own)
-    #expect(folder.path.hasPrefix(base.path))
-    #expect(folder == SessionStore.folder(applicationSupport: support, profile: profile))
-}
-
-@Test func twoProfilesNeverShareASession() {
-    let readback = SessionStore.folder(applicationSupport: support, profile: "readback")
-    #expect(readback != SessionStore.folder(applicationSupport: support, profile: "other"))
-    #expect(!readback.lastPathComponent.contains("readback"), "the folder name is the profile's identifier")
-}

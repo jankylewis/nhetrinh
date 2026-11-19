@@ -42,8 +42,6 @@ enum VersionOneStep {
     }
 
     private static func folder() -> URL? {
-        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first.map {
-            SessionStore.folder(applicationSupport: $0, profile: AppSession.profile)
-        }
+        AppSession.folder()
     }
 }

@@ -3,16 +3,15 @@ import NhetrinhCore
 
 /// Session restore (P1): the tabs are saved 2 s after a tab change and at quit, and come back at
 /// launch, each unloaded except the selected one. A measurement run (NHT_BENCH_URLS) neither reads
-/// nor writes a session; with NHT_PROFILE the session is that profile's own (`SessionStore.folder`).
+/// nor writes a session; each profile keeps its own in its folder (`ProfileLayout`, P10-PROFILE, D29).
 extension BrowserWindowController {
     static let saveDelay: TimeInterval = 2
 
-    /// The folder of this launch's session; nil when the session is off (bench seeding).
+    /// The folder of this launch's session: the one the launch's migration chose, else the profile's own under
+    /// `DataRoot` (a temporary folder before a launch); nil when the session is off (bench seeding, a refused name).
     static func sessionFolder(_ env: [String: String] = ProcessInfo.processInfo.environment) -> URL? {
-        guard (env["NHT_BENCH_URLS"] ?? "").isEmpty,
-              let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        else { return nil }
-        return SessionStore.folder(applicationSupport: support, profile: env["NHT_PROFILE"])
+        guard (env["NHT_BENCH_URLS"] ?? "").isEmpty, let layout = profileLayout(env) else { return nil }
+        return DataRoot.inUse ?? layout.folder
     }
 
     /// Restore the saved session, or one home tab. Turns saving on.

@@ -60,6 +60,9 @@ extension BrowserWindowController {
         hub.onChange = { [weak self] change in self?.updatePrefs(change) }
         hub.onForgetSignIns = { [weak self] in self?.signIns?.forget() }
         hub.onForgetHistory = { [weak self] in self?.forgetHistory() }  // P11-HISTORY
+        hub.onShowFolder = { [weak self] in self?.showDataFolder() }  // P10-PROFILE
+        hub.onResetProfile = { [weak self] in self?.resetProfile() }
+        hub.show(profile: Self.profileLayout(ProcessInfo.processInfo.environment)?.name ?? "none kept")
         hub.show(prefs)
     }
 }

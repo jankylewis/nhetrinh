@@ -18,13 +18,15 @@ enum ToolSteps {
     /// The readback profile's prefs, removed (`prefs.json` and a kept bad file).
     @discardableResult
     static func forgetPrefs() -> Bool {
-        guard let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        else { return false }
-        let folder = SessionStore.folder(applicationSupport: support, profile: AppSession.profile)
-        for name in [PrefsStore.fileName, PrefsStore.badFileName] {
-            try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
+        let folders = AppSession.folders()  // its own and P9's old one (P10-PROFILE)
+        for folder in folders {
+            for name in [PrefsStore.fileName, PrefsStore.badFileName] {
+                try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
+            }
         }
-        return !FileManager.default.fileExists(atPath: folder.appendingPathComponent(PrefsStore.fileName).path)
+        return !folders.isEmpty && folders.allSatisfy {
+            !FileManager.default.fileExists(atPath: $0.appendingPathComponent(PrefsStore.fileName).path)
+        }
     }
 
     /// No prefs, then a fresh start: one home tab. The app writes prefs only on a change, never at quit.

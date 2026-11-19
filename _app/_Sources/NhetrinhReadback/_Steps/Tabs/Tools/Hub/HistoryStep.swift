@@ -44,11 +44,11 @@ enum HistoryStep {
     /// The readback profile's history files removed (the app is quit first). Never another profile's folder.
     @discardableResult
     static func forgetHistory() -> Bool {
-        guard let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-        else { return false }
-        let folder = SessionStore.folder(applicationSupport: support, profile: AppSession.profile)
-        let file = folder.appendingPathComponent(HistoryStore.fileName)
-        for suffix in ["", "-wal", "-shm"] { try? FileManager.default.removeItem(atPath: file.path + suffix) }
-        return !FileManager.default.fileExists(atPath: file.path)
+        let files = AppSession.folders().map { $0.appendingPathComponent(HistoryStore.fileName) }  // P10: both
+        guard !files.isEmpty else { return false }
+        for file in files {
+            for suffix in ["", "-wal", "-shm"] { try? FileManager.default.removeItem(atPath: file.path + suffix) }
+        }
+        return files.allSatisfy { !FileManager.default.fileExists(atPath: $0.path) }
     }
 }

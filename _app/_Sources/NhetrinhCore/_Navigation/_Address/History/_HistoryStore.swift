@@ -2,8 +2,8 @@ import Foundation
 
 // P11-HISTORY (D30); tests in Tests/_NhetrinhCoreTests/_Navigation/_Address/History/.
 
-/// The visited pages, `history.sqlite` in the folder it is given (the profile's folder; today the session's,
-/// `SessionStore.folder`). One `pages` table, url unique; at most `capacity` rows: past it the lowest score
+/// The visited pages, `history.sqlite` in the folder it is given (the profile's folder, `ProfileLayout`, D29).
+/// One `pages` table, url unique; at most `capacity` rows: past it the lowest score
 /// (`Frecency`) goes. The file is the user's alone (0600); deleted rows are overwritten (secure_delete).
 public final class HistoryStore {
     public static let fileName = "history.sqlite"

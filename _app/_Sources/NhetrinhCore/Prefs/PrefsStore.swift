@@ -1,6 +1,6 @@
 import Foundation
 
-/// Reads and writes `prefs.json` in the session's folder (`SessionStore.folder`: per profile).
+/// Reads and writes `prefs.json` in the profile's folder (`ProfileLayout`, D29).
 /// A file that cannot be read gives the defaults and is kept as `prefs.bad.json`: no crash, no silent loss.
 public enum PrefsStore {
     public static let fileName = "prefs.json"

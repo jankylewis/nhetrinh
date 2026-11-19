@@ -11,7 +11,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-BLD-004 | development | `test_a_feature_row_of_the_wrong_shape_is_an_error` | OBSERVED | A feature row with a missing column? `release_notes.py` must stop with its line number |
 | NT-GAT-001 | self-test | `error: plugin for module 'TestingMacros' not found` | FIXED | Was it plain `swift test`? Run `_app/scripts/test.sh`; compare `swift test -v` compile commands |
 | NT-GAT-002 | development | `no testTarget depends on NhetrinhReadback` | FIXED | Does `_app/Package.swift` have `NhetrinhReadbackTests`? |
-| NT-TAB-001 | development | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`IdleUnload.swift`); R11 PASS 22:09, red on P0 not run |
+| NT-TAB-001 | development | `background tab stops playing after about 10 minutes` | OPEN | Does the idle unload ask WebKit for the media state first? Since P1-BUILD-1 it does (`Lifecycle/Idle/_IdleUnload.swift`); R11 PASS 22:09, red on P0 not run |
 | NT-UIX-001 | readback | `after New Tab the sidebar has 1 rows, not 2` | FIXED | Nil-target menu item and no key window (app not active)? Browser items target the controller |
 | NT-UIX-002 | development | `the selected tab stays` | OBSERVED | Did a close of a row that is not selected select another tab? `close(at:)` selects only when the selected tab closes |
 | NT-UIX-004 | development | `the sheet is still shown, the answer none` | OBSERVED | Tab closed or left with a page's sheet up? `endSheets(of:)` ends it unanswered |
@@ -20,6 +20,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-NAV-004 | development | `isMainFrame != false` | OBSERVED | A page asking to open another app in a loop? Ruling pending: ask only for a click |
 | NT-TAB-002 | development | `ask selects the asking tab` | OBSERVED | A background tab pulling the user to it? Ruling pending: hold its question |
 | NT-TAB-003 | self-test | `aLinkFromAnotherAppKeepsTheFolders` | OBSERVED | Folders gone after a new tab? A mutation of the flat `tabs` rebuilds the tree: insert through `tree` |
+| NT-TAB-004 | development | `aNameThatCollidesOrEscapesIsRefused` | OBSERVED | `NHT_PROFILE=default` (any case)? It shared the default profile's Keychain item; refused since P10-PROFILE |
 | NT-UIX-003 | development | `closingARowKeepsTheBackgroundSlotInPlace` | OBSERVED | A row above `backgroundSlot` closed? `close(at:)` must move the slot up by one |
 | NT-UIX-005 | headmate | `theLeftButtonsClearTheTrafficLights` | OBSERVED | A toolbar control at a fixed x under the title bar? Place it from `standardWindowButton(.zoomButton)`'s frame, on every layout |
 | NT-UIX-006 | headmate | `theFieldFillsTheRowAndIsNotAmbiguous` | FIXED | A view in a stack row lost its width? Default gravity areas + equal hugging = ambiguous: use `.fill` and the lowest hugging on the view that stretches |

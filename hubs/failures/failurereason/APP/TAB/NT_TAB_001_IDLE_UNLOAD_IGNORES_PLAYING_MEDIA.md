@@ -6,7 +6,7 @@ status: OPEN
 date: 2026-11-16
 found_by: development (code read while writing the plan)
 signature: background tab stops playing after about 10 minutes
-source: _app/_Sources/_Nhetrinh/_Browser/_BrowserWindowController.swift `unloadIdleTabs` (P0; since P1-BUILD-1: `_Browser/Lifecycle/IdleUnload.swift`)
+source: _app/_Sources/_Nhetrinh/_Browser/_BrowserWindowController.swift `unloadIdleTabs` (P0; since P1-BUILD-1: `_Browser/Lifecycle/Idle/_IdleUnload.swift`)
 observed: not seen live; found by reading the code while writing the plan
 links: fix=yes lesson=no evidence=no toolgap=none
 

@@ -8,7 +8,7 @@ extension BrowserWindowController {
     func openInitialTabs() {
         defer { Bench.startPolling { [weak self] in self?.current } }
         loadPrefs(from: Self.sessionFolder())
-        keepHistory(in: Self.sessionFolder())  // P11-HISTORY: the profile's folder once P10 lands
+        keepHistory(in: Self.sessionFolder())  // P11-HISTORY: the profile's folder (P10)
         if let folder = Self.sessionFolder(), let home = Self.homeURL {
             openSavedSession(in: folder, home: home)
             return

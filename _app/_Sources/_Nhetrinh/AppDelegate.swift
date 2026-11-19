@@ -12,14 +12,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Screen.presenter = AppKitScreen()  // before a launch nothing comes on screen (P8-TESTWIN-1)
+        DataRoot.launch()  // before a launch: a temporary root, no Finder, no store cleared (P10-PROFILE)
         SignInSeams.secrets = KeychainSecrets()  // before a launch: in memory (P9-REMEMBER)
         SignInSeams.jar = { WebCookieJar { WebConfig.shared.websiteDataStore.httpCookieStore } }
         setDockIcon()
+        let env = ProcessInfo.processInfo.environment
+        let folder = BrowserWindowController.prepareProfile(env)  // P9's files moved first (P10-PROFILE)
+        DataRoot.inUse = folder
         let browser = BrowserWindowController()
         AppMenu.install(browser: browser)
         browser.showWindow(nil)
-        let env = ProcessInfo.processInfo.environment
-        let folder = BrowserWindowController.sessionFolder(env)
         let keeper = BrowserWindowController.signInKeeper(folder: folder, profile: env["NHT_PROFILE"])
         begin(browser, keeper: keeper, remember: BrowserWindowController.remembers(in: folder), env: env)
     }

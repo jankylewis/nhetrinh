@@ -2,9 +2,9 @@ import AppKit
 import NhetrinhCore
 import WebKit
 
-/// P11-HISTORY (D30): this launch's history. The store (`history.sqlite` in the profile's folder; today the
-/// session's) opens at its first use; none without a folder (a measurement run). It remembers which tabs the
-/// user typed into and which loads are the error page, until their page finishes.
+/// P11-HISTORY (D30): this launch's history. The store (`history.sqlite` in the profile's folder, D29) opens at
+/// its first use; none without a folder (a measurement run). It remembers which tabs the user typed into and
+/// which loads are the error page, until their page finishes.
 final class HistoryKeeper {
     var folder: URL?
     var probeOn = false
@@ -27,6 +27,13 @@ final class HistoryKeeper {
             Log.app.error("history: the store could not open: \(String(describing: error), privacy: .public)")
         }
         return opened
+    }
+
+    /// The store closed; the next use opens the file anew. Reset profile closes it before its folder is emptied,
+    /// or the open store would keep writing to deleted files ("disk I/O error", P10 with P11).
+    func close() {
+        opened = nil
+        failed = false
     }
 }
 

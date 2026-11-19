@@ -1,7 +1,7 @@
 import NhetrinhCore
 
 /// Put Tab to Idle / Put Other Tabs to Idle (headmate, 2026-11-19): a row's menu sends tabs idle now, as the idle
-/// timer does after its minutes (`IdleUnload.swift`). The tab in view never goes idle: Put Tab to Idle on it first
+/// timer does after its minutes (`_IdleUnload.swift`). The tab in view never goes idle: Put Tab to Idle on it first
 /// shows the nearest other tab (none: nothing happens); Other Tabs shows the tab clicked. WebKit is asked first;
 /// a tab that plays or holds the camera or the microphone stays loaded (NT-TAB-001, F3 ruling).
 extension BrowserWindowController {
