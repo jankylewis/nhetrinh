@@ -10,6 +10,8 @@ public final class HistoryStore {
     public static let capacity = 5_000
     /// The dropdown's rows at most.
     public static let shown = 8
+    /// How many candidates per row the store reads before the word-start rule (`suggestions`).
+    static let pool = 8
     public let fileURL: URL
     let capacity: Int
     let database: SQLiteFile
@@ -101,10 +103,13 @@ public final class HistoryStore {
         let first = prefix == nil ? "(1 = 0)" : "instr(bare, ?\(words.count + 2)) = 1"
         let sql = "SELECT url, title, visits, typed, last_visit FROM pages WHERE \(filter) "
             + "ORDER BY \(first) DESC, \(Frecency.sql(now: now)) DESC, last_visit DESC LIMIT ?1"
-        let values = [SQLValue.int(limit)] + words.map(SQLValue.text) + (prefix.map { [SQLValue.text($0)] } ?? [])
+        // SQL finds the words anywhere (`instr`); `HistoryMatch.matches` keeps the rows where they start a word,
+        // from a pool of `limit` x `pool` best rows (no column to migrate).
+        let values = [SQLValue.int(limit * Self.pool)] + words.map(SQLValue.text)
+            + (prefix.map { [SQLValue.text($0)] } ?? [])
         var found: [HistoryEntry] = []
         try database.rows(sql, values) { found.append(Self.entry($0)) }
-        return found
+        return Array(found.filter { HistoryMatch.matches(words, url: $0.url, title: $0.title) }.prefix(limit))
     }
 
     private static func entry(_ row: SQLiteFile.Row) -> HistoryEntry {

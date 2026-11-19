@@ -18,6 +18,27 @@ struct HistoryMatchTests {
                                      title: "Tin tức Đường phố") == match)
     }
 
+    /// A typed word matches only where a word starts (after a space or a mark such as . / ? = -), as other
+    /// browsers do (headmate, 2026-11-19): "ample" is not "example", "test/news" is.
+    @Test(arguments: [
+        (typed: "ews", match: false), (typed: "ample", match: false), (typed: "uong", match: false),
+        (typed: "afe", match: false), (typed: "ức", match: false), (typed: "test/news", match: true),
+        (typed: "pho", match: true), (typed: "exam", match: true), (typed: "q=caf", match: true),
+        (typed: "new tin", match: true), (typed: "tin ews", match: false),
+    ])
+    func aWordMatchesWhereAWordStarts(typed: String, match: Bool) {
+        #expect(HistoryMatch.matches(HistoryMatch.words(typed), url: "https://example.test/news?q=caf%C3%A9",
+                                     title: "Tin tức Đường phố") == match)
+    }
+
+    /// The store keeps the same rule, and still gives its best rows first, up to the limit.
+    @Test(arguments: [(typed: "ews", found: 0), (typed: "new", found: 1), (typed: "ample", found: 0)])
+    func theStoreMatchesWhereAWordStarts(typed: String, found: Int) throws {
+        let store = try HistoryRig.store()
+        try HistoryRig.visit(store, "https://example.test/news", title: "Tin tức")
+        #expect(try HistoryRig.urls(store, typed).count == found)
+    }
+
     /// The store matches as `matches` does: words, case and diacritics, in the url or the title.
     @Test(arguments: ["tin tuc", "TIN TỨC", "duong", "news", "café", "tuc news"])
     func theStoreMatchesTheSameWay(typed: String) throws {

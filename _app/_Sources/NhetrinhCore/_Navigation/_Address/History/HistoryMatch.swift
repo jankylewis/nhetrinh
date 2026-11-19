@@ -32,7 +32,7 @@ public struct Suggestion: Equatable, Sendable {
     public init(url: String, title: String, tab: Int?) { (self.url, self.title, self.tab) = (url, title, tab) }
 }
 
-/// What the address bar matches: every typed word appears in the url or the title, case- and
+/// What the address bar matches: every typed word starts a word of the url or the title, case- and
 /// diacritic-insensitive (đ reads as d); a host that starts with the typed text ranks first.
 public enum HistoryMatch {
     /// `text` lower case, without diacritics: "Tin Tức Đường" is "tin tuc duong".
@@ -54,7 +54,20 @@ public enum HistoryMatch {
 
     public static func matches(_ words: [String], url: String, title: String) -> Bool {
         let text = haystack(url: url, title: title)
-        return !words.isEmpty && words.allSatisfy(text.contains)
+        return !words.isEmpty && words.allSatisfy { startsAWord($0, in: text) }
+    }
+
+    /// `word` in `text` where a word starts: at the start, or after a character that is no letter and no digit
+    /// (headmate, 2026-11-19: as other browsers narrow the list; "ample" is not "example").
+    static func startsAWord(_ word: String, in text: String) -> Bool {
+        var from = text.startIndex
+        while let found = text.range(of: word, range: from..<text.endIndex) {
+            guard found.lowerBound > text.startIndex else { return true }
+            let before = text[text.index(before: found.lowerBound)]
+            if !before.isLetter && !before.isNumber { return true }
+            from = text.index(after: found.lowerBound)
+        }
+        return false
     }
 
     /// The url without its scheme and a leading `www.`, folded: what a host prefix is read against.
