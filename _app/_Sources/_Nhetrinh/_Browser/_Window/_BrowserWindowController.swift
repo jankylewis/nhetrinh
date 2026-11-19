@@ -113,6 +113,7 @@ final class BrowserWindowController: NSWindowController {
     private func wireCallbacks() {
         sidebar.onSelect = { [weak self] index in self?.select(index) }
         sidebar.onClose = { [weak self] index in self?.close(at: index) }
+        sidebar.onDuplicate = { [weak self] index in self?.duplicate(at: index) }
         sidebar.onNewTab = { [weak self] in self?.newTab(nil) }
         sidebar.onAction = { [weak self] action in self?.sidebarAction(action) }
         sidebar.moveRefusal = { [weak self] in self?.moveRefusal(from: $0, into: $1, at: $2) }

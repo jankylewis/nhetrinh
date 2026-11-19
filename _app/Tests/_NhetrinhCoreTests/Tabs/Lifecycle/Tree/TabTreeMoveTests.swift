@@ -109,3 +109,16 @@ func aFolderTabStepsOutAtItsEdge(path: TabPath, up: Bool, expected: [Tree<String
     var tree = steps([.tab("r"), box("F", ["f1", "f2"]), .tab("s")])
     #expect(tree.step(path, up: up) == placed && tree == steps(expected))
 }
+
+/// Duplicate Tab: the copy goes right after its tab, in that tab's folder, also after a folder's last tab when
+/// it is the last tab of all (`insert(atFlat:)` would put it at the root's end); past the tabs, the root's end.
+@Test(arguments: [
+    (2, [treeRoot("a"), treeFolder("work", ["b", "c", "n"])]),
+    (0, [treeRoot("a"), treeRoot("n"), treeFolder("work", ["b", "c"])]),
+    (9, [treeRoot("a"), treeFolder("work", ["b", "c"]), treeRoot("n")]),
+])
+func insertAfterFlatIndex(flat: Int, expected: [TabTree.Item]) {
+    var tree = TabTree(items: [treeRoot("a"), treeFolder("work", ["b", "c"])])
+    tree.insert(treeTab("n"), afterFlat: flat)
+    #expect(tree.items == expected)
+}

@@ -9,6 +9,18 @@ extension BrowserWindowController {
     }
 
     @objc func closeTab(_ sender: Any?) { close(at: selected) }
+
+    /// Duplicate Tab (a row's menu): a copy right after the tab, in its group, with its page, title, icon and
+    /// back / forward history (given at its first load, as a restored tab's); the copy is selected.
+    func duplicate(at index: Int) {
+        guard tabs.indices.contains(index) else { return }
+        let source = tabs[index]
+        let copy = Tab(url: source.webView?.url ?? source.url, title: source.title)
+        copy.icon = source.icon
+        copy.savedState = source.webView?.interactionState ?? source.savedState
+        tree.insert(copy, afterFlat: index)
+        select(index + 1)
+    }
     @objc func focusAddress(_ sender: Any?) { window?.makeFirstResponder(toolbar.address) }
     @objc func reload(_ sender: Any?) { current?.reload() }
     @objc func stopLoading(_ sender: Any?) { current?.stopLoading() }

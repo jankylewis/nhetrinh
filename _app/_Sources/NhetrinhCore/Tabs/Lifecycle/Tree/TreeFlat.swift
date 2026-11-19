@@ -54,6 +54,13 @@ extension Tree {
         _ = try? edit(before.parent) { $0.insert(.tab(tab), at: before.last + 1) }
     }
 
+    /// A tab right after the tab at flat index `index`, in that tab's folder, even after a folder's last tab
+    /// (Duplicate Tab); past the tabs, the root's end.
+    public mutating func insert(_ tab: Element, afterFlat index: Int) {
+        guard let path = path(ofFlat: index) else { return items.append(.tab(tab)) }
+        _ = try? edit(path.parent) { $0.insert(.tab(tab), at: path.last + 1) }
+    }
+
     /// Take out the tab at flat index `index`; its groups stay, even empty. Nil past the tabs.
     @discardableResult
     public mutating func removeTab(atFlat index: Int) -> Element? {
