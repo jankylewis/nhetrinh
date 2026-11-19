@@ -27,6 +27,13 @@ public enum SecretsError: Error, Equatable {
     /// The real Keychain seam was reached outside the launched app (a unit test).
     case notLaunched
 
+    /// A Keychain status that refuses this build the item (its access list trusts another signature, or it would
+    /// ask): errSecAuthFailed, errSecNoAccessForItem, errSecInvalidOwnerEdit, errSecInteractionNotAllowed.
+    public var refusesAccess: Bool {
+        guard case .status(let code) = self else { return false }
+        return [-25293, -25243, -25244, -25308].contains(code)
+    }
+
     public var kind: String {
         switch self {
         case .status(let code): return "keychain status \(code)"

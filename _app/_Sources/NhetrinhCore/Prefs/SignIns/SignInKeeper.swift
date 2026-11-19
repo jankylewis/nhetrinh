@@ -10,6 +10,8 @@ public final class SignInKeeper {
     let log: (String) -> Void
     /// While the kept cookies are being set: a quit then leaves the item as it is (the next launch restores it).
     private var restoring = false
+    /// This run's launch was refused the item (another signature's, NT-BLD-006): its quit writes nothing.
+    private var refused: SecretsError?
 
     public init(secrets: SecretStore, jar: CookieJar, marker: CleanQuitMarker, service: String,
                 log: @escaping (String) -> Void) {
@@ -47,6 +49,7 @@ public final class SignInKeeper {
             bytes = try secrets.read(service: service)
         } catch {
             log("sign-ins: \(Self.kind(error)), restored 0")
+            if let error = error as? SecretsError, error.refusesAccess { refused = error }
             forget()
             return nil
         }
@@ -94,6 +97,10 @@ public final class SignInKeeper {
         }
         jar.all { [self] cookies in
             let session = SignIns.sessionOnly(cookies)
+            if let refused {  // an item no launch of this build can read: never feed it
+                log("sign-ins: the item cannot be read (\(refused.kind)), kept 0 of \(session.count)")
+                return done(0)
+            }
             do {
                 if session.isEmpty {
                     try secrets.delete(service: service)
