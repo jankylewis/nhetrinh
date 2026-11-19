@@ -22,3 +22,9 @@ Actual (849c3e3, headmate): the site asks to sign in again.
 
 WebKit writes dated cookies to disk but never a session cookie (the headmate's measurement, D28). nhetrinh kept
 nothing across a quit. Not proven in the repository: a run on the installed app (R51 is not read back).
+
+## Observed again (2026-11-19, found_by: headmate)
+
+After the reinstall of d826c82 the headmate's work site asked to pick an account again. The Keychain holds no
+saved sign-ins item for the default profile (`security find-generic-password` exit 44): nothing was ever kept.
+Cause not proven; the info-level log lines were not persisted.

@@ -94,9 +94,12 @@ final class SuggestionList: NSView {
     /// The rows as they read (the probe, R54): "title — url", and "Switch to tab" when it says so.
     var shownRows: [String] { rows.map { SuggestionRow.text(of: $0) } }
 
+    /// Colours resolve in the view's own appearance, never the process's (NT-BUG-022: dark Mac, light app).
     private func paint() {
-        layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
-        layer?.borderColor = NSColor.separatorColor.cgColor
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
+            layer?.borderColor = NSColor.separatorColor.cgColor
+        }
         for (index, view) in stack.arrangedSubviews.enumerated() {
             (view as? SuggestionRow)?.isChosen = index == chosen
         }

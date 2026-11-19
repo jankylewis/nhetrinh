@@ -18,13 +18,10 @@ final class SuggestionRow: NSView {
         let image = NSImageView(image: icon ?? NSImage(systemSymbolName: "globe", accessibilityDescription: nil)
             ?? NSImage())
         image.widthAnchor.constraint(equalToConstant: 16).isActive = true
-        let lines = NSStackView(views: [title, url])
-        lines.orientation = .vertical
-        lines.alignment = .leading
-        lines.spacing = 1
-        var views: [NSView] = [image, lines]
+        var views: [NSView] = [image, Self.lines(title, url)]
         if row.tab != nil { views.append(NSTextField(labelWithString: Self.switchText)) }
         let line = NSStackView(views: views)
+        line.distribution = .fill
         line.spacing = 8
         line.edgeInsets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
         line.translatesAutoresizingMaskIntoConstraints = false
@@ -43,6 +40,16 @@ final class SuggestionRow: NSView {
 
     required init?(coder: NSCoder) { return nil }
 
+    /// The title over the url; it takes the free width, so "Switch to tab" sits at the end (NT-BUG-022).
+    private static func lines(_ title: NSTextField, _ url: NSTextField) -> NSStackView {
+        let lines = NSStackView(views: [title, url])
+        lines.orientation = .vertical
+        lines.alignment = .leading
+        lines.spacing = 1
+        lines.setContentHuggingPriority(.init(1), for: .horizontal)
+        return lines
+    }
+
     private func configureLabels() {
         url.textColor = .secondaryLabelColor
         for field in [title, url] {
@@ -59,8 +66,16 @@ final class SuggestionRow: NSView {
 
     override func mouseDown(with event: NSEvent) { onClick?() }
 
+    /// In the row's own appearance (NT-BUG-022).
     private func paint() {
-        layer?.backgroundColor = isChosen ? NSColor.selectedContentBackgroundColor.withAlphaComponent(0.25).cgColor
-            : NSColor.clear.cgColor
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            layer?.backgroundColor = isChosen
+                ? NSColor.selectedContentBackgroundColor.withAlphaComponent(0.25).cgColor : NSColor.clear.cgColor
+        }
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        paint()
     }
 }
