@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 let grid = 80
 let shipped = ["128x128": 128, "128x128@2x": 256, "256x256": 256, "256x256@2x": 512,
-               "512x512": 512, "512x512@2x": 1024]
+               "512x512": 512]  // no 512@2x: make_icns.sh leaves the 1024 px size out (bundle budget)
 
 func must<T>(_ value: T?, _ what: String) -> T {
     guard let value else { fatalError(what) }

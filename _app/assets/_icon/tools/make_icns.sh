@@ -15,7 +15,8 @@ for s in 16 32; do
 done
 for s in 128 256 512; do
   "$WORK/nearest" draw _AppIcon.png "$WORK/AppIcon.iconset/icon_${s}x${s}.png" $s
-  "$WORK/nearest" draw _AppIcon.png "$WORK/AppIcon.iconset/icon_${s}x${s}@2x.png" $((s*2))
+  # No 512@2x (1024 px): 40 KB, only Finder's largest view on a Retina screen; the bundle budget is 1 MB.
+  [[ $s == 512 ]] || "$WORK/nearest" draw _AppIcon.png "$WORK/AppIcon.iconset/icon_${s}x${s}@2x.png" $((s*2))
 done
 iconutil -c icns "$WORK/AppIcon.iconset" -o bundle/AppIcon.icns
 iconutil -c iconset bundle/AppIcon.icns -o "$WORK/check.iconset"
