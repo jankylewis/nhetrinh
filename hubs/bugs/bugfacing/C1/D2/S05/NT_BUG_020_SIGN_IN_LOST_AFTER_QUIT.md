@@ -30,3 +30,16 @@ followed found no item, but it ran after the next launch, which restores the ite
 nothing. On 2026-11-19 (b3d0e32) the item was there after the headmate's quit (exit 0) and gone after the launch
 (exit 44): the save and the restore both ran. Cause of the account picker not proven (not every sign-in is a
 session cookie; restore counts are not persisted in the log).
+
+## Checked (2026-11-19, found_by: headmate)
+
+A one-off check build (approved by the headmate, never committed; it wrote cookie names, sites and expiry, no
+values, to a private temp file, deleted after) ran sign in, quit, reopen. Log: `sign-ins: kept 11` at the quit,
+`sign-ins: restored 11` 7 s later at the launch. The cookies after the restore held the session cookies of the
+identity provider and of the work site, set before the first tab loaded; the headmate confirmed the site opened
+signed in, with no password asked. Cookie attributes (domain, secure, httpOnly, sameSite, session) came back
+unchanged (a scratch round-trip test). So the keep and restore work on a clean quit.
+
+Not proven: why one earlier launch the same morning logged `restored 0` (the item already used by an earlier
+launch, or a quit that was not clean, are the leading guesses). Status stays OBSERVED until that is explained or
+not seen again.

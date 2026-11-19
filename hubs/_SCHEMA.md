@@ -52,7 +52,7 @@ Title `# <id> — <short name>`, then one line each:
 ```
 id: NT-NAV-001            (or NT-BUG-001, NT-TG-001)
 family: NAV
-status: OPEN | OBSERVED | FIXED
+status: OPEN | OBSERVED | FIXED | NOT_A_BUG
 date: <first seen, YYYY-MM-DD>
 found_by: <headmate|readback|self-test|development> (<the source that proves it>)
 signature: <exact text to grep in a log or report; failurereason and bugfacing only>
@@ -80,6 +80,7 @@ When the source cannot prove who found it: `development (found_by not proven)`.
 | `OPEN` | Cause not proven. Write "not proven" for each unproven part. |
 | `OBSERVED` | Proven by a cited source; fix not on `master` or not proven. |
 | `FIXED` | Fix on `master` AND a cited proof: red-first test then green, gate run, readback. |
+| `NOT_A_BUG` | Reported, then withdrawn or shown to be expected; the entry quotes why. Kept so it is not re-filed. |
 
 ## Laws
 

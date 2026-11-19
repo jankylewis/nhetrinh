@@ -28,3 +28,4 @@ Grep the signature in the report or log.
 | NT-BUG-021 | headmate | `typing https shows nothing` | OBSERVED | Does the address field show visited pages and open tabs below it while typing? P11-HISTORY; R54 not read back |
 | NT-BUG-022 | headmate | `dark dropdown, black text` | FIXED | Text unreadable on a coloured surface? A layer colour set outside drawing must resolve in the view's `effectiveAppearance` |
 | NT-BUG-023 | headmate | `address field gone, ⌘L does nothing` | FIXED | Toolbar without the address field? Is the row's layout ambiguous (`hasAmbiguousLayout`)? (NT-UIX-006) |
+| NT-BUG-024 | headmate | `can scroll horizontally, cannot scroll vertically` | NOT_A_BUG | Withdrawn by the headmate. Does the same page scroll in another browser? An inner scroll area or modal may hold the scroll |
