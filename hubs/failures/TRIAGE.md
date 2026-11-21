@@ -51,6 +51,7 @@ One row per failure reason (`NT-<FAM>-*`) and tool gap (`NT-TG-*`). Bugs are in 
 | NT-TG-004 | readback | `end: the app still runs`, a nhetrinh with `NHT_PROFILE=readback` after the run | OPEN | Read the report's `end:` line; `pgrep -fl 'Applications/nhetrinh.app'`; end only a `readback` profile instance, by pid |
 | NT-TG-005 | readback | `Cannot request fullscreen in a hidden document`, `media: asking (hidden)` | OPEN | R26a, R26b NOT READ BACK: the app runs without the focus (D18), WebKit counts the page as hidden; run with `--allow-focus` (D25) |
 | NT-TG-006 | development | `file choice: unit test only` | OPEN | R22: panel and Cancel read back; the file choice is `UploadTests` (ruling, as R17) |
+| NT-TG-007 | development | `test process hangs at 0 % CPU after _killWebContentProcess` | OPEN | Do not crash the page helper in `test.sh`; the local-page crash path needs a readback (NT-BUG-027 family) |
 | NT-NAV-005 | development | `aCancelNeverRemovesTheNextDownloadsFile` | OBSERVED | A cancel deletes the next download's file? P5-FIX-1 (p5/review) |
 | NT-NAV-006 | development | `everyRunningDownloadCanBeCancelled` | OBSERVED | Running downloads hidden, a page downloads without asking? P5-FIX-1 (p5/review) |
 | NT-NAV-007 | development | `linksFromAnotherAppLoadOnlyTheShownTab` | OBSERVED | Links from another app load every tab? P5-FIX-1 (p5/review) |
