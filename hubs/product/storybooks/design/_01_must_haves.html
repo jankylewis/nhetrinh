@@ -5,62 +5,63 @@
 <main class="wrap">
 <span class="tag r">01 · MUST-HAVES</span>
 <h1>What a browser<br>needs.</h1>
-<p class="lead">Strip any browser down and the same few parts are left. nhetrinh writes the parts that make it feel
-like a browser, and borrows the engine from macOS.</p>
+<p class="lead">Every browser has the same few parts. nhetrinh builds the parts you see and touch. It takes the
+engine from the Mac.</p>
 
-<h2>1 · The core, in layers</h2>
+<h2>1 · The six layers</h2>
 <p class="hint">CLICK A BOX</p>
 <div class="dia" role="group" aria-label="The layers every browser has">
   <div class="node a" data-k="chrome">1 · THE CHROME<small>window · tabs · address bar · buttons · menus</small></div>
   <div class="arrow">&#9660;</div>
   <div class="row">
-    <div class="node" data-k="nav">2 · NAVIGATION<small>typed text → address or search; back · forward · reload</small></div>
-    <div class="node" data-k="tabs">3 · TAB MANAGER<small>which tabs exist, which one shows, which are loaded</small></div>
+    <div class="node" data-k="nav">2 · NAVIGATION<small>text to address; back · forward · reload</small></div>
+    <div class="node" data-k="tabs">3 · TAB MANAGER<small>which tabs exist, and which one shows</small></div>
   </div>
   <div class="arrow">&#9660;</div>
-  <div class="node g" data-k="engine">4 · THE ENGINE<small>fetch · parse HTML/CSS · run JavaScript · lay out · paint</small></div>
+  <div class="node g" data-k="engine">4 · THE ENGINE<small>gets the page · runs it · draws it</small></div>
   <div class="arrow">&#9660;</div>
   <div class="row">
-    <div class="node v" data-k="net">5 · NETWORK + SECURITY<small>HTTPS · certificates · cookies · cache</small></div>
-    <div class="node v" data-k="store">6 · STORAGE<small>tabs, settings, history, sign-ins kept between launches</small></div>
+    <div class="node v" data-k="net">5 · NETWORK AND SAFETY<small>HTTPS · cookies · cache</small></div>
+    <div class="node v" data-k="store">6 · STORAGE<small>what stays after you quit</small></div>
   </div>
-  <p class="caption">Layers 1 to 3 are what you see and touch. Layer 4 is what turns an address into a page.
-  Layers 5 and 6 make it safe and make it remember.</p>
+  <p class="caption">You see and touch layers 1 to 3. Layer 4 turns an address into a page. Layers 5 and 6 keep you
+  safe and remember things for you.</p>
 </div>
 
 <h2>2 · Who builds each part</h2>
 <table>
-  <tr><th>Must-have</th><th>nhetrinh writes</th><th>Borrowed from the Mac</th></tr>
-  <tr><td>Window, sidebar, toolbar, menus</td><td>All of it (AppKit views)</td><td>AppKit itself</td></tr>
-  <tr><td>Address bar</td><td>Text → address or search; history dropdown</td><td>-</td></tr>
-  <tr><td>Back, forward, reload, stop</td><td>The buttons and keys</td><td>WebKit keeps each tab's history list</td></tr>
-  <tr><td>Tabs</td><td>Open, close, switch, reorder, groups, idle</td><td>-</td></tr>
-  <tr><td>Showing a page</td><td>One web view per loaded tab</td><td><b>WebKit</b>: the whole engine</td></tr>
-  <tr><td>Network, HTTPS, cookies, cache</td><td>Which data store a tab uses</td><td>WebKit's network process, macOS TLS</td></tr>
-  <tr><td>Page dialogs, permissions</td><td>The sheets: alerts, uploads, camera / mic asks</td><td>WebKit asks; nhetrinh answers</td></tr>
-  <tr><td>Downloads</td><td>Names, the footer rows, the guard on page-started downloads</td><td>WebKit writes the bytes</td></tr>
-  <tr><td>Keeping things</td><td>Session, settings, history files</td><td>Keychain (sign-ins), WebKit data store</td></tr>
-  <tr><td>Being a browser to macOS</td><td>Info.plist claims; links, HTML files, Handoff</td><td>Launch Services</td></tr>
+  <tr><th>Part</th><th>nhetrinh builds</th><th>The Mac gives</th></tr>
+  <tr><td>Window, tab list, toolbar, menus</td><td>All of it</td><td>AppKit (Apple's kit for Mac windows)</td></tr>
+  <tr><td>Address bar</td><td>Text to address or search; the history list</td><td>-</td></tr>
+  <tr><td>Back, forward, reload, stop</td><td>The buttons and keys</td><td>WebKit keeps each tab's back list</td></tr>
+  <tr><td>Tabs</td><td>Open, close, switch, move, groups, rest</td><td>-</td></tr>
+  <tr><td>Showing a page</td><td>One web view for each open tab</td><td><b>WebKit</b>: the whole engine</td></tr>
+  <tr><td>Network, HTTPS, cookies, cache</td><td>Which store the tabs use</td><td>WebKit's network helper, macOS</td></tr>
+  <tr><td>Page questions</td><td>The boxes that ask you (alerts, file pick, camera)</td><td>WebKit asks; nhetrinh answers</td></tr>
+  <tr><td>Downloads</td><td>File names, the download list, the guard</td><td>WebKit writes the file</td></tr>
+  <tr><td>Things kept after quit</td><td>Tabs, settings, history files</td><td>Keychain (sign-ins), WebKit's store</td></tr>
+  <tr><td>Being a browser to macOS</td><td>The list of what it can open</td><td>macOS reads that list</td></tr>
 </table>
 
 <h2>3 · Must, should, and nhetrinh's own</h2>
-<div class="rung bad"><span class="k">MUST</span><span class="v">A window, an address bar, one tab that shows a page through
-an engine, back / forward / reload, HTTPS. Without these it is not a browser.</span></div>
-<div class="rung mid"><span class="k">SHOULD</span><span class="v">Many tabs, tabs that survive a quit, error pages with Retry,
-downloads, uploads, find in page, zoom, page dialogs, links from other apps.</span></div>
-<div class="rung ok"><span class="k">NHETRINH</span><span class="v">Tabs load only when shown; idle tabs give their memory back;
-nested tab groups; a history dropdown; sign-ins kept across launches; a 1 MB app.</span></div>
+<div class="rung bad"><span class="k">MUST</span><span class="v">A window, an address bar, one tab that shows a page, back,
+forward, reload, and HTTPS. Without these, it is not a browser.</span></div>
+<div class="rung mid"><span class="k">SHOULD</span><span class="v">Many tabs, tabs that come back after a quit, error pages,
+downloads, file uploads, find in page, zoom, and links from other apps.</span></div>
+<div class="rung ok"><span class="k">NHETRINH</span><span class="v">A tab loads only when you show it. A tab you do not use gives
+its memory back. Groups of tabs. A history list. Sign-ins kept. A 1 MB app.</span></div>
 
-<div class="box cyan"><p><b>Why borrow the engine?</b> An engine is millions of lines (WebKit, Blink, Gecko).
-Writing one is out of reach for a small browser, and shipping one (as Chromium-based browsers do) costs hundreds of
-megabytes. WebKit is already on every Mac, updated by Apple, and the same engine Safari uses, so sites work.</p></div>
+<div class="box cyan"><p><b>Why not build our own engine?</b></p>
+<p>An engine has millions of lines of code. A small team cannot write one.</p>
+<p>Chrome-based browsers carry their own engine. That costs hundreds of megabytes.</p>
+<p>WebKit is already on every Mac, and Apple keeps it up to date. Sites work, because Safari uses it too.</p></div>
 </main>
 <script type="application/json" id="notes">{
-"chrome": {"title": "1 · The chrome", "body": "<p>Browser people call everything around the page the <b>chrome</b>. In nhetrinh: one window, the tab sidebar on the left or right, a toolbar (sidebar toggle, back, forward, reload, the address field), a find bar, a downloads footer, the menus and the Settings Hub.</p><p>All of it is AppKit, no SwiftUI. Every keyboard shortcut is defined in one place, the main menu.</p>", "files": "_Nhetrinh/UI/ · _Nhetrinh/_Browser/_Window/"},
-"nav": {"title": "2 · Navigation", "body": "<p>The address bar decides: does the text look like an address (<code>example.org</code>, <code>localhost:8080</code>), or is it words to search? That rule is pure logic in the core, with tests.</p><p>While you type, a dropdown offers pages from your history, ranked by how often and how recently you went there.</p>", "files": "NhetrinhCore/_Navigation/_Address/"},
-"tabs": {"title": "3 · Tab manager", "body": "<p>The list of tabs is a tree: tabs, and groups that hold tabs and more groups. The manager knows which tab shows, which tabs have a live page and which are idle.</p><p>A tab costs memory only after it is shown once; a tab left alone long enough gives its page back.</p>", "files": "NhetrinhCore/Tabs/ · _Nhetrinh/_Browser/Tab/"},
-"engine": {"title": "4 · The engine (WebKit)", "body": "<p>Fetching, HTML and CSS, JavaScript, layout, painting, video: all WebKit. nhetrinh makes one <code>WKWebView</code> per loaded tab and listens to what it reports: title, address, progress, a new window, a download, a failure.</p>", "files": "_Nhetrinh/_Browser/_Window/BrowserWindowController+WebKit.swift"},
-"net": {"title": "5 · Network and security", "body": "<p>WebKit's network process does HTTP, HTTPS, cookies and the cache; macOS checks certificates. nhetrinh chooses the data store (the real one, or a separate one for the readback) and asks before a page opens another app (<code>mailto:</code>, meeting links).</p>", "files": "_Nhetrinh/_Browser/Tab/WebConfig.swift · NhetrinhCore/_Navigation/ExternalScheme.swift"},
-"store": {"title": "6 · Storage", "body": "<p>What survives a quit: the tab tree (<code>session.json</code>), the settings (<code>prefs.json</code>), the history (<code>history.sqlite</code>), and your sign-ins (one Keychain item). Cookies and the cache live in WebKit's own store. Page 08 shows them all.</p>", "files": "NhetrinhCore/Tabs/Lifecycle/ · NhetrinhCore/Prefs/"}
+"chrome": {"title": "1 · The chrome", "body": "<p>People call everything around the page the <b>chrome</b>.</p><p>In nhetrinh: one window, the tab list on the left or right, a toolbar, a find bar, a download list, the menus and the Settings Hub.</p><p>nhetrinh builds all of it with AppKit, Apple's kit for Mac windows.</p><p>All keyboard shortcuts live in one place: the main menu.</p>", "files": "_Nhetrinh/UI/ · _Nhetrinh/_Browser/_Window/"},
+"nav": {"title": "2 · Navigation", "body": "<p>You type text in the address bar. nhetrinh decides: is it an address, or words to search?</p><p><code>example.org</code> is an address. <code>how tall is everest</code> is a search.</p><p>While you type, a list shows pages from your history. Pages you visit often and lately come first.</p>", "files": "NhetrinhCore/_Navigation/_Address/"},
+"tabs": {"title": "3 · Tab manager", "body": "<p>The tabs form a tree: tabs, and groups that hold tabs and more groups.</p><p>The tab manager knows which tab shows, which tabs have an open page, and which tabs rest.</p><p>A tab uses memory only after you show it. A tab you leave alone gives its memory back.</p>", "files": "NhetrinhCore/Tabs/ · _Nhetrinh/_Browser/Tab/"},
+"engine": {"title": "4 · The engine (WebKit)", "body": "<p>WebKit gets the page, reads its HTML and CSS, runs its JavaScript, and draws it. It also plays video.</p><p>nhetrinh makes one <b>web view</b> for each open tab. A web view is WebKit's box that shows one page.</p><p>The web view tells nhetrinh what happens: the title, the address, the progress, a new window, a download, an error.</p>", "files": "_Nhetrinh/_Browser/_Window/BrowserWindowController+WebKit.swift"},
+"net": {"title": "5 · Network and safety", "body": "<p>WebKit's network helper sends every request. It handles HTTPS (safe connections), cookies and the cache (saved copies of files).</p><p>macOS checks that each site is really who it says it is.</p><p>nhetrinh asks you before a page opens another app, such as Mail.</p>", "files": "_Nhetrinh/_Browser/Tab/WebConfig.swift · NhetrinhCore/_Navigation/ExternalScheme.swift"},
+"store": {"title": "6 · Storage", "body": "<p>These things stay after you quit: your tabs, your settings, your history and your sign-ins.</p><p>WebKit keeps the cookies and the cache in its own store.</p><p>Page 08 shows every place.</p>", "files": "NhetrinhCore/Tabs/Lifecycle/ · NhetrinhCore/Prefs/"}
 }</script>
 </body></html>

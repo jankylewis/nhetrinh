@@ -4,54 +4,55 @@
 <body data-page="design/04_rules.html" data-root="../">
 <main class="wrap">
 <span class="tag r">04 · DESIGN RULES</span>
-<h1>Lightness first,<br>speed second.</h1>
-<p class="lead">nhetrinh exists to be light. Four numbers bound it, and a handful of rules keep every change inside them.</p>
+<h1>Light first,<br>fast second.</h1>
+<p class="lead">nhetrinh exists to be light. Four limits set its size. A few rules keep every change inside them.</p>
 
-<h2>1 · The lightness budget</h2>
+<h2>1 · The four limits</h2>
 <table>
-  <tr><th>Measure</th><th>Limit</th><th>Why it holds</th></tr>
-  <tr><td>The app's own process</td><td>40 MB</td><td>The page content lives in WebKit's processes, not here</td></tr>
-  <tr><td>App + WebKit helpers</td><td>110 MB</td><td>Only shown tabs load; idle tabs unload</td></tr>
-  <tr><td>The app bundle</td><td>1 MB</td><td>The engine is the Mac's; no third-party code</td></tr>
-  <tr><td>CPU when idle</td><td>2 %</td><td>No timers that poll; work happens on events</td></tr>
+  <tr><th>What</th><th>Limit</th><th>How nhetrinh stays under it</th></tr>
+  <tr><td>Memory of the app itself</td><td>40 MB</td><td>Pages live in WebKit's helper programs, not in the app</td></tr>
+  <tr><td>Memory of the app and its helpers</td><td>110 MB</td><td>Only shown tabs load; unused tabs rest</td></tr>
+  <tr><td>Size of the app on disk</td><td>1 MB</td><td>The engine comes with the Mac; no outside code</td></tr>
+  <tr><td>CPU while you do nothing</td><td>2 %</td><td>Nothing runs in a loop; work starts only when something happens</td></tr>
 </table>
-<div class="box rose"><p><b>Today:</b> the bundle measures 1,048 KB, a little over 1 MB, with more features waiting on
-other branches. The headmate decides between a new limit and cuts (the plan's open question). A change that breaks the
-budget stops until the cost is removed or a new number is accepted.</p></div>
+<div class="box rose"><p><b>Today the app is 1,048 KB.</b> That is a little over 1 MB.</p>
+<p>More features wait on other branches, and they add size.</p>
+<p>The headmate decides: raise the limit, or cut something.</p>
+<p>A change that breaks a limit stops until the cost is gone or the headmate accepts a new limit.</p></div>
 
-<h2>2 · The rules that keep it light</h2>
+<h2>2 · Rules that keep it light</h2>
 <p class="hint">CLICK A BOX</p>
 <div class="dia" role="group" aria-label="Design rules">
   <div class="row">
-    <div class="node g" data-k="lazy">LAZY TABS<small>a tab costs nothing until shown</small></div>
-    <div class="node g" data-k="idle">GIVE IT BACK<small>idle tabs unload</small></div>
-    <div class="node g" data-k="one">ONE OF EACH<small>one window, one config, one store</small></div>
+    <div class="node g" data-k="lazy">LOAD LATE<small>a tab costs nothing until you show it</small></div>
+    <div class="node g" data-k="idle">GIVE IT BACK<small>unused tabs rest</small></div>
+    <div class="node g" data-k="one">ONE OF EACH<small>one window, one setup, one store</small></div>
   </div>
   <div class="row">
-    <div class="node v" data-k="apple">APPLE ONLY<small>AppKit + WebKit, no packages</small></div>
-    <div class="node v" data-k="events">NO POLLING<small>react to events</small></div>
+    <div class="node v" data-k="apple">APPLE ONLY<small>AppKit and WebKit, no outside code</small></div>
+    <div class="node v" data-k="events">NO LOOPS<small>act only when something happens</small></div>
     <div class="node v" data-k="basics">BASICS ONLY<small>no extensions, no sync</small></div>
   </div>
 </div>
 
-<h2>3 · The rules that keep it right</h2>
-<div class="rung ok"><span class="k">TESTS FIRST</span><span class="v">Every rule is a test before it is code. A bug fix starts with a
-test that fails, and a test that cannot fail is itself a bug.</span></div>
-<div class="rung ok"><span class="k">READBACK</span><span class="v">Done means used: the readback drives the installed app as you
-would and checks what it shows. "Merged" and "tests green" are not done.</span></div>
-<div class="rung mid"><span class="k">HUBS</span><span class="v">Every bug, failure, lesson and feature is written down in
-<code>hubs/</code> in the same change, with who found it and what proves it.</span></div>
-<div class="rung mid"><span class="k">YOUR MACHINE</span><span class="v">Builds and tests run gently (<code>nice</code>), one heavy job at
-a time; the app you are using is never restarted or replaced without your go.</span></div>
-<div class="rung bad"><span class="k">PUBLIC</span><span class="v">The repository is public: no secrets, names, work details or
-personal paths in any file. Sign-ins stay in the Keychain; cookie values are never logged.</span></div>
+<h2>3 · Rules that keep it right</h2>
+<div class="rung ok"><span class="k">TEST FIRST</span><span class="v">Write the test first, then the code. A bug fix starts with a test
+that fails. A test that cannot fail is a bug too.</span></div>
+<div class="rung ok"><span class="k">USE IT</span><span class="v">Done means used. The checker uses the installed app as you do. "Merged"
+and "tests pass" do not mean done.</span></div>
+<div class="rung mid"><span class="k">WRITE IT DOWN</span><span class="v">Every bug, failure, lesson and feature gets a note in
+<code>hubs/</code>, in the same change. The note says who found it and what proves it.</span></div>
+<div class="rung mid"><span class="k">YOUR MAC</span><span class="v">Builds and tests run at low priority, one big job at a time. The app
+you use is never restarted or replaced without your OK.</span></div>
+<div class="rung bad"><span class="k">PUBLIC</span><span class="v">Anyone can read the code. So no secrets, names, work details or
+personal paths go in it. Sign-ins stay in the Keychain. Cookie values never go in a log.</span></div>
 </main>
 <script type="application/json" id="notes">{
-"lazy": {"title": "Lazy tabs", "body": "<p>At launch only the selected tab gets a web view. Thirty restored tabs cost thirty small objects, not thirty pages. A link from another app adds a tab; only the shown one loads.</p>"},
-"idle": {"title": "Give it back", "body": "<p>A background tab unused for the idle minutes (10 by default, Settings Hub) drops its web view, and WebKit ends that page's process. The address, title, icon and back / forward history stay, so a click brings it back. You can also do it at once: Put Tab to Idle.</p>"},
-"one": {"title": "One of each", "body": "<p>One window, one shared WebKit configuration, one data store for cookies and cache, one network process. Sharing keeps the per-tab cost down to the page itself.</p>"},
-"apple": {"title": "Apple only", "body": "<p>No package dependency, no SwiftUI. The checker refuses a package dependency. The engine, TLS, SQLite and the Keychain are already on every Mac.</p>"},
-"events": {"title": "No polling", "body": "<p>nhetrinh reacts: WebKit reports page changes through observers and delegate calls; macOS reports memory pressure; the only steady timer is the idle check, once a minute (a fifth of the idle limit, at most 60 s), and it only compares times. Nothing spins while you read.</p>"},
-"basics": {"title": "Basics only", "body": "<p>Tabs, groups, address bar, history, downloads, find, zoom, sign-ins. No extensions, no account sync, no built-in ad blocker: each would cost weight the budget does not have.</p>"}
+"lazy": {"title": "Load late", "body": "<p>At start, only the tab you see gets a web view.</p><p>30 tabs cost 30 small objects, not 30 open pages.</p><p>When another app sends a link, nhetrinh adds a tab. Only the tab you see loads.</p>"},
+"idle": {"title": "Give it back", "body": "<p>A tab in the background that you have not used for some minutes goes to rest. The default is 10 minutes. You can change it in the Settings Hub.</p><p>A resting tab drops its web view, and WebKit stops that page's helper program.</p><p>The address, the title, the icon and the back-and-forward list stay. One click brings the page back.</p><p>Put Tab to Idle does the same at once.</p>"},
+"one": {"title": "One of each", "body": "<p>One window. One WebKit setup for all tabs. One store for cookies and the cache. One network helper.</p><p>Because the tabs share these, each tab costs only its own page.</p>"},
+"apple": {"title": "Apple only", "body": "<p>No outside code, and no SwiftUI. The checker blocks outside code.</p><p>The engine, safe connections, SQLite and the Keychain are already on every Mac.</p>"},
+"events": {"title": "No loops", "body": "<p>nhetrinh waits for things to happen.</p><p>WebKit tells it when a page changes. macOS tells it when memory is low.</p><p>The only repeating timer is the rest check. It runs once a minute and only compares times.</p><p>Nothing works while you just read a page.</p>"},
+"basics": {"title": "Basics only", "body": "<p>nhetrinh has tabs, groups, the address bar, history, downloads, find, zoom and sign-ins.</p><p>It has no extensions, no account sync, and no ad blocker. Each of these would add weight the limits do not allow.</p>"}
 }</script>
 </body></html>

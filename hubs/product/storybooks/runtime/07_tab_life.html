@@ -5,50 +5,50 @@
 <main class="wrap">
 <span class="tag g">07 · A TAB'S LIFE</span>
 <h1>Four states,<br>one costly.</h1>
-<p class="lead">A tab is cheap: an address, a title, an icon. Only a <b>loaded</b> tab holds a page in a WebKit process.
-nhetrinh's whole lightness story is about keeping tabs out of that state when you are not looking.</p>
+<p class="lead">A tab is cheap. It is an address, a title and an icon. Only an <b>open</b> tab holds a page in a
+WebKit helper. nhetrinh keeps tabs out of that state when you do not look at them.</p>
 
-<h2>1 · The states</h2>
+<h2>1 · The four states</h2>
 <p class="hint">CLICK A STATE</p>
 <div class="dia" role="group" aria-label="Tab state machine">
-  <div class="node x" data-k="new">NOT YET LOADED<small>restored or opened in the background · no web view · ~0 MB</small></div>
+  <div class="node x" data-k="new">NOT OPENED YET<small>brought back or opened behind · no web view · about 0 MB</small></div>
   <div class="arrow">&#9660;<small>you show it (click, ⌘1-9, ⌃⇥)</small></div>
-  <div class="node a" data-k="loaded">LOADED<small>web view + its page process · the costly state</small></div>
+  <div class="node a" data-k="loaded">OPEN<small>web view and its page helper · the costly state</small></div>
   <div class="row">
-    <div class="arrow">&#9660;<small>idle 10 min · Put to Idle · memory short</small></div>
+    <div class="arrow">&#9660;<small>unused 10 min · Put to Idle · memory low</small></div>
     <div class="arrow">&#9650;<small>you show it again</small></div>
   </div>
-  <div class="node v" data-k="idle">IDLE (UNLOADED)<small>dimmed in the sidebar · history kept · ~0 MB</small></div>
+  <div class="node v" data-k="idle">RESTING<small>dimmed in the tab list · back list kept · about 0 MB</small></div>
   <div class="arrow">&#9660;<small>you close it (from any state)</small></div>
-  <div class="node r" data-k="closed">CLOSED<small>kept for ⌘⇧T with its place in the groups</small></div>
-  <p class="caption">Read the arrows as rules. A tab moves down to IDLE only when nhetrinh is sure you lose nothing;
-  it moves up to LOADED only when you look at it.</p>
+  <div class="node r" data-k="closed">CLOSED<small>kept for ⌘⇧T, with its place in the groups</small></div>
+  <p class="caption">Read each arrow as a rule. A tab goes down to RESTING only when nhetrinh is sure you lose
+  nothing. A tab goes up to OPEN only when you look at it.</p>
 </div>
 
-<h2>2 · Who may not go idle</h2>
-<div class="rung bad"><span class="k">SHOWN</span><span class="v">The tab in view never goes idle. "Put Tab to Idle" on it first
-shows the nearest other tab.</span></div>
-<div class="rung bad"><span class="k">PLAYING</span><span class="v">A tab playing sound or video stays loaded: WebKit is asked first.</span></div>
-<div class="rung bad"><span class="k">IN A CALL</span><span class="v">A tab using the camera or the microphone stays loaded.</span></div>
-<div class="rung ok"><span class="k">EVERY OTHER</span><span class="v">Background, silent, unused past the idle minutes (10 by default;
-a minute when macOS warns of memory; at once when memory is critical).</span></div>
+<h2>2 · Tabs that never rest</h2>
+<div class="rung bad"><span class="k">SHOWN</span><span class="v">The tab you see never rests. If you choose Put Tab to Idle on it,
+nhetrinh first shows the nearest other tab.</span></div>
+<div class="rung bad"><span class="k">PLAYING</span><span class="v">A tab that plays sound or video stays open. nhetrinh asks WebKit
+first.</span></div>
+<div class="rung bad"><span class="k">IN A CALL</span><span class="v">A tab that uses the camera or the microphone stays open.</span></div>
+<div class="rung ok"><span class="k">ALL OTHERS</span><span class="v">They rest after the set minutes (10 by default). When memory is low,
+after 1 minute. When memory is very low, at once.</span></div>
 
-<h2>3 · Across a quit</h2>
+<h2>3 · What survives a quit</h2>
 <table>
   <tr><th>Kept</th><th>Where</th><th>Not kept</th></tr>
-  <tr><td>Every tab's address and title, the groups, which groups are closed, the selected tab, the sidebar width</td>
-      <td><code>session.json</code></td><td>Each tab's back / forward list (it lives in WebKit's memory)</td></tr>
-  <tr><td>Your sign-ins (session cookies)</td><td>One Keychain item, after a clean quit</td>
-      <td>Sign-ins after a crash (on purpose: a clean quit is the proof)</td></tr>
-  <tr><td>Closed tabs</td><td>Memory only</td><td>⌘⇧T after a relaunch</td></tr>
+  <tr><td>Each tab's address and title, the groups, which groups are closed, the tab you see, the tab list width</td>
+      <td><code>session.json</code></td><td>Each tab's back list (it lives in WebKit's memory)</td></tr>
+  <tr><td>Your sign-ins</td><td>One Keychain item, after a clean quit</td>
+      <td>Sign-ins after a crash (on purpose: only a clean quit proves they are fresh)</td></tr>
+  <tr><td>Closed tabs</td><td>Memory only</td><td>⌘⇧T after you quit and start again</td></tr>
 </table>
-<p>At launch every tab comes back <b>not yet loaded</b>, and only the selected one loads. Thirty tabs open in the time
-of one.</p>
+<p>At start, every tab comes back <b>not opened yet</b>. Only the tab you see loads. So 30 tabs open as fast as one.</p>
 </main>
 <script type="application/json" id="notes">{
-"new": {"title": "Not yet loaded", "body": "<p>A <code>Tab</code> object with an address and a title, and <code>webView = nil</code>. Every tab restored at launch starts here, and so does a link opened in the background or several links handed in by another app at once. It costs a few hundred bytes.</p>", "files": "_Nhetrinh/_Browser/Tab/_Tab.swift"},
-"loaded": {"title": "Loaded", "body": "<p>The tab has a web view, and WebKit has a web content process for its page: the DOM, the JavaScript heap, images, video. This is the state that costs tens or hundreds of megabytes. The sidebar row is drawn at full strength.</p>", "files": "_Browser/_Window/BrowserWindowController+Tabs.swift"},
-"idle": {"title": "Idle (unloaded)", "body": "<p><code>unload()</code> saves WebKit's history blob (<code>interactionState</code>) and drops the web view; WebKit ends the page's process. The row is dimmed. Click it: a new web view is made and the blob restored, so back and forward still work. A form you had half filled is lost, which is why the shown tab and busy tabs never go idle.</p>", "files": "_Browser/Lifecycle/IdleUnload.swift · IdleNow.swift · NhetrinhCore/Tabs/Lifecycle/UnloadPolicy.swift"},
-"closed": {"title": "Closed", "body": "<p>The tab and its web view are gone. Its address, title and place (the group path, by name) go on a stack: File > Reopen Closed Tab (⌘⇧T) puts it back where it was, and remakes its groups if they were closed too. Close Group… keeps the whole group as one entry.</p>", "files": "NhetrinhCore/Tabs/ClosedTabs.swift · _Browser/Tab/Groups+Close.swift"}
+"new": {"title": "Not opened yet", "body": "<p>The tab has an address and a title, but no web view.</p><p>Every tab brought back at start begins here. So does a link opened in the background, and a group of links from another app.</p><p>It costs a few hundred bytes.</p>", "files": "_Nhetrinh/_Browser/Tab/_Tab.swift"},
+"loaded": {"title": "Open", "body": "<p>The tab has a web view. WebKit has a page helper for it, with the page's parts, its JavaScript, pictures and video.</p><p>This state costs tens or hundreds of megabytes.</p><p>The tab row is drawn at full strength.</p>", "files": "_Browser/_Window/BrowserWindowController+Tabs.swift"},
+"idle": {"title": "Resting", "body": "<p>nhetrinh saves the tab's back-and-forward list and drops its web view. WebKit stops the page helper. The row is dimmed.</p><p>Click the tab: nhetrinh makes a new web view and puts the list back. So back and forward still work.</p><p>A half-filled form is lost. That is why the tab you see, and busy tabs, never rest.</p>", "files": "_Browser/Lifecycle/IdleUnload.swift · IdleNow.swift · NhetrinhCore/Tabs/Lifecycle/UnloadPolicy.swift"},
+"closed": {"title": "Closed", "body": "<p>The tab and its web view are gone.</p><p>nhetrinh keeps its address, title and place (the names of its groups) on a list.</p><p>File > Reopen Closed Tab (⌘⇧T) puts it back where it was. If its groups were closed too, nhetrinh makes them again.</p><p>Close Group keeps the whole group as one item.</p>", "files": "NhetrinhCore/Tabs/ClosedTabs.swift · _Browser/Tab/Groups+Close.swift"}
 }</script>
 </body></html>

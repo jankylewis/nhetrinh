@@ -5,8 +5,8 @@
 <main class="wrap">
 <span class="tag g">08 · ON DISK</span>
 <h1>What is kept,<br>and where.</h1>
-<p class="lead">Four small files of nhetrinh's own, one Keychain item, and WebKit's data store. Nothing is sent
-anywhere: no account, no sync, no telemetry.</p>
+<p class="lead">nhetrinh keeps four small files of its own, one Keychain item, and WebKit's store. It sends nothing to
+anyone: no account, no sync, no usage reports.</p>
 
 <h2>1 · The places</h2>
 <p class="hint">CLICK A BOX</p>
@@ -14,43 +14,45 @@ anywhere: no account, no sync, no telemetry.</p>
   <div class="frame" style="max-width:820px;width:100%"><span class="label">~/Library/Application Support/nhetrinh/</span>
     <div class="row">
       <div class="node a" data-k="session">session.json<small>your tabs and groups</small></div>
-      <div class="node a" data-k="prefs">prefs.json<small>Settings Hub, zoom per site</small></div>
-      <div class="node a" data-k="history">history.sqlite<small>visits, for the dropdown</small></div>
+      <div class="node a" data-k="prefs">prefs.json<small>Settings Hub, zoom for each site</small></div>
+      <div class="node a" data-k="history">history.sqlite<small>visits, for the history list</small></div>
       <div class="node a" data-k="marker">running.marker<small>was the last quit clean?</small></div>
     </div></div>
   <div class="row">
     <div class="node v" data-k="keychain">KEYCHAIN<small>one item: kept sign-ins</small></div>
-    <div class="node g" data-k="webdata">WEBKIT DATA STORE<small>cookies · cache · site storage</small></div>
-    <div class="node" data-k="downloads">~/Downloads<small>your downloads, quarantined</small></div>
+    <div class="node g" data-k="webdata">WEBKIT'S STORE<small>cookies · cache · site data</small></div>
+    <div class="node" data-k="downloads">~/Downloads<small>your downloads</small></div>
   </div>
-  <p class="caption">Amber: nhetrinh writes these itself. Violet: macOS keeps it, encrypted. Green: WebKit manages it.
-  The readback runs in its own profile, with its own folder and store, so it never touches these.</p>
+  <p class="caption">Amber: nhetrinh writes these itself. Violet: macOS keeps it, locked. Green: WebKit looks after it.
+  The checker uses its own profile, its own folder and its own store. It never touches these.</p>
 </div>
-<div class="box amber"><p><b>On a branch, not in your build yet:</b> profiles (P10) move these files into
-<code>nhetrinh/Default/</code>, one folder per profile, with a one-time move of your current files at the first launch.</p></div>
+<div class="box amber"><p><b>On a branch, not in your build yet:</b> profiles (P10). They move these files into
+<code>nhetrinh/Default/</code>, one folder for each profile. Your files move once, at the first start.</p></div>
 
-<h2>2 · A launch</h2>
+<h2>2 · When nhetrinh starts</h2>
 <div class="rung"><span class="k">1 · WINDOW</span><span class="v">The window and the menu appear first, empty.</span></div>
-<div class="rung"><span class="k">2 · SIGN-INS</span><span class="v">If the last quit was clean, the kept cookies are read from the
-Keychain and set back into WebKit, with a short wait so they land first.</span></div>
-<div class="rung"><span class="k">3 · TABS</span><span class="v"><code>session.json</code> is read; every tab comes back unloaded; the
-selected one loads. A file that cannot be read is set aside as <code>session.bad.json</code>, never deleted.</span></div>
-<div class="rung"><span class="k">4 · LINKS</span><span class="v">Links that arrived during the launch (you clicked one in another app)
-open as new tabs.</span></div>
+<div class="rung"><span class="k">2 · SIGN-INS</span><span class="v">If the last quit was clean, nhetrinh reads the kept cookies from the
+Keychain. It puts them back into WebKit, and waits a moment so they arrive first.</span></div>
+<div class="rung"><span class="k">3 · TABS</span><span class="v">nhetrinh reads <code>session.json</code>. Every tab comes back not opened
+yet. The tab you see loads. If the file is broken, nhetrinh keeps it aside as <code>session.bad.json</code>. It never
+deletes it.</span></div>
+<div class="rung"><span class="k">4 · LINKS</span><span class="v">Links that came in during the start open as new tabs. (For example, you
+clicked a link in another app.)</span></div>
 
-<h2>3 · A quit</h2>
-<div class="rung ok"><span class="k">1 · TABS</span><span class="v"><code>session.json</code> written at once.</span></div>
-<div class="rung ok"><span class="k">2 · SIGN-INS</span><span class="v">WebKit is asked for the session cookies; they go into the one Keychain
-item. The app waits for that answer, then ends.</span></div>
-<div class="rung ok"><span class="k">3 · CLEAN</span><span class="v">The marker is cleared: the next launch knows this quit was clean.</span></div>
+<h2>3 · When you quit</h2>
+<div class="rung ok"><span class="k">1 · TABS</span><span class="v">nhetrinh writes <code>session.json</code> at once.</span></div>
+<div class="rung ok"><span class="k">2 · SIGN-INS</span><span class="v">nhetrinh asks WebKit for the sign-in cookies, and puts them in the
+Keychain item. It waits for that, then ends.</span></div>
+<div class="rung ok"><span class="k">3 · CLEAN</span><span class="v">nhetrinh removes the marker. Next time it starts, it knows this quit
+was clean.</span></div>
 </main>
 <script type="application/json" id="notes">{
-"session": {"title": "session.json", "body": "<p>The tab tree (tabs and nested groups, which groups are closed), the selected tab, the sidebar width. Written 2 seconds after any tab change and at quit, atomically. Read once at launch. Versioned: an older file is upgraded, a newer or broken one is kept aside, not overwritten.</p>", "files": "NhetrinhCore/Tabs/Lifecycle/ (SessionStore, Tree/Session/)"},
-"prefs": {"title": "prefs.json", "body": "<p>Everything in the Settings Hub (appearance, sidebar side, search engine, idle minutes, remember sign-ins) and the zoom level per site. Written on every change.</p>", "files": "NhetrinhCore/Prefs/ · _Browser/Handling/PrefsKeeping.swift"},
-"history": {"title": "history.sqlite", "body": "<p>macOS's own SQLite, in WAL mode (so <code>-wal</code> and <code>-shm</code> files sit beside it). One row per page: address, title, visit count, typed count, last visit. Sign-in steps are never written, and old ones are removed when the store opens. Turning off History in the Settings Hub stops the keeping and forgets what was kept.</p>", "files": "NhetrinhCore/_Navigation/_Address/History/"},
-"marker": {"title": "running.marker", "body": "<p>Written at launch, removed at a clean quit. If it is still there at the next launch, the last run crashed or was killed, and kept sign-ins are not set back: a clean quit is the proof they are current.</p>", "files": "NhetrinhCore/Prefs/SignIns/CleanQuit.swift"},
-"keychain": {"title": "Keychain", "body": "<p>One generic-password item in your login Keychain holds the kept sign-in cookies, encrypted by macOS. The item is tied to the app's signature, so a rebuilt app with the same local signing identity can still read it. Cookie values never appear in a log.</p>", "files": "_Nhetrinh/Support/Secrets.swift · KeychainCalls.swift"},
-"webdata": {"title": "WebKit data store", "body": "<p>Persistent cookies, the HTTP cache, local storage and IndexedDB of every site. WebKit owns its location and format; nhetrinh only picks which store a launch uses and can clear it (Settings Hub > Clear Website Data, by time range).</p>", "files": "_Nhetrinh/_Browser/Tab/WebConfig.swift"},
-"downloads": {"title": "~/Downloads", "body": "<p>Each download gets the first free name (<code>file.pdf</code>, <code>file (1).pdf</code>…), reserved while it is written, and is marked as downloaded from the internet, so macOS's Gatekeeper checks it like a Safari download.</p>", "files": "_Browser/Page/Outside/ · NhetrinhCore/_Navigation/Downloads/"}
+"session": {"title": "session.json", "body": "<p>This file holds the tree of tabs and groups, which groups are closed, the tab you see, and the tab list width.</p><p>nhetrinh writes it 2 seconds after any tab change, and at quit. It writes a new file and swaps it in at once. It reads the file once, at start.</p><p>The file has a version number. nhetrinh upgrades an older file. It keeps a newer or broken file aside and does not write over it.</p>", "files": "NhetrinhCore/Tabs/Lifecycle/ (SessionStore, Tree/Session/)"},
+"prefs": {"title": "prefs.json", "body": "<p>This file holds everything in the Settings Hub: light or dark look, tab list side, search engine, rest minutes, keep sign-ins, keep history. It also holds the zoom level for each site.</p><p>nhetrinh writes it on every change.</p>", "files": "NhetrinhCore/Prefs/ · _Browser/Handling/PrefsKeeping.swift"},
+"history": {"title": "history.sqlite", "body": "<p>This is a small database. It uses macOS's own SQLite. Two helper files (<code>-wal</code> and <code>-shm</code>) sit next to it.</p><p>It has one row for each page: the address, the title, how many visits, how many typed visits, and the last visit.</p><p>It never keeps sign-in steps. When it opens, it removes old sign-in steps.</p><p>If you turn off History in the Settings Hub, nhetrinh stops keeping it and forgets what it kept.</p>", "files": "NhetrinhCore/_Navigation/_Address/History/"},
+"marker": {"title": "running.marker", "body": "<p>nhetrinh writes this file at start and removes it at a clean quit.</p><p>If the file is still there at the next start, the last run crashed or was killed. Then nhetrinh does not put the kept sign-ins back, because only a clean quit proves they are fresh.</p>", "files": "NhetrinhCore/Prefs/SignIns/CleanQuit.swift"},
+"keychain": {"title": "Keychain", "body": "<p>The Keychain is macOS's safe store for passwords and secrets.</p><p>One item in your login Keychain holds the kept sign-in cookies. macOS keeps it locked.</p><p>The item is tied to the app's signature (its maker's mark). A new build with the same local signature can still read it.</p><p>Cookie values never go in a log.</p>", "files": "_Nhetrinh/Support/Secrets.swift · KeychainCalls.swift"},
+"webdata": {"title": "WebKit's store", "body": "<p>This holds the cookies that last, the cache, and the data that sites save in the browser.</p><p>WebKit chooses where and how. nhetrinh only chooses which store to use. It can also clear it: Settings Hub > Clear Website Data, for a time range.</p>", "files": "_Nhetrinh/_Browser/Tab/WebConfig.swift"},
+"downloads": {"title": "~/Downloads", "body": "<p>Each download gets the first free name: <code>file.pdf</code>, then <code>file (1).pdf</code>, and so on. nhetrinh holds the name while the file is written.</p><p>macOS marks the file as from the internet. So macOS checks it before it opens, like a Safari download.</p>", "files": "_Browser/Page/Outside/ · NhetrinhCore/_Navigation/Downloads/"}
 }</script>
 </body></html>
