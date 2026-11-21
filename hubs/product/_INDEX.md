@@ -6,3 +6,4 @@ What nhetrinh is, can do, and will do next. `_SCHEMA.md` (hubs root) has the rul
 |---|---|
 | `features/` | shipped features, one row each (`NT-FEAT-nnn`) |
 | `plan/` | the development plan: phases, exit criteria, decisions |
+| `storybooks/` | how nhetrinh is built, for a human reader: open `storybooks/_index.html` in a browser |

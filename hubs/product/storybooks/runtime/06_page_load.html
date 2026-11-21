@@ -1,0 +1,68 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nhetrinh One Page Load</title><link rel="stylesheet" href="../style.css"><script src="../story.js" defer></script></head>
+<body data-page="runtime/06_page_load.html" data-root="../">
+<main class="wrap">
+<span class="tag g">06 · ONE PAGE LOAD</span>
+<h1>From a typed address<br>to pixels.</h1>
+<p class="lead">You type <code>example.org</code> and press Return. Here is every hand the request passes through, in order.
+Colours tell you where it runs: <span class="tag">YOU</span> <span class="tag c">APP</span> <span class="tag v">CORE</span>
+<span class="tag g">WEBKIT</span></p>
+
+<h2>1 · The path, step by step</h2>
+<p class="hint">CLICK A STEP</p>
+<div class="dia" role="group" aria-label="One page load end to end">
+  <div class="node a" data-k="type">1 · TYPE + RETURN<small>the address field in the toolbar</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node" data-k="navigate">2 · NAVIGATE<small>the window controller takes the text</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node v" data-k="parse">3 · ADDRESS OR SEARCH?<small>the core decides: https://example.org/</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node" data-k="webview">4 · A WEB VIEW<small>made now if the tab had none (lazy)</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="row">
+    <div class="node g" data-k="policy">5 · MAY IT GO?<small>another app? a new tab?</small></div>
+    <div class="node g" data-k="fetch">6 · FETCH<small>networking process: TLS, cookies</small></div>
+    <div class="node g" data-k="show">7 · SHOW OR SAVE?<small>a page, or a download</small></div>
+  </div>
+  <div class="arrow">&#9660;</div>
+  <div class="row">
+    <div class="node g" data-k="render">8 · PARSE + RUN<small>web content process</small></div>
+    <div class="node g" data-k="paint">9 · PAINT<small>GPU process</small></div>
+  </div>
+  <div class="arrow">&#9660;<small>WebKit reports back</small></div>
+  <div class="row">
+    <div class="node" data-k="observe">10 · CHROME UPDATES<small>title · progress · back / forward</small></div>
+    <div class="node" data-k="icon">11 · SITE ICON<small>fetched once, cached</small></div>
+    <div class="node v" data-k="history">12 · HISTORY<small>one row, unless a sign-in step</small></div>
+  </div>
+  <div class="arrow">&#9660;<small>2 seconds later</small></div>
+  <div class="node v" data-k="save">13 · SESSION SAVED<small>session.json, atomic write</small></div>
+</div>
+
+<h2>2 · When it goes wrong</h2>
+<div class="rung bad"><span class="k">NO NETWORK</span><span class="v">Step 6 fails: nhetrinh shows its error page in the tab, with
+Retry. A bad certificate fails the same way; there is no "proceed anyway".</span></div>
+<div class="rung mid"><span class="k">PASSWORD</span><span class="v">The site asks for a user and password (HTTP Basic): a sign-in
+sheet on the window.</span></div>
+<div class="rung mid"><span class="k">CRASH</span><span class="v">The page's process dies: only that tab is affected. nhetrinh logs
+it and reloads the tab.</span></div>
+<div class="rung ok"><span class="k">OTHER APP</span><span class="v">A <code>mailto:</code> or meeting link: a sheet asks first, then
+macOS opens the app. Nothing leaves without your Open.</span></div>
+</main>
+<script type="application/json" id="notes">{
+"type": {"title": "1 · Type and Return", "body": "<p>The address field is an AppKit text field. While you type, the history dropdown offers pages; Return (or a picked row) sends the text to the window controller.</p>", "files": "_Nhetrinh/UI/Bars/_Toolbar/ · ToolbarView+Typing.swift"},
+"navigate": {"title": "2 · Navigate", "body": "<p><code>navigate(text)</code> on the window controller: turn the text into an address, give it to the selected tab, forget that tab's old kept history (a new address replaces it), and mark the visit as typed for the history ranking.</p>", "files": "_Browser/_Window/BrowserWindowController+Tabs.swift"},
+"parse": {"title": "3 · Address or search?", "body": "<p>Pure logic in the core. <code>example.org</code>, <code>localhost:3000</code>, an IP, a <code>file:</code> address: an address (https added when missing). <code>how tall is everest</code>: a search with the engine chosen in the Settings Hub, every special character escaped.</p>", "files": "NhetrinhCore/_Navigation/_Address/_AddressParser.swift"},
+"webview": {"title": "4 · A web view", "body": "<p>If the tab was never shown or is idle, it has no web view. One is made now from the shared configuration (shared cookies and cache), observers are attached (title, address, progress), and the address is loaded. A local file is loaded with read access to its own folder only.</p>", "files": "_Browser/_Window/BrowserWindowController+Tabs.swift · _Browser/Tab/WebConfig.swift"},
+"policy": {"title": "5 · May it go?", "body": "<p>WebKit asks nhetrinh before every navigation. A link to another app (<code>mailto:</code>, <code>tel:</code>, a meeting app) is stopped and asked about. A ⌘-click or a middle click opens a background tab instead. A popup becomes a new tab.</p>", "files": "_Browser/_Window/BrowserWindowController+WebKit.swift · NhetrinhCore/_Navigation/ExternalScheme.swift"},
+"fetch": {"title": "6 · Fetch", "body": "<p>WebKit's networking process resolves the name, opens a TLS connection (macOS checks the certificate), sends your cookies for the site, and streams the answer. nhetrinh is not in this path at all.</p>"},
+"show": {"title": "7 · Show or save?", "body": "<p>When the response arrives, WebKit asks: show it or download it? The core decides from the type and the <code>Content-Disposition</code> header. A download goes to ~/Downloads under a free name, gets a row in the sidebar footer, and is quarantined like Safari's. A page that starts many downloads by itself is asked about after five.</p>", "files": "NhetrinhCore/_Navigation/Downloads/DownloadPolicy.swift · _Browser/Page/Outside/"},
+"render": {"title": "8 · Parse and run", "body": "<p>In the web content process: HTML becomes the DOM, CSS the styles, JavaScript runs, layout places every box. Sub-resources (images, scripts) go back through the networking process.</p>"},
+"paint": {"title": "9 · Paint", "body": "<p>Layers are composited by the GPU process and handed to the window server, which shows them inside nhetrinh's window. The app's own process only placed the web view.</p>"},
+"observe": {"title": "10 · The chrome updates", "body": "<p>Observers on the web view report title, address, loading and progress, back / forward. The toolbar turns reload into stop and draws the thin progress line; the sidebar row's title changes without reloading the whole list.</p>", "files": "_Browser/Handling/BrowserWindowController+Page.swift · UI/_Sidebar/Rows/SidebarUpdate.swift"},
+"icon": {"title": "11 · Site icon", "body": "<p>The page's <code>&lt;link rel=\"icon\"&gt;</code>, else <code>/favicon.ico</code>, fetched once by a small URL session and cached in memory per site, then shown in the sidebar and the dropdown.</p>", "files": "_Browser/Handling/Favicons.swift · NhetrinhCore/Tabs/IconCache.swift"},
+"history": {"title": "12 · History", "body": "<p>When the page finishes, one visit is written to <code>history.sqlite</code>: address, title, time, typed or not. Never kept: sign-in and redirect steps (tokens, codes in the address), pages of the readback profile. The dropdown ranks by how often and how recently you went there.</p>", "files": "_Browser/_Window/Chrome/AddressBar.swift · NhetrinhCore/_Navigation/_Address/History/"},
+"save": {"title": "13 · Session saved", "body": "<p>Two seconds after the change, the tab tree is written to <code>session.json</code> in one atomic write, so a crash or a power cut leaves either the old file or the new one, never half of each.</p>", "files": "_Browser/Lifecycle/_SessionKeeping.swift · NhetrinhCore/Tabs/Lifecycle/SessionStore.swift"}
+}</script>
+</body></html>

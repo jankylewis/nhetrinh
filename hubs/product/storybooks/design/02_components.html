@@ -1,0 +1,120 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nhetrinh Components</title><link rel="stylesheet" href="../style.css"><script src="../story.js" defer></script></head>
+<body data-page="design/02_components.html" data-root="../">
+<main class="wrap">
+<span class="tag r">02 · COMPONENTS</span>
+<h1>The parts,<br>and what each does.</h1>
+<p class="lead">Seven main components. The window controller sits in the middle: the views talk to it, it talks to
+WebKit, and every rule it follows is pure logic in the core.</p>
+
+<h2>1 · High level: seven components</h2>
+<p class="hint">CLICK A BOX</p>
+<div class="dia" role="group" aria-label="The seven main components and how they connect">
+  <div class="node a" data-k="app">APP SHELL<small>launch · menus · links in · quit</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="row">
+    <div class="node" data-k="ui">VIEWS<small>sidebar · toolbar · bars · Settings Hub</small></div>
+    <div class="node a" data-k="window">WINDOW CONTROLLER<small>the hub: one window, all tabs</small></div>
+  </div>
+  <div class="arrow">&#9660;</div>
+  <div class="row">
+    <div class="node g" data-k="tabs">TABS<small>tab · web view · groups · WebKit setup</small></div>
+    <div class="node g" data-k="life">LIFECYCLE<small>session · idle · memory · sign-ins</small></div>
+    <div class="node g" data-k="page">PAGE TALK<small>dialogs · failures · downloads · links</small></div>
+  </div>
+  <div class="arrow">&#9660;<small>every rule above is decided here</small></div>
+  <div class="node v" data-k="core">CORE (PURE LOGIC)<small>no windows, no WebKit: tested alone</small></div>
+  <p class="caption">Arrows point from the part that asks to the part that answers. The core never calls up: it
+  only takes values and gives values back, which is why every rule in it can be tested in milliseconds.</p>
+</div>
+
+<h2>2 · One level down: the parts inside each</h2>
+<p class="hint">CLICK A PART</p>
+<div class="dia" role="group" aria-label="Sub-components of each main component">
+  <div class="row">
+    <div class="frame"><span class="label">APP SHELL</span><div class="row">
+      <div class="node a" data-k="delegate">APP DELEGATE<small>launch, links, Handoff, quit</small></div>
+      <div class="node a" data-k="menu">MAIN MENU<small>every shortcut</small></div>
+      <div class="node a" data-k="support">SUPPORT<small>log · Keychain · screen</small></div></div></div>
+    <div class="frame"><span class="label">WINDOW CONTROLLER</span><div class="row">
+      <div class="node a" data-k="wtabs">+TABS<small>open · select · load</small></div>
+      <div class="node a" data-k="wkit">+WEBKIT<small>page events</small></div>
+      <div class="node a" data-k="wactions">+ACTIONS<small>menu commands</small></div></div></div>
+  </div>
+  <div class="row">
+    <div class="frame"><span class="label">VIEWS</span><div class="row">
+      <div class="node" data-k="sidebar">SIDEBAR<small>tab + group rows</small></div>
+      <div class="node" data-k="toolbar">TOOLBAR<small>address field · dropdown</small></div>
+      <div class="node" data-k="bars">BARS<small>find · downloads</small></div>
+      <div class="node" data-k="hub">SETTINGS HUB<small>⌘,</small></div></div></div>
+    <div class="frame"><span class="label">TABS</span><div class="row">
+      <div class="node g" data-k="tab">TAB<small>one page, maybe unloaded</small></div>
+      <div class="node g" data-k="webview">WEB VIEW<small>WebKit's view</small></div>
+      <div class="node g" data-k="groups">GROUPS<small>the tree</small></div>
+      <div class="node g" data-k="config">WEB CONFIG<small>one for all</small></div></div></div>
+  </div>
+  <div class="row">
+    <div class="frame"><span class="label">LIFECYCLE</span><div class="row">
+      <div class="node g" data-k="session">SESSION<small>save · restore</small></div>
+      <div class="node g" data-k="idle">IDLE<small>timer · Put to Idle</small></div>
+      <div class="node g" data-k="memory">MEMORY GUARD<small>macOS is short</small></div>
+      <div class="node g" data-k="signins">SIGN-INS<small>kept cookies</small></div></div></div>
+    <div class="frame"><span class="label">PAGE TALK</span><div class="row">
+      <div class="node g" data-k="sheets">SHEETS<small>alert · confirm · prompt</small></div>
+      <div class="node g" data-k="failure">LOAD FAILURE<small>error page</small></div>
+      <div class="node g" data-k="panels">PANELS<small>upload · print · camera</small></div>
+      <div class="node g" data-k="outside">OUTSIDE<small>downloads · links</small></div></div></div>
+  </div>
+  <div class="frame" style="max-width:860px;width:100%"><span class="label">CORE (PURE LOGIC)</span><div class="row">
+    <div class="node v" data-k="cnav">NAVIGATION<small>address · history · downloads · errors</small></div>
+    <div class="node v" data-k="ctabs">TABS<small>tree · session · unload policy</small></div>
+    <div class="node v" data-k="cprefs">PREFS<small>settings · zoom · sign-in rules</small></div>
+    <div class="node v" data-k="cshell">SHELL<small>layout · profile</small></div>
+    <div class="node v" data-k="cprobe">PROBE<small>readback wire</small></div></div></div>
+  <p class="caption">Amber: the shell and the hub. Cyan: what you see. Green: what manages pages. Violet: the rules.</p>
+</div>
+
+<h2>3 · And one tool outside the app</h2>
+<div class="box violet"><p><b>The readback</b> (<code>nhetrinh-readback</code>) is a separate program. It launches the installed
+app the way you do, drives it through a private socket (the probe) and through the Dock, and gives a verdict per step.
+It is how a change is proven on the real app, not only in tests. It is never part of the app you use: the probe
+exists only when the app is started with <code>NHT_READBACK=1</code>.</p></div>
+</main>
+<script type="application/json" id="notes">{
+"app": {"title": "App shell", "body": "<p>The process starts in <code>main.swift</code> (four lines: make the app, set the delegate, run). The app delegate builds the one window, installs the menu, sets back the kept sign-ins, then opens your tabs and any links that arrived during launch.</p>", "files": "_Nhetrinh/main.swift · AppDelegate.swift · UI/AppMenu.swift"},
+"ui": {"title": "Views", "body": "<p>Plain AppKit views. They show state and report what you did (a click, a typed key) through callbacks such as <code>onSelect</code> or <code>onAction</code>. They hold no browser logic: the window controller decides.</p>", "files": "_Nhetrinh/UI/"},
+"window": {"title": "Window controller (the hub)", "body": "<p><code>BrowserWindowController</code> owns the window, the tab tree and the selected tab. Its work is split over extensions by topic: tabs, WebKit callbacks, menu actions, groups, idle, downloads, sign-ins. Every view callback and every WebKit callback lands here.</p>", "files": "_Nhetrinh/_Browser/_Window/_BrowserWindowController.swift"},
+"tabs": {"title": "Tabs", "body": "<p>A tab is a small object: its address, title, icon, and a web view <b>only while loaded</b>. Unloaded, it keeps WebKit's saved history blob, so back / forward still work after it loads again.</p>", "files": "_Nhetrinh/_Browser/Tab/"},
+"life": {"title": "Lifecycle", "body": "<p>Everything about time: saving the tabs 2 seconds after a change and at quit, restoring them at launch, unloading idle tabs, freeing memory when macOS is short, and keeping sign-ins across a quit.</p>", "files": "_Nhetrinh/_Browser/Lifecycle/"},
+"page": {"title": "Page talk", "body": "<p>A page asks things of the browser: show an alert, pick a file, use the camera, download a file, open a mail app. Each request becomes a sheet on the window or an action, and nothing leaves the browser without your answer.</p>", "files": "_Nhetrinh/_Browser/Page/"},
+"core": {"title": "Core (pure logic)", "body": "<p><code>NhetrinhCore</code> is a separate Swift module with no AppKit and no WebKit. It holds every rule that can be stated as values in, values out: is this text an address, which tabs may unload, what does the session file look like, how is history ranked. The app calls it; it never calls the app.</p>", "files": "_app/_Sources/NhetrinhCore/"},
+"delegate": {"title": "App delegate", "body": "<p>Launch order: screen presenter, Keychain seam, Dock icon, window, menu; then the kept sign-ins are set back into WebKit (with a short wait), then the tabs open. It also receives links from other apps, HTML files from Finder, pages from Handoff, and the quit, where it saves the tabs and keeps the sign-ins first.</p>", "files": "_Nhetrinh/AppDelegate.swift"},
+"menu": {"title": "Main menu", "body": "<p>The only place keyboard shortcuts are defined. Menu items target the window controller directly, so they work even when no window is key (a bug once taught this, NT-BUG-003).</p>", "files": "_Nhetrinh/UI/AppMenu.swift"},
+"support": {"title": "Support", "body": "<p>The logger (every failure path writes a line), the Keychain calls behind a seam, how windows and sheets come on screen (inert in tests), and measurement hooks that do nothing unless switched on.</p>", "files": "_Nhetrinh/Support/"},
+"wtabs": {"title": "+Tabs", "body": "<p>Open a tab, select it, create its web view on first show (lazy), close it. Typing in the address bar ends here: <code>navigate</code> turns the text into an address and loads it.</p>", "files": "_Browser/_Window/BrowserWindowController+Tabs.swift"},
+"wkit": {"title": "+WebKit", "body": "<p>The web view's delegate: a page started, finished or failed; it wants a new window (a popup becomes a tab); a link for a background tab; a link to another app.</p>", "files": "_Browser/_Window/BrowserWindowController+WebKit.swift"},
+"wactions": {"title": "+Actions", "body": "<p>What the menu items do: new tab, close tab, reopen closed tab, duplicate, show the sidebar, Settings Hub, and so on.</p>", "files": "_Browser/_Window/Chrome/BrowserWindowController+Actions.swift"},
+"sidebar": {"title": "Sidebar", "body": "<p>An outline view: one row per tab (icon, title, close on hover; dimmed when idle) and one per group (folder, name, count). Click a group to open or close it, double-click to rename, drag to move, right-click for the menus. It reloads only when the tree's shape changes.</p>", "files": "_Nhetrinh/UI/_Sidebar/"},
+"toolbar": {"title": "Toolbar", "body": "<p>Sidebar toggle, back, forward, reload (stop while loading, with a thin progress line), and the address field. Typing drives the history dropdown: up to 8 rows, arrow keys, Return.</p>", "files": "_Nhetrinh/UI/Bars/_Toolbar/"},
+"bars": {"title": "Bars", "body": "<p>The find bar under the toolbar (⌘F), and the downloads footer at the bottom of the sidebar: one row per download, progress, Cancel, Show in Finder.</p>", "files": "_Nhetrinh/UI/Bars/"},
+"hub": {"title": "Settings Hub", "body": "<p>One small native window (⌘,): appearance, sidebar side, search engine, idle minutes, remember sign-ins, keep history, clear website data.</p>", "files": "_Nhetrinh/UI/Settings/"},
+"tab": {"title": "Tab", "body": "<p>Address, title, icon, and <code>webView</code> (nil when not loaded). <code>unload()</code> keeps WebKit's history blob (<code>interactionState</code>) and drops the web view: its page process goes away.</p>", "files": "_Nhetrinh/_Browser/Tab/_Tab.swift"},
+"webview": {"title": "Web view", "body": "<p>A small subclass of <code>WKWebView</code>: its right-click menu says \"Open Link in New Tab\", and it notes when you last clicked or typed (so a download a page starts by itself can be told apart).</p>", "files": "_Nhetrinh/_Browser/Tab/BrowserWebView.swift"},
+"groups": {"title": "Groups", "body": "<p>The window's side of the tab tree: new group, rename, collapse, ungroup, move, close group (with a confirmation that names the tab count). The tree rules themselves (depth limit 4, what may move where) are in the core.</p>", "files": "_Nhetrinh/_Browser/Tab/Groups.swift"},
+"config": {"title": "Web config", "body": "<p>One <code>WKWebViewConfiguration</code> for every tab: one data store (shared cookies and cache), a Safari-like user agent, fullscreen video on. A separate store is used for the readback, so a test never touches your cookies.</p>", "files": "_Nhetrinh/_Browser/Tab/WebConfig.swift"},
+"session": {"title": "Session", "body": "<p>The tab tree, the selected tab, the sidebar width: written to <code>session.json</code> 2 seconds after a change and at quit, read at launch. Only the selected tab loads at launch; the rest wait until shown.</p>", "files": "_Nhetrinh/_Browser/Lifecycle/_SessionKeeping.swift"},
+"idle": {"title": "Idle", "body": "<p>A background tab unused for the idle minutes (10 by default) is unloaded. Before that, WebKit is asked whether it plays sound or uses the camera or microphone: those stay. Put Tab to Idle / Put Other Tabs to Idle do the same at once.</p>", "files": "_Nhetrinh/_Browser/Lifecycle/IdleUnload.swift · IdleNow.swift"},
+"memory": {"title": "Memory guard", "body": "<p>macOS tells the app how short memory is. At <b>warning</b>, background tabs idle for more than a minute unload at once; at <b>critical</b>, every background tab unloads. Tabs playing sound or using the camera or microphone stay, as with idle.</p>", "files": "_Nhetrinh/_Browser/Lifecycle/MemoryGuard.swift"},
+"signins": {"title": "Sign-ins", "body": "<p>WebKit forgets session cookies at quit, so sites would ask you to sign in again. At a clean quit nhetrinh keeps those cookies in one Keychain item and sets them back at the next launch, before any tab loads. Off with one switch in the Settings Hub.</p>", "files": "_Nhetrinh/_Browser/Lifecycle/SignInKeeping.swift · NhetrinhCore/Prefs/SignIns/"},
+"sheets": {"title": "Sheets", "body": "<p>JavaScript's <code>alert</code>, <code>confirm</code> and <code>prompt</code> become sheets on the window, one at a time, tied to their tab: closing the tab answers them.</p>", "files": "_Nhetrinh/_Browser/Page/_Sheets.swift"},
+"failure": {"title": "Load failure", "body": "<p>A page that cannot load (no network, bad certificate, unknown host) shows nhetrinh's error page with Retry; a site that asks for a password gets a sign-in sheet.</p>", "files": "_Nhetrinh/_Browser/Page/LoadFailure.swift · NhetrinhCore/_Navigation/ErrorPage.swift"},
+"panels": {"title": "Panels", "body": "<p>File upload (the open panel), File > Print…, and the camera / microphone question, answered per site.</p>", "files": "_Nhetrinh/_Browser/Page/Panels.swift"},
+"outside": {"title": "Outside", "body": "<p>What crosses the browser's edge. Out: downloads to ~/Downloads (first free name, quarantined like Safari's), links to other apps (asked first). In: links from other apps, HTML files from Finder, pages from Handoff, each a new tab.</p>", "files": "_Nhetrinh/_Browser/Page/Outside/"},
+"cnav": {"title": "Core · Navigation", "body": "<p>Address parsing (address or search), the history store (SQLite, ranking, what is never kept: sign-in steps), download naming and policy, the error page text, which schemes leave the browser and which links come in.</p>", "files": "NhetrinhCore/_Navigation/"},
+"ctabs": {"title": "Core · Tabs", "body": "<p>The tab tree and its file format, the flat order ⌘1-⌘9 follow, the closed-tabs stack (⌘⇧T), favicon rules, and <code>UnloadPolicy</code>: which tabs may unload and when.</p>", "files": "NhetrinhCore/Tabs/"},
+"cprefs": {"title": "Core · Prefs", "body": "<p>The settings and their file, zoom steps (50 % to 300 %), the clear-data ranges, and the sign-in keeper: what a launch and a quit do with kept sign-ins.</p>", "files": "NhetrinhCore/Prefs/"},
+"cshell": {"title": "Core · Shell", "body": "<p>Layout rules (which side the sidebar is on, where the toolbar's first button starts) and profiles (a name → its own cookies and cache).</p>", "files": "NhetrinhCore/Shell/"},
+"cprobe": {"title": "Core · Probe", "body": "<p>The readback's wire: one JSON line per request over a Unix socket in a folder only you can open. Off unless the app is started for a readback.</p>", "files": "NhetrinhCore/Probe/"}
+}</script>
+</body></html>

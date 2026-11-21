@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nhetrinh Code Map</title><link rel="stylesheet" href="../style.css"><script src="../story.js" defer></script></head>
+<body data-page="design/03_code_map.html" data-root="../">
+<main class="wrap">
+<span class="tag r">03 · CODE MAP</span>
+<h1>Where the code<br>lives.</h1>
+<p class="lead">One Swift package, three programs' worth of code, three test sets. No third-party package: only
+Apple's frameworks.</p>
+
+<h2>1 · The package: who depends on whom</h2>
+<p class="hint">CLICK A BOX</p>
+<div class="dia" role="group" aria-label="Swift package targets and their dependencies">
+  <div class="row">
+    <div class="node a" data-k="app">NHETRINH<small>the app · 60 files · ~4,800 lines</small></div>
+    <div class="node r" data-k="readback">NHETRINH-READBACK<small>the checker · 46 files · ~3,700 lines</small></div>
+  </div>
+  <div class="arrow">&#9660; &nbsp; &#9660;<small>both use</small></div>
+  <div class="node v" data-k="core">NHETRINHCORE<small>pure logic · 48 files · ~3,100 lines</small></div>
+  <div class="arrow">&#9660;<small>uses only</small></div>
+  <div class="row">
+    <div class="node x" data-k="apple">FOUNDATION<small>+ SQLite for history</small></div>
+    <div class="node x" data-k="apple">APPKIT + WEBKIT<small>the app only</small></div>
+  </div>
+  <p class="caption">The core may not import AppKit or WebKit. That one rule keeps every browser rule testable without
+  a window, and stops a view from growing business logic.</p>
+</div>
+
+<h2>2 · The folders</h2>
+<pre>_app/
+  _Sources/
+    _Nhetrinh/             <b>the app</b>
+      _Browser/            window controller, tabs, lifecycle, page talk
+        _Window/  Tab/  Lifecycle/  Page/  Handling/
+      UI/                  sidebar, toolbar + bars, Settings Hub, menu, font
+      Support/             log, Keychain seam, screen seam, bench hooks
+      AppDelegate.swift  main.swift
+    NhetrinhCore/          <b>the rules</b> (no AppKit, no WebKit)
+      _Navigation/  Tabs/  Prefs/  Shell/  Probe/
+    NhetrinhReadback/      <b>the checker</b>: drives the installed app
+      _Steps/  Driver/
+  Tests/
+    _NhetrinhCoreTests/    rules, in milliseconds
+    NhetrinhTests/         app wiring: menus, sidebar, sheets, tabs (no screen)
+    NhetrinhReadbackTests/ the checker's own pure parts
+  scripts/                 _build.sh  test.sh  install/  conventions/
+  assets/_icon/            the icon and the tools that drew it
+hubs/                      bugs, failures, lessons, features, plan, these storybooks</pre>
+
+<h2>3 · Why the folders look the way they do</h2>
+<div class="rung"><span class="k">≤ 5</span><span class="v">At most five entries in any folder. Past five, the code is grouped
+by meaning (that is why <code>Page/Outside/</code> exists), never widened.</span></div>
+<div class="rung"><span class="k">ONE _</span><span class="v">Exactly one entry per folder starts with <code>_</code>: the most
+important one. Open any folder and start there (<code>_Browser/</code>, <code>_BrowserWindowController.swift</code>).</span></div>
+<div class="rung"><span class="k">SMALL FILES</span><span class="v">Code files at most 150 lines, functions at most 30. A big type
+is split into extensions by topic: <code>BrowserWindowController+Tabs</code>, <code>+WebKit</code>, <code>+Actions</code>.</span></div>
+<div class="rung"><span class="k">BY TOOL</span><span class="v">A checker (<code>scripts/conventions/_check.py</code>) enforces all of
+this before every commit. Nobody checks by eye.</span></div>
+
+<h2>4 · Where to start reading</h2>
+<table>
+  <tr><th>To understand</th><th>Open</th></tr>
+  <tr><td>How the app starts</td><td><code>_Nhetrinh/main.swift</code>, then <code>AppDelegate.swift</code></td></tr>
+  <tr><td>The window and its tabs</td><td><code>_Browser/_Window/_BrowserWindowController.swift</code></td></tr>
+  <tr><td>When a tab loads</td><td><code>_Browser/_Window/BrowserWindowController+Tabs.swift</code></td></tr>
+  <tr><td>When a tab unloads</td><td><code>NhetrinhCore/Tabs/Lifecycle/UnloadPolicy.swift</code></td></tr>
+  <tr><td>What the address bar does with text</td><td><code>NhetrinhCore/_Navigation/_Address/_AddressParser.swift</code></td></tr>
+  <tr><td>What the app tells macOS</td><td><code>scripts/_build.sh</code> (it writes the Info.plist)</td></tr>
+</table>
+</main>
+<script type="application/json" id="notes">{
+"app": {"title": "Nhetrinh (the app)", "body": "<p>The program you run. It links AppKit (windows, views, menus) and WebKit (web views). Everything that needs a window or a web view is here; everything that can be decided without one is pushed down into the core.</p>", "files": "_app/_Sources/_Nhetrinh/"},
+"readback": {"title": "nhetrinh-readback (the checker)", "body": "<p>A second program. It launches the installed app in its own profile (never your cookies or tabs), talks to it over the probe socket, and reads the Dock through Accessibility. Each step (R1, R2, …) prints PASS or FAIL with evidence. A feature is done when its readback passes on the real app, not when its tests pass.</p>", "files": "_app/_Sources/NhetrinhReadback/"},
+"core": {"title": "NhetrinhCore", "body": "<p>A library both programs use. Rules as plain Swift values: addresses, the tab tree, the session file, unload decisions, download names, history ranking, the probe's wire format. Parameterized tests cover each rule, and a bug fix starts with a test that fails.</p>", "files": "_app/_Sources/NhetrinhCore/"},
+"apple": {"title": "Apple frameworks only", "body": "<p>No third-party package, no SwiftUI. Foundation everywhere; AppKit and WebKit in the app; macOS's own SQLite library for history; the Security framework for the Keychain. The app bundle stays near 1 MB because nothing is shipped that the Mac already has.</p>"}
+}</script>
+</body></html>

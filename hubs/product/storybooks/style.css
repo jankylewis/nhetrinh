@@ -1,0 +1,112 @@
+/* nhetrinh storybooks: one pixel theme for every page (the same palette and type as the fleet storybooks). */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root{
+  --bg:#232136; --panel:#2a273f; --panel2:#332f4a; --line:#4a4661;
+  --ink:#e0def4; --dim:#a6a0c4;
+  --cyan:#9ccfd8; --amber:#f6c177; --rose:#eb6f92; --green:#a6da95; --violet:#c4a7e7;
+  --pixel:'Press Start 2P',monospace;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--mono); font-size:16px; line-height:1.75;
+  padding:0 16px 80px;
+  background-image:
+    linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:4px 4px;
+}
+.wrap{max-width:900px;margin:0 auto}
+
+h1,h2,h3,.pix{font-family:var(--pixel);font-weight:400;letter-spacing:.5px;line-height:1.9}
+h1{font-size:20px;color:var(--amber);margin:18px 0 8px}
+h2{font-size:14px;color:var(--cyan);margin:44px 0 14px;border-left:6px solid var(--cyan);padding-left:12px}
+h3{font-size:11px;color:var(--violet);margin:22px 0 8px}
+p{margin:12px 0;max-width:66ch}
+.lead{color:var(--dim);font-size:15px}
+b{color:var(--amber);font-weight:400}
+a{color:var(--cyan)}
+ul{max-width:66ch;padding-left:22px} li{margin:6px 0}
+
+/* sticky header with the page menu */
+header.top{position:sticky;top:0;z-index:10;background:var(--bg);padding:12px 0}
+.menu{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tag{font-family:var(--pixel);font-size:9px;color:var(--bg);background:var(--amber);padding:5px 8px;display:inline-block;
+     text-decoration:none}
+.tag.c{background:var(--cyan)} .tag.g{background:var(--green)} .tag.r{background:var(--rose)} .tag.v{background:var(--violet)}
+.menu .tag.c:hover{background:var(--amber)}
+
+/* chunky pixel frame */
+.box{background:var(--panel);border:3px solid var(--line);box-shadow:6px 6px 0 rgba(0,0,0,.30);padding:18px 22px;margin:18px 0}
+.box.cyan{border-color:var(--cyan)} .box.amber{border-color:var(--amber)}
+.box.rose{border-color:var(--rose)} .box.green{border-color:var(--green)} .box.violet{border-color:var(--violet)}
+
+/* home cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin:24px 0}
+.card{display:block;text-decoration:none;color:var(--ink);background:var(--panel);border:3px solid var(--line);
+      box-shadow:5px 5px 0 rgba(0,0,0,.30);padding:16px 18px;transition:transform .08s steps(2),border-color .08s}
+.card:hover{transform:translate(-3px,-3px);border-color:var(--amber);box-shadow:8px 8px 0 rgba(0,0,0,.32)}
+.card .n{font-family:var(--pixel);font-size:10px;color:var(--dim)}
+.card .t{font-family:var(--pixel);font-size:11px;color:var(--amber);display:block;margin:8px 0 6px}
+.card .d{font-size:14px;color:var(--dim);line-height:1.6}
+
+/* diagram primitives: a node is clickable when it has data-k (story.js opens its note) */
+.dia{background:var(--panel2);border:3px solid var(--line);padding:26px 18px;margin:22px 0;
+     display:flex;flex-direction:column;align-items:center}
+.row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:stretch}
+.node{font-family:var(--pixel);font-size:10px;text-align:center;background:var(--bg);border:3px solid var(--cyan);
+      color:var(--cyan);padding:14px 14px;min-width:120px;max-width:260px;box-shadow:4px 4px 0 rgba(0,0,0,.35)}
+.node small{display:block;font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:8px;letter-spacing:0;
+            line-height:1.5}
+.node.a{border-color:var(--amber);color:var(--amber)} .node.g{border-color:var(--green);color:var(--green)}
+.node.r{border-color:var(--rose);color:var(--rose)}   .node.v{border-color:var(--violet);color:var(--violet)}
+.node.x{border-color:#6b6880;color:#8b88a0;border-style:dashed}
+.node[data-k]{cursor:pointer}
+.node[data-k]:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 rgba(0,0,0,.32)}
+.node[data-k]:focus-visible{outline:3px solid var(--amber);outline-offset:4px}
+.arrow{font-family:var(--pixel);font-size:14px;color:var(--dim);padding:10px 0;text-align:center}
+.arrow small{display:block;font-family:var(--mono);font-size:12px;letter-spacing:0}
+.caption{font-size:14px;color:var(--dim);text-align:center;margin-top:16px;max-width:60ch}
+.hint{font-family:var(--pixel);font-size:8px;color:var(--dim);text-align:center;margin:-8px 0 8px}
+
+/* a group frame inside a diagram: a component and its parts */
+.frame{border:3px dashed var(--line);padding:16px 12px 12px;margin:8px;position:relative;flex:1 1 260px;max-width:420px}
+.frame > .label{position:absolute;top:-12px;left:12px;background:var(--panel2);padding:0 8px;
+                font-family:var(--pixel);font-size:9px;color:var(--amber)}
+.frame .row{gap:10px} .frame .node{min-width:0;flex:1 1 110px;padding:10px 8px}
+
+/* step ladder */
+.rung{display:flex;gap:14px;align-items:center;border:3px solid var(--line);background:var(--panel);padding:12px 16px;
+      margin:10px 0;box-shadow:4px 4px 0 rgba(0,0,0,.28)}
+.rung .k{font-family:var(--pixel);font-size:10px;min-width:110px;color:var(--cyan)}
+.rung .v{font-size:14px;color:var(--ink)}
+.rung.ok{border-color:var(--green)} .rung.ok .k{color:var(--green)}
+.rung.mid{border-color:var(--amber)} .rung.mid .k{color:var(--amber)}
+.rung.bad{border-color:var(--rose)} .rung.bad .k{color:var(--rose)}
+
+/* tables */
+table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px;background:var(--panel)}
+th,td{border:2px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--pixel);font-size:9px;color:var(--amber);font-weight:400;background:var(--panel2)}
+
+code{background:var(--panel2);border:1px solid var(--line);padding:1px 6px;font-size:14px;color:var(--amber)}
+pre{background:var(--panel2);border:3px solid var(--line);padding:16px;overflow-x:auto;font-size:13px;line-height:1.7}
+
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:48px;border-top:3px solid var(--line);
+       padding-top:18px;font-family:var(--pixel);font-size:10px}
+.pager a{text-decoration:none}
+hr{border:0;border-top:3px dashed var(--line);margin:34px 0}
+
+/* the note a clicked node opens */
+dialog.note{width:min(640px,calc(100vw - 32px));max-height:min(700px,calc(100vh - 32px));overflow:auto;
+            color:var(--ink);background:var(--panel);border:3px solid var(--cyan);box-shadow:8px 8px 0 rgba(0,0,0,.42);
+            padding:28px 32px 24px}
+dialog.note::backdrop{background:rgba(10,8,22,.78)}
+dialog.note h2{margin-top:6px}
+dialog.note .close{position:absolute;top:10px;right:12px;color:var(--bg);background:var(--amber);border:0;
+                   padding:4px 9px 7px;font:22px/1 var(--mono);cursor:pointer}
+dialog.note .files{font-size:13px;color:var(--dim)}
+
+@media (max-width:620px){ .rung{flex-direction:column;align-items:flex-start} dialog.note{padding:26px 20px 20px} }

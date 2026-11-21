@@ -1,0 +1,59 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nhetrinh Processes</title><link rel="stylesheet" href="../style.css"><script src="../story.js" defer></script></head>
+<body data-page="runtime/_05_processes.html" data-root="../">
+<main class="wrap">
+<span class="tag g">05 · PROCESSES</span>
+<h1>What runs<br>while you browse.</h1>
+<p class="lead">nhetrinh is one process. WebKit adds its own helper processes beside it, and nhetrinh decides how many
+of the costly ones exist by deciding which tabs are loaded.</p>
+
+<h2>1 · The processes</h2>
+<p class="hint">CLICK A BOX</p>
+<div class="dia" role="group" aria-label="Processes while nhetrinh runs">
+  <div class="frame" style="max-width:820px;width:100%"><span class="label">NHETRINH (ONE PROCESS · BUDGET 40 MB)</span>
+    <div class="row">
+      <div class="node a" data-k="main">MAIN THREAD<small>every view, every WebKit call, files, history</small></div>
+      <div class="node" data-k="bg">SMALL QUEUES<small>download names · icon fetches</small></div>
+    </div></div>
+  <div class="arrow">&#9660;<small>WebKit starts and stops these itself (XPC)</small></div>
+  <div class="row">
+    <div class="node g" data-k="content">WEB CONTENT ×N<small>one per loaded tab, roughly · the big cost</small></div>
+    <div class="node v" data-k="network">NETWORKING ×1<small>HTTP(S), cookies, cache</small></div>
+    <div class="node v" data-k="gpu">GPU ×1<small>drawing, video, WebGL</small></div>
+  </div>
+  <div class="arrow">&#9660;</div>
+  <div class="node x" data-k="system">macOS SERVICES<small>window server · Keychain · Launch Services</small></div>
+  <p class="caption">The app's own process stays small because no page lives in it. The rows of green boxes grow with
+  loaded tabs, which is why idle unloading matters: an idle tab has no web content process at all.</p>
+</div>
+
+<h2>2 · What lives where</h2>
+<table>
+  <tr><th>Process / thread</th><th>Does</th><th>Started by</th></tr>
+  <tr><td>nhetrinh · main thread</td><td>Views, menus, tab tree, all WebKit calls, session / prefs / history files, sheets, timers</td><td>You (Dock, Finder, a link)</td></tr>
+  <tr><td>nhetrinh · download-name queue</td><td>Reserves a free file name in ~/Downloads without blocking the window</td><td>The first download</td></tr>
+  <tr><td>nhetrinh · URL session</td><td>Fetches a site's icon (<code>favicon.ico</code>), answers on the main thread</td><td>A page that has no cached icon</td></tr>
+  <tr><td>WebKit · Web Content</td><td>Parses HTML and CSS, runs JavaScript, lays out the page</td><td>WebKit, when a tab loads</td></tr>
+  <tr><td>WebKit · Networking</td><td>Every request, TLS, cookies, cache, download bytes</td><td>WebKit, on first use</td></tr>
+  <tr><td>WebKit · GPU</td><td>Compositing, video decode, canvas, WebGL</td><td>WebKit, on first use</td></tr>
+</table>
+
+<h2>3 · The one-thread rule</h2>
+<div class="box cyan"><p><b>Almost everything nhetrinh does runs on the main thread.</b> That sounds slow, but each piece is
+tiny: the heavy work (pages, network, drawing) is already in other processes. One thread means no locks and no races
+in the app's own state; the few background jobs hand their answer back to the main thread before touching anything.</p></div>
+<div class="rung ok"><span class="k">FAST</span><span class="v">A click on a tab: the main thread swaps one web view for another.
+No page is copied; WebKit's processes keep drawing.</span></div>
+<div class="rung mid"><span class="k">IF SLOW</span><span class="v">A slow page freezes only its own web content process. The window,
+the sidebar and the other tabs keep answering.</span></div>
+</main>
+<script type="application/json" id="notes">{
+"main": {"title": "The main thread", "body": "<p>AppKit's run loop. Every view lives here, and WebKit requires its API to be called here. nhetrinh also writes its small files here: <code>session.json</code> (atomic write), <code>prefs.json</code>, and history rows into SQLite. They are small and quick, so the window does not stutter.</p><p>The memory-pressure signal and the idle timer are delivered here too.</p>", "files": "_Nhetrinh/main.swift · AppDelegate.swift"},
+"bg": {"title": "Small background queues", "body": "<p>Two short jobs leave the main thread: choosing a free download name (one serial queue, so two downloads never get the same name) and fetching site icons (an ephemeral URL session). Both hand their result back to the main thread.</p>", "files": "_Browser/Page/Outside/_Downloads.swift · _Browser/Handling/Favicons.swift"},
+"content": {"title": "Web Content processes", "body": "<p>Where pages live: the DOM, the styles, the JavaScript heap. This is where browsers spend their memory, typically tens to hundreds of MB per busy page. WebKit decides how pages map to processes; roughly, each loaded tab has one.</p><p>When nhetrinh unloads a tab it drops that tab's web view, and WebKit ends the process it no longer needs.</p>"},
+"network": {"title": "Networking process", "body": "<p>One for the app. All requests from all tabs go through it, so cookies and the cache are shared, and a tab that goes idle does not lose your sign-in.</p>"},
+"gpu": {"title": "GPU process", "body": "<p>One for the app. It talks to the graphics card for compositing, video and WebGL, keeping that driver work out of the page processes.</p>"},
+"system": {"title": "macOS services", "body": "<p>The window server draws the window; the Keychain service holds the kept sign-ins; Launch Services knows nhetrinh is a browser (it reads the Info.plist) and sends it links and HTML files.</p>"}
+}</script>
+</body></html>
