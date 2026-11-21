@@ -48,3 +48,18 @@ func linksAreReadByTheirScheme(link: String, leaves: Bool) throws {
 func javascriptStays(scheme: String) {
     expectDecision(scheme, leaves: false)
 }
+
+/// NT-BUG-026: links handed in by macOS (another app, Finder, Handoff): web pages and local files open as
+/// tabs; any other scheme is not ours (it never came in as a browser's link).
+@Test(arguments: [("https://example.org/a", true), ("HTTP://example.org", true), ("file:///tmp/page.html", true),
+                  ("mailto:someone@example.org", false), ("about:blank", false), ("x-app:open", false)])
+func incomingLinksAreWebPagesOrFiles(link: String, opens: Bool) throws {
+    #expect(IncomingLink.opens(try #require(URL(string: link))) == opens)
+}
+
+/// A local page may read its own folder (its pictures and styles), nothing above it; a web page needs nothing.
+@Test func aLocalPageReadsItsOwnFolder() throws {
+    let page = URL(fileURLWithPath: "/tmp/site/index.html")
+    #expect(IncomingLink.readAccess(for: page) == URL(fileURLWithPath: "/tmp/site/", isDirectory: true))
+    #expect(IncomingLink.readAccess(for: try #require(URL(string: "https://example.org/index.html"))) == nil)
+}

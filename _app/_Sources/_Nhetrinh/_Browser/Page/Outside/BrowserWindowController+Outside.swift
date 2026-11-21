@@ -4,7 +4,8 @@ import WebKit
 
 /// P5: what comes in from outside the page and goes out of it: a response saved as a download
 /// (`DownloadPolicy`, `Downloads`), and a link another app hands to nhetrinh (Info.plist declares
-/// `http` and `https`), opened as a new tab. The default browser is never changed by the app.
+/// `http`, `https`, `file` and HTML files: `IncomingLink`, NT-BUG-026), opened as a new tab.
+/// The default browser is never changed by the app.
 extension BrowserWindowController {
     /// A response WebKit is about to show: shown, or saved as a download. Only the page itself
     /// downloads: a frame inside it never starts one by its response.
@@ -49,7 +50,7 @@ extension BrowserWindowController {
 
     /// Links from other apps: each `http`/`https` URL opens as a new tab at the end; the last is selected.
     func openIncoming(_ urls: [URL]) {
-        let web = urls.filter { ["http", "https"].contains($0.scheme?.lowercased() ?? "") }
+        let web = urls.filter(IncomingLink.opens)
         guard !web.isEmpty else { return }
         // At the root's end, the folders stay (P7); added unloaded, only the last is shown and loads (F3).
         web.forEach { tree.insert(Tab(url: $0), atFlat: tabs.count) }

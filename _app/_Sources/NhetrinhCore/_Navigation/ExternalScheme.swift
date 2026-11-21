@@ -19,3 +19,15 @@ public enum ExternalScheme {
         leaves(scheme: url.scheme)
     }
 }
+
+/// NT-BUG-026: a link macOS hands in (another app, an HTML file from Finder, a page from Handoff). The Info.plist
+/// claims (`_build.sh`) and this rule are one list: web pages and local files.
+public enum IncomingLink {
+    static let schemes: Set<String> = ["http", "https", "file"]
+
+    /// Whether `url` opens as a tab: a web page or a local file; any other scheme was never ours.
+    public static func opens(_ url: URL) -> Bool { schemes.contains(url.scheme?.lowercased() ?? "") }
+
+    /// The folder a local page may read (its pictures and styles), nothing above it; nil for a web page.
+    public static func readAccess(for url: URL) -> URL? { url.isFileURL ? url.deletingLastPathComponent() : nil }
+}

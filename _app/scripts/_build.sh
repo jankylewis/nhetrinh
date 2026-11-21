@@ -29,7 +29,7 @@ DOCK=assets/_icon/bundle/_DockIcon.png
 SIDE=$(sips -g pixelWidth "$DOCK" | awk '/pixelWidth/ {print $2}')
 (( SIDE <= 256 )) || { echo "error: $DOCK is $SIDE px; the Dock icon is at most 256 px (NT-PRF-001)" >&2; exit 1; }
 cp "$DOCK" "$APP/Contents/Resources/AppIcon.png"
-# P5: http and https make nhetrinh a possible default browser (links from other apps open as tabs);
+# P5: http and https (and NT-BUG-026's claims below) make nhetrinh a possible default browser;
 # the build never makes it the default. macOS asks once for ~/Downloads with the text below.
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -59,10 +59,31 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <array><dict>
     <key>CFBundleURLName</key><string>Web site URL</string>
     <key>CFBundleTypeRole</key><string>Viewer</string>
-    <key>CFBundleURLSchemes</key><array><string>http</string><string>https</string></array>
+    <key>CFBundleURLSchemes</key><array><string>http</string><string>https</string><string>file</string></array>
   </dict></array>
+  <key>CFBundleDocumentTypes</key>
+  <array><dict>
+    <key>CFBundleTypeName</key><string>Web page</string>
+    <key>CFBundleTypeRole</key><string>Viewer</string>
+    <key>LSItemContentTypes</key><array><string>public.html</string><string>public.xhtml</string></array>
+  </dict></array>
+  <key>NSUserActivityTypes</key><array><string>NSUserActivityTypeBrowsingWeb</string></array>
 </dict></plist>
 PLIST
+# NT-BUG-026: what makes macOS treat nhetrinh as a browser. Web links alone left it out of the default browser
+# list; HTML files (that list, Open With), file links and Handoff are claimed too. A missing claim stops the build.
+browser_claims() {
+  local plist=$1 key want got
+  for key want in CFBundleURLTypes '"http"' CFBundleURLTypes '"https"' CFBundleURLTypes '"file"' \
+      CFBundleDocumentTypes '"public.html"' CFBundleDocumentTypes '"public.xhtml"' \
+      NSUserActivityTypes '"NSUserActivityTypeBrowsingWeb"'; do
+    got=$(plutil -extract "$key" json -o - "$plist" 2>/dev/null || true)
+    [[ "$got" == *"$want"* ]] && continue
+    echo "error: Info.plist $key lacks $want: not a browser to macOS (NT-BUG-026)" >&2
+    return 1
+  done
+}
+browser_claims "$APP/Contents/Info.plist"
 # NT-BUG-019: without this key ATS refuses plain http (-1022) to every name but localhost (and, as recalled from
 # Apple's docs, not proven: unqualified and .local names); IP addresses pass.
 # Web content only: the app's own loads stay under ATS, and nothing else in the dict is relaxed.

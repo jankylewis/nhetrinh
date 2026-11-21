@@ -95,8 +95,9 @@ struct OutsideProbeTests {
         #expect(browser.sidebar.downloads.isHidden)
     }
 
-    @Test(arguments: [("mailto:a@example.com", 0), ("file:///tmp/a.html", 0), ("HTTP://127.0.0.1:9/a", 1)])
-    func linkFromAnotherAppOpensOnlyForTheWeb(link: String, added: Int) throws {
+    /// A local file opens too since NT-BUG-026 (P5 took web links only; no decision kept that refusal).
+    @Test(arguments: [("mailto:a@example.com", 0), ("file:///tmp/a.html", 1), ("HTTP://127.0.0.1:9/a", 1)])
+    func linkFromAnotherAppOpensOnlyForWebAndFiles(link: String, added: Int) throws {
         _ = NSApplication.shared
         let browser = BrowserWindowController()
         browser.openIncoming([try #require(URL(string: link))])

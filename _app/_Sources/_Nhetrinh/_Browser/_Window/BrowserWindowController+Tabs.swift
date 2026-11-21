@@ -67,11 +67,13 @@ extension BrowserWindowController {
         tab.webView = webView
         observe(webView, for: tab)
         guard adopted == nil else { return }
-        if let state = tab.savedState {
-            tab.savedState = nil
+        let state = tab.savedState
+        tab.savedState = nil
+        // A local page's kept history is not restored: WebKit reads a file only through `open` (NT-BUG-026).
+        if let state, tab.url?.isFileURL != true {
             webView.interactionState = state
         } else if let url = tab.url {
-            webView.load(URLRequest(url: url))
+            webView.open(url)
         }
     }
 
@@ -128,10 +130,18 @@ extension BrowserWindowController {
         tab.savedState = nil  // a new address replaces the history kept at unload
         markTyped()  // P11-HISTORY: typed or picked in the address bar
         if let webView = tab.webView {
-            webView.load(URLRequest(url: url))
+            webView.open(url)
         } else {
             select(selected)
         }
         window?.makeFirstResponder(tab.webView)
+    }
+}
+
+extension WKWebView {
+    /// Load `url`: a local file with read access to its folder (WebKit shows no file without it), else a request.
+    func open(_ url: URL) {
+        guard let folder = IncomingLink.readAccess(for: url) else { return _ = load(URLRequest(url: url)) }
+        loadFileURL(url, allowingReadAccessTo: folder)
     }
 }

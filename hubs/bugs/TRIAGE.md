@@ -29,3 +29,4 @@ Grep the signature in the report or log.
 | NT-BUG-022 | headmate | `dark dropdown, black text` | FIXED | Text unreadable on a coloured surface? A layer colour set outside drawing must resolve in the view's `effectiveAppearance` |
 | NT-BUG-023 | headmate | `address field gone, ⌘L does nothing` | FIXED | Toolbar without the address field? Is the row's layout ambiguous (`hasAmbiguousLayout`)? (NT-UIX-006) |
 | NT-BUG-024 | headmate | `can scroll horizontally, cannot scroll vertically` | NOT_A_BUG | Withdrawn by the headmate. Does the same page scroll in another browser? An inner scroll area or modal may hold the scroll |
+| NT-BUG-026 | headmate | `not in the default web browser list` | FIXED | Does Info.plist claim what browsers claim: http, https, file, public.html, Handoff? (`browser_claims` in `_build.sh`) |

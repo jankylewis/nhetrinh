@@ -52,6 +52,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         browser.openIncoming(urls)
     }
 
+    /// Handoff (NT-BUG-026): a page open on another device continues here as a new tab.
+    static func continueBrowsing(_ activity: NSUserActivity, in browser: BrowserWindowController) -> Bool {
+        guard let url = browsedPage(activity) else { return false }
+        browser.openIncoming([url])
+        return true
+    }
+
+    private static func browsedPage(_ activity: NSUserActivity) -> URL? {
+        guard activity.activityType == NSUserActivityTypeBrowsingWeb, let url = activity.webpageURL,
+              IncomingLink.opens(url) else { return nil }
+        return url
+    }
+
+    func application(_ application: NSApplication, willContinueUserActivityWithType type: String) -> Bool {
+        type == NSUserActivityTypeBrowsingWeb
+    }
+
+    func application(_ application: NSApplication, continue userActivity: NSUserActivity,
+                     restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
+        if let browser { return Self.continueBrowsing(userActivity, in: browser) }
+        guard let url = Self.browsedPage(userActivity) else { return false }
+        incoming.append(url)  // before the window: opened with the other early links
+        return true
+    }
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 
     /// P9-REMEMBER: a quit first keeps the sign-ins (WebKit answers later), then ends.
