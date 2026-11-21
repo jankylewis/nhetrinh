@@ -28,6 +28,7 @@ public enum IncomingLink {
     /// Whether `url` opens as a tab: a web page or a local file; any other scheme was never ours.
     public static func opens(_ url: URL) -> Bool { schemes.contains(url.scheme?.lowercased() ?? "") }
 
-    /// The folder a local page may read (its pictures and styles), nothing above it; nil for a web page.
-    public static func readAccess(for url: URL) -> URL? { url.isFileURL ? url.deletingLastPathComponent() : nil }
+    /// What a local page may load (pictures, styles, links): any file, as in Safari, so `../style.css` works
+    /// (NT-BUG-027). Its scripts still cannot read other files: WebKit keeps file pages apart. nil for a web page.
+    public static func readAccess(for url: URL) -> URL? { url.isFileURL ? URL(fileURLWithPath: "/") : nil }
 }

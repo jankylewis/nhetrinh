@@ -58,8 +58,8 @@ func incomingLinksAreWebPagesOrFiles(link: String, opens: Bool) throws {
 }
 
 /// A local page may read its own folder (its pictures and styles), nothing above it; a web page needs nothing.
-@Test func aLocalPageReadsItsOwnFolder() throws {
-    let page = URL(fileURLWithPath: "/tmp/site/index.html")
-    #expect(IncomingLink.readAccess(for: page) == URL(fileURLWithPath: "/tmp/site/", isDirectory: true))
+@Test func aLocalPageLoadsFilesAboveItsFolder() throws {  // NT-BUG-027: `../style.css` must load
+    let page = URL(fileURLWithPath: "/tmp/site/sub/index.html")
+    #expect(IncomingLink.readAccess(for: page) == URL(fileURLWithPath: "/"))
     #expect(IncomingLink.readAccess(for: try #require(URL(string: "https://example.org/index.html"))) == nil)
 }

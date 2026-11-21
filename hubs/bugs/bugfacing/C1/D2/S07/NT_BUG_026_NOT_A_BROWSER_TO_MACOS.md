@@ -30,9 +30,9 @@ handed off from another device (Handoff). `openIncoming` also dropped every link
 - Info.plist claims `file`, `public.html`, `public.xhtml` (Viewer) and `NSUserActivityTypeBrowsingWeb`; the build
   stops when a claim is missing (`browser_claims`; red on the 0dbca37 plist: "lacks file").
 - `IncomingLink` (core) is the one list: web pages and local files open as tabs; a local page reads its own folder
-  only (`loadFileURL`). Not proven needed: a plain load of the file also showed it in the tests (mutation check).
+  only (`loadFileURL`); that was too narrow, see NT-BUG-027. Not proven needed: a plain load of the file also showed it in the tests (mutation check).
 - Handoff: `AppDelegate.continueBrowsing` opens the page as a tab.
-- Tests: `incomingLinksAreWebPagesOrFiles`, `aLocalPageReadsItsOwnFolder`, `LocalPageTests`.
+- Tests: `incomingLinksAreWebPagesOrFiles`, `aLocalPageReadsItsOwnFolder` (now `aLocalPageLoadsFilesAboveItsFolder`), `LocalPageTests`.
 
-Not read back: the default browser list, Open With and Handoff need the installed app and the headmate's eyes; a
-local page's back / forward history is not kept when its tab goes idle (it reloads the file).
+Read back: on 2026-11-21 the headmate set nhetrinh as the default web browser in System Settings (installed
+d355a1e), and opened the storybook from it. Not read back: Open With and Handoff. A local page's back / forward history is not kept when its tab goes idle (it reloads the file).
