@@ -48,4 +48,19 @@ struct IdleTabTests {
         try? await Task.sleep(nanoseconds: 500_000_000)
         #expect(browser.selected == 0 && browser.tabs[0].isLoaded)
     }
+
+    /// Leak guard: a tab that rests or closes lets go of its web view. If anything still held it, WebKit would keep
+    /// its page helper. No leak found; red when `unload` keeps a hold (mutation check, 2026-11-21).
+    @Test func aRestingOrClosedTabLetsGoOfItsWebView() async {
+        let browser = loadedBrowser(selected: 0)
+        defer { browser.closeAfterTest() }
+        weak var rested = browser.tabs[5].webView
+        weak var closed = browser.tabs[4].webView
+        #expect(rested != nil && closed != nil)
+        #expect(browser.probeAnswer(.rowMenu(row: 9, item: SidebarView.idleTab), menu: nil) == .done)
+        _ = await eventually { !browser.tabs[5].isLoaded }
+        browser.close(at: 4)
+        let gone = await eventually { rested == nil && closed == nil }
+        #expect(gone, "still held: rested \(rested != nil), closed \(closed != nil)")
+    }
 }
