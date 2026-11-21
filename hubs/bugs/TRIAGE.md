@@ -31,3 +31,4 @@ Grep the signature in the report or log.
 | NT-BUG-024 | headmate | `can scroll horizontally, cannot scroll vertically` | NOT_A_BUG | Withdrawn by the headmate. Does the same page scroll in another browser? An inner scroll area or modal may hold the scroll |
 | NT-BUG-026 | headmate | `not in the default web browser list` | FIXED | Does Info.plist claim what browsers claim: http, https, file, public.html, Handoff? (`browser_claims` in `_build.sh`) |
 | NT-BUG-027 | self-test | `aLocalPageReadsAndOpensItsParentsFiles` | FIXED | Does a local page get read access above its own folder? (`IncomingLink.readAccess`) |
+| NT-BUG-028 | self-test | `aRestingLocalPageComesBackWithItsHistory` | FIXED | Does `load` restore `interactionState` for a `file:` tab too? |

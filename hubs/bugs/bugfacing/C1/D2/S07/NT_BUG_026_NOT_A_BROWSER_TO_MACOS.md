@@ -35,4 +35,4 @@ handed off from another device (Handoff). `openIncoming` also dropped every link
 - Tests: `incomingLinksAreWebPagesOrFiles`, `aLocalPageReadsItsOwnFolder` (now `aLocalPageLoadsFilesAboveItsFolder`), `LocalPageTests`.
 
 Read back: on 2026-11-21 the headmate set nhetrinh as the default web browser in System Settings (installed
-d355a1e), and opened the storybook from it. Not read back: Open With and Handoff. A local page's back / forward history is not kept when its tab goes idle (it reloads the file).
+d355a1e), and opened the storybook from it. Not read back: Open With and Handoff. A local page lost its back / forward history when its tab went idle: fixed in NT-BUG-028.

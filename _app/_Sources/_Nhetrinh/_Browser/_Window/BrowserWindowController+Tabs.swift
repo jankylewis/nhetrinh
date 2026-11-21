@@ -69,8 +69,8 @@ extension BrowserWindowController {
         guard adopted == nil else { return }
         let state = tab.savedState
         tab.savedState = nil
-        // A local page's kept history is not restored: WebKit reads a file only through `open` (NT-BUG-026).
-        if let state, tab.url?.isFileURL != true {
+        // A local page's history comes back too: WebKit gives a restored file page its read access (NT-BUG-028).
+        if let state {
             webView.interactionState = state
         } else if let url = tab.url {
             webView.open(url)
