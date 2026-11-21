@@ -4,7 +4,8 @@ import NhetrinhCore
 /// The vertical tab list, an outline (P7): tabs and groups, a group's items under it, indented by level
 /// (P8-GROUPS-1). One row per tab (`TabRowView`): icon, title, close button on hover; a tab that is not
 /// loaded is dimmed. A row's menu and a middle click close it (P2); a drag moves a tab or a group
-/// (`+Outline`); the groups' menus: `+Groups`. A double click on a group's row renames it.
+/// (`+Outline`); the groups' menus: `+Groups`. A click on a group's row opens or closes it; a double click
+/// renames it.
 final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate {
     struct Row {
         let title: String
@@ -67,6 +68,7 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
         table.onMiddleClick = { [weak self] row in self?.closeRow(row) }
         table.menuForRow = { [weak self] row in self?.menu(forRow: row) }
         table.target = self
+        table.action = #selector(clicked)
         table.doubleAction = #selector(doubleClicked)
     }
 
@@ -131,9 +133,11 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
 
     @objc private func doubleClicked() { doubleClick(row: table.clickedRow) }
 
-    /// A double click on a group's row: Rename Group… (P8-GROUPS-1); on a tab's row, nothing more.
+    /// A double click on a group's row: Rename Group… (P8-GROUPS-1); its first click opened or closed the
+    /// group, so that is undone (NT-FEAT-063). On a tab's row, nothing more.
     func doubleClick(row: Int) {
         guard let node = node(atRow: row), node.isGroup else { return }
+        click(row: row)
         onAction?(.rename(node.path))
     }
 }

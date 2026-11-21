@@ -51,6 +51,21 @@ extension SidebarView {
         onAction?(.setCollapsed(node.path, collapsed))
     }
 
+    /// The outline's click: on the disclosure arrow the outline itself opens or closes the group.
+    @objc func clicked() {
+        let row = table.clickedRow
+        guard row >= 0, let event = NSApp.currentEvent else { return }
+        let point = table.convert(event.locationInWindow, from: nil)
+        if !table.frameOfOutlineCell(atRow: row).contains(point) { click(row: row) }
+    }
+
+    /// One click on a group's row, anywhere on it: opens or closes it, as Expand / Collapse Group does
+    /// (NT-FEAT-063): the tree keeps the state, and the outline follows it.
+    func click(row: Int) {
+        guard let node = node(atRow: row), node.isGroup else { return }
+        onAction?(.setCollapsed(node.path, !node.collapsed))
+    }
+
     // MARK: - Drag
 
     func outlineView(_ outlineView: NSOutlineView, pasteboardWriterForItem item: Any) -> NSPasteboardWriting? {
