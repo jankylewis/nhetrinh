@@ -63,4 +63,21 @@ struct IdleTabTests {
         let gone = await eventually { rested == nil && closed == nil }
         #expect(gone, "still held: rested \(rested != nil), closed \(closed != nil)")
     }
+
+    /// Leak guard: a pop-up's tab (a web view WebKit asked for, `createWebViewWith`) lets go of it when it closes.
+    @Test func aClosedPopupLetsGoOfItsWebView() async throws {
+        _ = NSApplication.shared
+        let browser = BrowserWindowController()
+        defer { browser.closeAfterTest() }
+        browser.tabs = [Tab(url: URL(string: "about:blank?1"), title: "t1")]
+        browser.select(0)
+        let opener = try #require(browser.tabs[0].webView)
+        _ = await eventually { !opener.isLoading }
+        _ = try await opener.evaluateJavaScript("window.open('about:blank?popup'); 0")
+        #expect(await eventually { browser.tabs.count == 2 })
+        weak var popup = browser.tabs.last?.webView
+        #expect(popup != nil)
+        browser.close(at: 1)
+        #expect(await eventually { popup == nil }, "the closed pop-up's web view is still held")
+    }
 }
