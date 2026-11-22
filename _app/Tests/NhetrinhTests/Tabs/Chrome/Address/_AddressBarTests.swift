@@ -9,7 +9,7 @@ import WebKit
 /// switch off keeps nothing and the dropdown lists the open tabs only; the dropdown's keys; Clear All.
 @MainActor
 struct AddressBarTests {
-    private func browser() throws -> BrowserWindowController {
+    func browser() throws -> BrowserWindowController {
         _ = NSApplication.shared
         let browser = BrowserWindowController()
         let folder = try HistoryFolder.make()
@@ -19,7 +19,7 @@ struct AddressBarTests {
         return browser
     }
 
-    private func kept(_ browser: BrowserWindowController, _ url: String) throws -> HistoryEntry? {
+    func kept(_ browser: BrowserWindowController, _ url: String) throws -> HistoryEntry? {
         try #require(browser.history.store).entry(url: url)
     }
 

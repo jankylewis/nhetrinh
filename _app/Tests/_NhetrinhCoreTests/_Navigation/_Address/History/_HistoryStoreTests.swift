@@ -26,6 +26,19 @@ struct HistoryStoreTests {
         #expect(try HistoryRig.urls(store, "kept") == ["https://example.test/"])
     }
 
+    /// NT-BUG-029: a title WebKit reports after the visit fills a row that has none; a kept title stays (a
+    /// changing title, as a chat's unread count, writes nothing); an empty title or an unknown page does nothing.
+    @Test(arguments: [("", "Late", "Late"), ("Kept", "Other", "Kept"), ("", "", "")])
+    func aLateTitleFillsOnlyARowWithout(kept: String, late: String, after: String) throws {
+        let store = try HistoryRig.store()
+        try store.record(url: "https://example.test/", title: kept, typed: false, at: HistoryRig.daysAgo(1))
+        try store.retitle(url: "https://example.test/", title: late)
+        try store.retitle(url: "https://example.test/never", title: "Late")
+        #expect(try store.entry(url: "https://example.test/")?.title == after)
+        #expect(store.count == 1)
+        if !after.isEmpty { #expect(try HistoryRig.urls(store, after.lowercased()) == ["https://example.test/"]) }
+    }
+
     @Test func theFileIsHistorySqliteAndOnlyTheUsers() throws {
         let store = try HistoryRig.store()
         try HistoryRig.visit(store, "https://example.test/")

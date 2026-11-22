@@ -65,6 +65,17 @@ extension BrowserWindowController {
         }
     }
 
+    /// `webView` reported its title (often after `didFinish`): it fills the page's history row if it has none
+    /// (NT-BUG-029). No row, nothing: the rules already chose at the visit.
+    func retitleVisit(in webView: WKWebView) {
+        guard let url = webView.url?.absoluteString, let title = webView.title, !title.isEmpty else { return }
+        do {
+            try history.store?.retitle(url: url, title: title)
+        } catch {
+            Log.app.error("history: a title was not kept: \(String(describing: error), privacy: .public)")
+        }
+    }
+
     /// The error page's load: never kept (`LoadFailure`).
     func errorPageLoads(_ navigation: WKNavigation?) {
         guard let navigation else { return }

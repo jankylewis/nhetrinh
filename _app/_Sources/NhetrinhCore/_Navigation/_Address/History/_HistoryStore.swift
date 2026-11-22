@@ -62,6 +62,14 @@ public final class HistoryStore {
         try trim(now: date)
     }
 
+    /// The title WebKit reported after the visit was kept (NT-BUG-029): it fills a row that has none. A row with a
+    /// title keeps it, so a page whose title keeps changing writes nothing.
+    public func retitle(url: String, title: String) throws {
+        guard !title.isEmpty else { return }
+        try database.run("UPDATE pages SET title = ?2, words = ?3 WHERE url = ?1 AND title = ''",
+                         [.text(url), .text(title), .text(HistoryMatch.haystack(url: url, title: title))])
+    }
+
     /// Past the cap, the lowest scores go (the oldest first among equals).
     func trim(now: Date) throws {
         let extra = count - capacity

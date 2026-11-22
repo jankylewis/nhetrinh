@@ -83,6 +83,7 @@ extension BrowserWindowController {
             webView.observe(\.title) { [weak self, weak tab] view, _ in
                 guard let tab, let title = view.title, !title.isEmpty else { return }
                 tab.title = title
+                self?.retitleVisit(in: view)  // NT-BUG-029: the title often comes after didFinish
                 self?.refreshChrome()
             },
             webView.observe(\.url) { [weak self, weak tab] view, _ in
