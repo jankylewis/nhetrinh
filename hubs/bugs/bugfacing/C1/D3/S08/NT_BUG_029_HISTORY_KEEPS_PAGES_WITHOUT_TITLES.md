@@ -30,4 +30,4 @@ test process saw it every time (5 of 5). An empty title was kept, and nothing fi
 - Tests: `aLoadedPagesTitleReachesTheHistory` (a real web view, 5 rounds; red before the fix, red again with
   the call removed: mutation check), `aLateTitleFillsOnlyARowWithout`.
 
-Not read back yet: R54 on an install of this fix.
+Read back: R54 PASS on the installed cd9b848 (2026-11-22; FAIL on fe657c9 the same morning).

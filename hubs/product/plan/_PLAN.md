@@ -31,7 +31,7 @@ Lightness first, speed second. After 1.0, features are added only when the headm
 | P8 Release 1.0 | 1.0.0 | S | downloadable build on GitHub Releases | DOING (P8-BUILD-1: release.yml, notes, README, R44; P8-FIX-1: review fixes; P8-MIN-1: Window > Minimize ⌘M, R46, tests green, not read back; P8-FONT-1: the interface in Menlo, R47, tests green, not read back; P8-CHROME-1: toolbar Toggle Sidebar, toolbar clears the traffic lights (NT-BUG-018), R48, tests green, not read back; P8-GROUPS-1: nested tab groups, 4 levels, full CRUD, session v3, R49, tests green, not read back; P8-SIDE-1: the sidebar on the left or the right (Settings Hub > Sidebar position), R50, tests green, not read back; no release yet) | `M3_V1_RELEASE.md` |
 | P9 Remember sign-ins | - | M | sign-ins survive quit and update (D28; P9-REMEMBER-2: one Keychain item per signing kind) | DOING (`p9/remember` 786a582, tests green; R51 not read back) | `DECISIONS.md` D28 |
 | P10 Profile folders | - | M | one folder per profile; Show data folder, Reset profile (D29) | DOING (`p10/profile` 40d0cbf, tests green; R53 not read back) | `DECISIONS.md` D29 |
-| P11 History | - | M | address-bar dropdown from history and open tabs (D30); Duplicate Tab, Put Tab to Idle | DOING (`p11/history`, installed; R54 not read back) | `DECISIONS.md` D30 |
+| P11 History | - | M | address-bar dropdown from history and open tabs (D30); Duplicate Tab, Put Tab to Idle | DOING (`p11/history`, installed cd9b848; R51, R52, R54, R55 PASS 2026-11-22) | `DECISIONS.md` D30 |
 
 Size is relative effort (S, M, L). No dates: a phase ends when its gate passes, not on a day.
 Status: TODO, DOING, DONE. DONE needs the readback verdict file cited next to it.
