@@ -1,7 +1,7 @@
 import Foundation
 
 // nhetrinh-readback: use the installed app as its end user and say what happened, step by step.
-// R1, R3-R7, R9-R43, R46-R52, R54 go through the app's readback probe (D23) and need no permission: they run from
+// R1, R3-R7, R9-R43, R46-R52, R54, R55 go through the app's readback probe (D23) and need no permission: they run from
 // any terminal. R2 reads the Dock: it needs Accessibility and Screen Recording (NT-TG-003).
 //
 //   swift run nhetrinh-readback                     every step, on ~/Applications/nhetrinh.app;
@@ -44,6 +44,7 @@ let allSteps = BaseSteps.all + LifecycleSteps.all + SidebarSteps.all + BasicStep
     + [RememberStep.step]  // P9-REMEMBER: R51
     + [LoadSteps.plainHTTPStep]  // P8-ATS-1: R52 (R51 is P9's)
     + [HistoryStep.step]  // P11-HISTORY: R54 (R53 is P10's)
+    + [LocalPageStep.step]  // NT-BUG-027: R55
 let options: Options
 do {
     options = try Options(CommandLine.arguments, known: Set(allSteps.map(\.id)))
