@@ -11,7 +11,9 @@ extension BrowserWindowController {
         func shown(_ items: [Tree<Tab>.Item]) -> [SidebarItem] {
             items.map { item in
                 switch item {
-                case .tab(let tab): return .tab(SidebarView.Row(title: tab.title, loaded: tab.isLoaded, icon: tab.icon))
+                case .tab(let tab):
+                    return .tab(SidebarView.Row(title: tab.title, loaded: tab.isLoaded, icon: tab.icon,
+                                                url: tab.url?.absoluteString))
                 case .folder(let group):
                     let inside = group.allTabs
                     let holds = inside.contains { $0 === chosen }

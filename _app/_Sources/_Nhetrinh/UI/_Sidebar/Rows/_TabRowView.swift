@@ -1,7 +1,7 @@
 import AppKit
 
 /// One sidebar row: the site's icon (16 pt), the title, and a close button shown while the pointer
-/// is over the row (P2). A row with no icon of its own shows a dim globe.
+/// is over the row (P2). A row with no icon of its own shows a dim globe. Its tooltip: the title and full address.
 final class TabRowView: NSTableCellView {
     static let identifier = NSUserInterfaceItemIdentifier("tab-row")
     private static let noIcon = NSImage(systemSymbolName: "globe", accessibilityDescription: nil)
@@ -55,6 +55,7 @@ final class TabRowView: NSTableCellView {
         icon.image = row.icon ?? Self.noIcon
         icon.alphaValue = row.icon == nil || !row.loaded ? 0.5 : 1
         close.isHidden = !isPointerInside
+        toolTip = row.url.map { "\(row.title)\n\($0)" } ?? row.title  // title and full address (NT-FEAT-064)
     }
 
     /// The row's text in the app's font (P8-FONT-1).

@@ -11,6 +11,8 @@ final class SidebarView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate 
         let title: String
         let loaded: Bool
         let icon: NSImage?
+        /// The tab's full address, shown with the title as the row's tooltip (NT-FEAT-064); nil for a group.
+        var url: String? = nil
     }
 
     static let rowType = NSPasteboard.PasteboardType("nhetrinh.tab-row")

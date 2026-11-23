@@ -96,6 +96,6 @@ final class SidebarNode {
 extension SidebarView.Row {
     /// Whether the row shows the same: title, loaded state and the same icon object.
     func same(as other: SidebarView.Row) -> Bool {
-        title == other.title && loaded == other.loaded && icon === other.icon
+        title == other.title && loaded == other.loaded && icon === other.icon && url == other.url
     }
 }
