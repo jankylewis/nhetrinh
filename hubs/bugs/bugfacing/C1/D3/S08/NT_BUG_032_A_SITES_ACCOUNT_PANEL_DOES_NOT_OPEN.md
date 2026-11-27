@@ -2,7 +2,7 @@
 
 id: NT-BUG-032
 family: WEB
-status: OPEN
+status: NOT_A_BUG
 date: 2026-11-27
 signature: a click on the signed-in user's picture in a work site's header shows nothing
 source: the headmate's screenshots (2026-11-23, 2026-11-27): the same page in nhetrinh (no panel) and in another
@@ -27,3 +27,9 @@ and sits under the field); no frame or script load refused (only other apps' lin
 error in the unified log. Not ruled out: a WebKit-only difference (the other browser may not use WebKit),
 cross-site storage in a frame (WebKit's Storage Access API asks the app, and nhetrinh answers nothing), the user
 agent. Needed: the page's Console errors on the click (Web Inspector is on: `isInspectable`), and Safari's result.
+
+## Verdict (2026-11-27)
+
+NOT_A_BUG of nhetrinh: the headmate saw the same in Safari (2026-11-27: "same for safari, cannot open too"); the
+other browser that opens it is not built on WebKit (not proven). The site's panel fails on WebKit itself; nhetrinh
+cannot fix it without pretending to be another browser, which it does not do.

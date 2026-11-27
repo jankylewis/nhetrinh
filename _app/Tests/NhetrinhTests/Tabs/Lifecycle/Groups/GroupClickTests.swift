@@ -15,7 +15,7 @@ struct GroupClickTests {
         defer { browser.closeAfterTest() }
         browser.sidebar.click(row: 3)
         #expect(collapsed(browser) == [false, true, false, false])
-        #expect(groupState(browser).rows == ["t1", "MBing", "t2", "FE", "t6"])
+        #expect(groupState(browser).rows == ["t1", "Work", "t2", "FE", "t6"])
         browser.sidebar.click(row: 3)
         #expect(collapsed(browser) == [false, false, false, false])
         #expect(groupState(browser).rows.count == 10 && browser.selected == 0)
