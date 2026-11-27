@@ -5,3 +5,4 @@ Index of this folder; `_SCHEMA.md` has the rules.
 | Entry | What |
 |---|---|
 | `NT_BUG_029_HISTORY_KEEPS_PAGES_WITHOUT_TITLES.md` | FIXED |
+| `NT_BUG_030_LONG_ADDRESS_WRAPS_IN_THE_ADDRESS_BAR.md` | OPEN |
