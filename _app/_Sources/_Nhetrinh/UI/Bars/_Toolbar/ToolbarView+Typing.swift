@@ -38,3 +38,20 @@ extension ToolbarView: NSTextFieldDelegate {
         return true
     }
 }
+
+extension ToolbarView {
+    /// The address field: one line, cut at the end (the field editor scrolls it while editing) (NT-BUG-030: a plain
+    /// field wrapped a long address onto a second line that the bar cut in half).
+    func setUpAddress() {
+        address.placeholderString = "Search or enter address"
+        address.bezelStyle = .roundedBezel
+        address.focusRingType = .none
+        address.usesSingleLineMode = true
+        address.lineBreakMode = .byTruncatingTail
+        address.cell?.wraps = false
+        address.target = self
+        address.action = #selector(submit)
+        address.delegate = self
+        address.setAccessibilityIdentifier("nhetrinh.address")
+    }
+}

@@ -32,4 +32,18 @@ struct AddressFieldLayoutTests {
         }
         #expect(toolbar.address.frame.width > 900)
     }
+
+    /// NT-BUG-030 (found_by: headmate), red first: a long address stays on one line, cut at the end; it never wraps
+    /// onto a second line that the bar's height cuts in half.
+    @Test(arguments: [60, 500] as [Int])
+    func aLongAddressStaysOnOneLine(length: Int) throws {
+        let toolbar = laidOut(width: 900)
+        toolbar.update(url: URL(string: "https://example.com/" + String(repeating: "a/b?c=d&", count: length / 8)),
+                       canBack: false, canForward: false)
+        let cell = try #require(toolbar.address.cell)
+        let oneLine = cell.cellSize(forBounds: NSRect(x: 0, y: 0, width: 10_000, height: 10_000)).height
+        let shown = cell.cellSize(forBounds: NSRect(x: 0, y: 0, width: toolbar.address.frame.width, height: 10_000))
+        #expect(shown.height == oneLine, "one line: \(oneLine) pt, shown: \(shown.height) pt")
+        #expect(cell.lineBreakMode == .byTruncatingTail)
+    }
 }

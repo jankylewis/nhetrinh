@@ -39,13 +39,7 @@ final class ToolbarView: NSView {
 
     override init(frame: NSRect) {
         super.init(frame: frame)
-        address.placeholderString = "Search or enter address"
-        address.bezelStyle = .roundedBezel
-        address.focusRingType = .none
-        address.target = self
-        address.action = #selector(submit)
-        address.delegate = self
-        address.setAccessibilityIdentifier("nhetrinh.address")
+        setUpAddress()
         AppFont.apply(to: textControls)
         toggle.toolTip = "Toggle Sidebar (⌘S)"
         let row = NSStackView(views: [toggle, back, forward, reload, address, zoomBadge])
@@ -135,7 +129,7 @@ final class ToolbarView: NSView {
     var buttons: [NSButton] { [toggle, back, forward, reload] }
 
     @objc private func tapReload() { loading ? onStop?() : onReload?() }
-    @objc private func submit() { onSubmit?(address.stringValue) }
+    @objc func submit() { onSubmit?(address.stringValue) }
 
     /// A borderless symbol button; `label` is its accessibility name and its identifier suffix.
     private func makeButton(_ symbol: String, _ label: String, _ action: Selector) -> NSButton {
