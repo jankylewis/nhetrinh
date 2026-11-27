@@ -2,7 +2,7 @@
 
 id: NT-BUG-026
 family: BLD
-status: FIXED
+status: OBSERVED
 date: 2026-11-21
 signature: not in the default web browser list
 source: the headmate's report, 2026-11-21 (matemaster session, outside the repository); the installed Info.plist
@@ -36,3 +36,6 @@ handed off from another device (Handoff). `openIncoming` also dropped every link
 
 Read back: on 2026-11-21 the headmate set nhetrinh as the default web browser in System Settings (installed
 d355a1e), and opened the storybook from it. Not read back: Open With and Handoff. A local page lost its back / forward history when its tab went idle: fixed in NT-BUG-028.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

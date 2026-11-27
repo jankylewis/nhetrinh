@@ -2,7 +2,7 @@
 
 id: NT-BUG-014
 family: TAB
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P7 review)
 signature: closingTheSelectedTabSelectsAVisibleTab
@@ -17,3 +17,6 @@ Rows r0, r1, then a collapsed folder A (a1). Select r1, close it.
 
 Expected: r0 is selected: the nearest visible tab above, else below; a hidden tab only when none is visible (ruling P2).
 Actual: a1, hidden inside the collapsed A, was selected (the next flat tab).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

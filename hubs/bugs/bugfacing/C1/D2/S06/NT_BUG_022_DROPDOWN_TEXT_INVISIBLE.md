@@ -2,7 +2,7 @@
 
 id: NT-BUG-022
 family: UIX
-status: FIXED
+status: OBSERVED
 date: 2026-11-19
 signature: dark dropdown, black text
 source: _app/Tests/NhetrinhTests/Tabs/Chrome/SuggestionLookTests.swift
@@ -28,3 +28,6 @@ The row's lines stack hugged its text, so "Switch to tab" followed the title.
 Both colours resolve inside `effectiveAppearance.performAsCurrentDrawingAppearance`, and a row repaints when its
 appearance changes. The lines take the free width. Tests (red first, 3 issues): `SuggestionLookTests`, both
 appearance pairs and the label's end. Not proven: the live look until the headmate sees the reinstalled app.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

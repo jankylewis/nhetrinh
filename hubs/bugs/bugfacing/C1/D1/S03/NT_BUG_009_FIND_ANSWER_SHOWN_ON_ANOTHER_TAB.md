@@ -2,7 +2,7 @@
 
 id: NT-BUG-009
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P4/P6 review)
 signature: anAnswerIsNotCarriedToAnotherTab
@@ -18,3 +18,6 @@ Find a word on tab A (Not found), then select tab B.
 
 Expected: the bar shows no answer for B until B is searched.
 Actual: from the code: B shows "Not found" (the probe reads `not found`) for a search it never ran (F5).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

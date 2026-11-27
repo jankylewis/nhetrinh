@@ -2,7 +2,7 @@
 
 id: NT-BUG-010
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P4/P6 review)
 signature: clearAllForgetsTheZoom
@@ -18,3 +18,6 @@ Zoom a site, then Settings Hub > Clear Website Data… > Clear All.
 
 Expected: the site's zoom goes too (ruling F6): `prefs.json` keeps no list of sites.
 Actual: from the code: the zoom map, a list of zoomed hosts, stays in `prefs.json` (F6).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

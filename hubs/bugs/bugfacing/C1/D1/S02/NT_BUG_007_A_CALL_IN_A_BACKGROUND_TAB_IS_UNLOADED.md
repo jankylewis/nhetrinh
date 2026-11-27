@@ -2,7 +2,7 @@
 
 id: NT-BUG-007
 family: TAB
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P4/P6 review)
 signature: aCapturingTabIsKept
@@ -18,3 +18,6 @@ Join a call in a tab with the camera or the microphone on, muted, with no sound 
 
 Expected: the call goes on (ruling F3: a capturing tab is kept at every level, like a playing one).
 Actual: from the code: after 1 min at a memory warning, at once at critical, after N min idle, the tab is unloaded and the call ends.
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

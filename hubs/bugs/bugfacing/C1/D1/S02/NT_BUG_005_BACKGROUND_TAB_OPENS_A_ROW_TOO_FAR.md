@@ -2,7 +2,7 @@
 
 id: NT-BUG-005
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 found_by: development (P2-REVIEW)
 signature: closingARowKeepsTheBackgroundSlotInPlace
@@ -22,3 +22,6 @@ Actual (cc8affe, from the test): it is row 3, after the tab that was row 3 befor
 row above the selected tab closes: the next background tab skips one row.
 
 Not run on the installed app (from the code and the unit test). Not on master.
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

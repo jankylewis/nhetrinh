@@ -2,7 +2,7 @@
 
 id: NT-BUG-029
 family: NAV
-status: FIXED
+status: OBSERVED
 date: 2026-11-22
 signature: the dropdown's first row is "<url> — <url>"
 source: readback R54 FAIL on the installed fe657c9 (2026-11-22): the readback profile's three rows had empty
@@ -31,3 +31,6 @@ test process saw it every time (5 of 5). An empty title was kept, and nothing fi
   the call removed: mutation check), `aLateTitleFillsOnlyARowWithout`.
 
 Read back: R54 PASS on the installed cd9b848 (2026-11-22; FAIL on fe657c9 the same morning).
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

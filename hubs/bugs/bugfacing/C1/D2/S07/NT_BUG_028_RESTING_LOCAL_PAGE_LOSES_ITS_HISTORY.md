@@ -2,7 +2,7 @@
 
 id: NT-BUG-028
 family: NAV
-status: FIXED
+status: OBSERVED
 date: 2026-11-21
 signature: aRestingLocalPageComesBackWithItsHistory
 source: NT-BUG-026's "not read back" note; `LocalPageTests` in the test process
@@ -30,3 +30,6 @@ assumed WebKit could not read a file through restored history. That was not true
 
 Not read back: needs the installed app. Not proven: a page helper WebKit starts new for the restore, rather than
 one it reused; the test cannot choose which.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

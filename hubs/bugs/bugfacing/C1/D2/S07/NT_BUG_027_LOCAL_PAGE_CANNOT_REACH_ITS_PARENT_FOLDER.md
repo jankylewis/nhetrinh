@@ -2,7 +2,7 @@
 
 id: NT-BUG-027
 family: NAV
-status: FIXED
+status: OBSERVED
 date: 2026-11-21
 signature: aLocalPageReadsAndOpensItsParentsFiles
 source: `LocalPageTests` in the test process; the storybook pages (`hubs/product/storybooks/`) use `../` links
@@ -34,3 +34,6 @@ Read back: R55 PASS on the installed fe657c9 (2026-11-22): `sub/page.html` read 
 title "margin 37px") and its `../other.html` link opened. Not shown: R55 red on an older build (a second app copy
 confuses the default browser list; the unit test's mutation check covers the rule). The "blocked" check was not
 shown to fail: WebKit's file setting cannot change in the test process.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

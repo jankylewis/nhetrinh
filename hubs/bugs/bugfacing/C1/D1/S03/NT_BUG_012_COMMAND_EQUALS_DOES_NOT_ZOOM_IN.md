@@ -2,7 +2,7 @@
 
 id: NT-BUG-012
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P4/P6 review)
 signature: zoomInHasBothKeys
@@ -18,3 +18,6 @@ Press ⌘= (no Shift) on a keyboard where + needs Shift.
 
 Expected: the page zooms in, as ⌘+ does.
 Actual: not proven (no key was pressed on the app): AppKit matches the typed character, `=`, and Zoom In's key was `+` (F9).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

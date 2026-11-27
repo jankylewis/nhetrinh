@@ -2,7 +2,7 @@
 
 id: NT-BUG-011
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P4/P6 review)
 signature: zoomReachesEveryLoadedTabOfTheHost
@@ -18,3 +18,6 @@ Open a site in two tabs; View > Zoom In in one.
 
 Expected: both tabs of the site show the new level (the level is kept per host).
 Actual: from the code: the other tab kept its level until its next page load (F8).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

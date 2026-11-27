@@ -2,7 +2,7 @@
 
 id: NT-BUG-031
 family: BLD
-status: FIXED
+status: OBSERVED
 date: 2026-11-27
 signature: Finder > Open With on a .pdf lists other browsers, not nhetrinh
 source: the headmate's screenshot (2026-11-27): Finder's Open With list for a PDF in Downloads; installed Info.plist
@@ -33,3 +33,6 @@ WebKit shows the PDF in the tab.
 
 Not read back on the installed app yet (Finder's Open With list). Images and plain text, which other browsers
 also claim, are not claimed: not asked.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

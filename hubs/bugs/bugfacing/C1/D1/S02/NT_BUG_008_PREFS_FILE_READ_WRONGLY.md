@@ -2,7 +2,7 @@
 
 id: NT-BUG-008
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P4/P6 review)
 signature: aBooleanIsNotMinutes
@@ -18,3 +18,6 @@ Edit `prefs.json`: `"idleUnloadMinutes": true`, or a zoom of `false`, or `"zoom"
 
 Expected: a value of the wrong kind is ignored alone (ruling F7); hosts are read lower case.
 Actual: from the code: `true` read as 1 minute, `false` as 50 %; a bad `zoom` made the whole file bad (engine, look, minutes reset, file moved to `prefs.bad.json`); `Example.COM` never applied (F4, F7, F10).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

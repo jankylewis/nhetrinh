@@ -2,7 +2,7 @@
 
 id: NT-BUG-030
 family: CHROME
-status: FIXED
+status: OBSERVED
 date: 2026-11-27
 signature: the address bar shows a long address on two lines, the second cut in half
 source: the headmate's screenshot (2026-11-27), a document page whose address has a long query; not kept here
@@ -32,3 +32,6 @@ address measured two lines high in the field's width.
   removed: mutation check).
 
 Not read back on the installed app yet.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

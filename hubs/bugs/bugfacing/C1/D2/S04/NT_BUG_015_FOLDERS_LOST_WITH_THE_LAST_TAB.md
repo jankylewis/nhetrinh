@@ -2,7 +2,7 @@
 
 id: NT-BUG-015
 family: TAB
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P7 review)
 signature: foldersWithoutATabAreKept
@@ -17,3 +17,6 @@ Make a folder, close every tab (the app quits), launch again.
 
 Expected: the folders are back, empty, with one home tab at the root (ruling P3).
 Actual: from the code: one home tab and no folder: a session with no tab was replaced by `.home`.
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

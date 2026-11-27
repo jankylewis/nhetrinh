@@ -2,7 +2,7 @@
 
 id: NT-BUG-023
 family: UIX
-status: FIXED
+status: OBSERVED
 date: 2026-11-19
 signature: address field gone, ⌘L does nothing
 source: _app/Tests/NhetrinhTests/Tabs/Chrome/AddressFieldLayoutTests.swift
@@ -24,3 +24,6 @@ The toolbar row fills its width (`row.distribution = .fill`) and only the field 
 `AddressFieldLayoutTests` (red first: the field's layout was ambiguous at 480, 900 and 1600 points).
 Not proven: the exact action that made the layout give the field no width (no capture of the live app);
 the reinstalled app until the headmate uses it.
+
+Status OBSERVED, not FIXED (2026-11-27): the fix is on a branch, not on `master` yet (`hubs/_SCHEMA.md`).
+It becomes FIXED at the merge to `master`.

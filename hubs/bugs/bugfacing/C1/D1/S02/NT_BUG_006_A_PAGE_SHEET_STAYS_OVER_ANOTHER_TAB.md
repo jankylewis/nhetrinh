@@ -2,7 +2,7 @@
 
 id: NT-BUG-006
 family: UIX
-status: OBSERVED
+status: FIXED
 date: 2026-11-16
 found_by: development (P3-REVIEW)
 signature: the sheet is still shown, the answer none
@@ -21,3 +21,6 @@ Actual (1d391d9, from the test): the next tab is shown and the sheet stays over 
 that is gone or hidden; the page gets no answer until the user presses a button.
 
 Not run on the installed app (from the code and the unit test). Not on master.
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).

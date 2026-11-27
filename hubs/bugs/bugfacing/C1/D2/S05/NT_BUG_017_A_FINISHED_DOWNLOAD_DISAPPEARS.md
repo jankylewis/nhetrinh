@@ -2,7 +2,7 @@
 
 id: NT-BUG-017
 family: NAV
-status: OBSERVED
+status: FIXED
 date: 2026-11-17
 found_by: development (P5-REVIEW)
 signature: aCancelNeverRemovesTheNextDownloadsFile
@@ -20,3 +20,6 @@ Expected: the second `x.zip` is in ~/Downloads, complete.
 Actual (e7dccf9, from the test): the row says "done", and within a second the file is gone.
 
 Not run on the installed app (the unit test drives real `WKDownload`s from a loopback server).
+
+Status FIXED (2026-11-27): the fix's test is on `master`, and its phase passed the full readback of
+2026-11-17 13:19 (`hubs/product/plan/_PLAN.md`).
