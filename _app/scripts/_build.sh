@@ -66,20 +66,27 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleTypeName</key><string>Web page</string>
     <key>CFBundleTypeRole</key><string>Viewer</string>
     <key>LSItemContentTypes</key><array><string>public.html</string><string>public.xhtml</string></array>
+  </dict><dict>
+    <key>CFBundleTypeName</key><string>PDF document</string>
+    <key>CFBundleTypeRole</key><string>Viewer</string>
+    <key>LSHandlerRank</key><string>Alternate</string>
+    <key>LSItemContentTypes</key><array><string>com.adobe.pdf</string></array>
   </dict></array>
   <key>NSUserActivityTypes</key><array><string>NSUserActivityTypeBrowsingWeb</string></array>
 </dict></plist>
 PLIST
 # NT-BUG-026: what makes macOS treat nhetrinh as a browser. Web links alone left it out of the default browser
-# list; HTML files (that list, Open With), file links and Handoff are claimed too. A missing claim stops the build.
+# list; HTML files (that list, Open With), file links and Handoff are claimed too; PDF files for Open With
+# (NT-BUG-031). A missing claim stops the build.
 browser_claims() {
   local plist=$1 key want got
   for key want in CFBundleURLTypes '"http"' CFBundleURLTypes '"https"' CFBundleURLTypes '"file"' \
       CFBundleDocumentTypes '"public.html"' CFBundleDocumentTypes '"public.xhtml"' \
+      CFBundleDocumentTypes '"com.adobe.pdf"' \
       NSUserActivityTypes '"NSUserActivityTypeBrowsingWeb"'; do
     got=$(plutil -extract "$key" json -o - "$plist" 2>/dev/null || true)
     [[ "$got" == *"$want"* ]] && continue
-    echo "error: Info.plist $key lacks $want: not a browser to macOS (NT-BUG-026)" >&2
+    echo "error: Info.plist $key lacks $want: not a browser to macOS (NT-BUG-026, NT-BUG-031)" >&2
     return 1
   done
 }

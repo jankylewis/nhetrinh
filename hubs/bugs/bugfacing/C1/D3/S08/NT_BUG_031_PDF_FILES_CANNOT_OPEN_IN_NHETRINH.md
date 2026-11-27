@@ -2,14 +2,14 @@
 
 id: NT-BUG-031
 family: BLD
-status: OPEN
+status: FIXED
 date: 2026-11-27
 signature: Finder > Open With on a .pdf lists other browsers, not nhetrinh
 source: the headmate's screenshot (2026-11-27): Finder's Open With list for a PDF in Downloads; installed Info.plist
   read 2026-11-27: `CFBundleDocumentTypes` holds only `public.html` and `public.xhtml`
 observed: on the installed 36db960, 2026-11-27
 found_by: headmate (2026-11-27, "cannot open .pdf files in nhetrinh, like other browsers?")
-links: fix=no lesson=no evidence=no toolgap=none
+links: fix=yes lesson=no evidence=no toolgap=none
 
 ## Steps
 
@@ -20,13 +20,16 @@ Observed: nhetrinh is not in the list.
 
 ## Cause
 
-The Info.plist claims web pages only (`public.html`, `public.xhtml`, NT-BUG-026). Nothing claims `com.adobe.pdf`,
-so macOS never offers nhetrinh for a PDF. Read from the installed Info.plist; the app side is not proven:
-`openIncoming` takes any `file:` URL and WebKit shows PDFs itself (expected, not run).
+The Info.plist claimed web pages only (`public.html`, `public.xhtml`, NT-BUG-026). Nothing claimed `com.adobe.pdf`,
+so macOS never offered nhetrinh for a PDF. The app side already worked: `openIncoming` takes any `file:` URL and
+WebKit shows the PDF in the tab.
 
-## To do
+## Fix
 
-1. Test first: `browser_claims` in `_build.sh` also wants `com.adobe.pdf` (red), then add it as a Viewer type.
-2. A unit test: a PDF opened with `openIncoming` shows as a tab (WebKit's PDF view).
-3. Consider `public.svg-image`, images and `public.plain-text`, which other browsers also claim (ask the headmate).
-4. Read back: Finder > Open With lists nhetrinh; the PDF opens. Keep the default PDF app as it is.
+- `_build.sh`: a second document type, "PDF document", `com.adobe.pdf`, role Viewer, rank Alternate (offered in
+  Open With; never takes the default PDF app's place).
+- Tests: `browser_claims` also wants `com.adobe.pdf` (the build stopped on it before the fix: red);
+  `aPDFFileOpensAsATabAndShows` (the tab shows `application/pdf`; red when `file:` links are refused: mutation check).
+
+Not read back on the installed app yet (Finder's Open With list). Images and plain text, which other browsers
+also claim, are not claimed: not asked.
