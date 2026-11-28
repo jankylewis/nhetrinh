@@ -8,8 +8,8 @@ import Testing
 @MainActor
 struct DuplicateTabTests {
     /// Row 8 is t5, alone in Feedback (level 4); row 9 is t6, the last tab, at the top level.
-    @Test(arguments: [(8, 4, ["t1", "MBing", "t2", "FE", "t3", "PRs", "t4", "Feedback", "t5", "t5", "t6"]),
-                      (9, 5, ["t1", "MBing", "t2", "FE", "t3", "PRs", "t4", "Feedback", "t5", "t6", "t6"])]
+    @Test(arguments: [(8, 4, ["t1", "Work", "t2", "FE", "t3", "PRs", "t4", "Feedback", "t5", "t5", "t6"]),
+                      (9, 5, ["t1", "Work", "t2", "FE", "t3", "PRs", "t4", "Feedback", "t5", "t6", "t6"])]
           as [(Int, Int, [String])])
     func theCopyFollowsItsTabAndIsSelected(row: Int, flat: Int, rows: [String]) {
         let browser = groupBrowser()

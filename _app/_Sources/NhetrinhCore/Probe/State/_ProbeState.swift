@@ -52,7 +52,7 @@ public struct ProbeState: Equatable, Sendable {
     public var downloadStates: [String] = []
     public var revealed: [String] = []
     /// P7: every group, top to bottom (a group's groups after it): its name, its own tabs' titles, whether
-    /// it is collapsed. P8-GROUPS-1: its path ("MBing > FE"), its tab count at any depth; per shown row its
+    /// it is collapsed. P8-GROUPS-1: its path ("Work > FE"), its tab count at any depth; per shown row its
     /// level (0: the top); every tab's title, hidden ones too; the reason of the last refusal shown.
     public var folders: [String] = []
     public var folderTabs: [[String]] = []

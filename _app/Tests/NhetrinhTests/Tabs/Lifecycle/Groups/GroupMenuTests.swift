@@ -18,8 +18,8 @@ struct GroupMenuTests {
     }
 
     /// The three ways to make a group, each asking a name.
-    @Test(arguments: [(0, SidebarView.newGroup, "G"), (5, SidebarView.newGroupInside, "MBing > FE > PRs > G"),
-                      (6, SidebarView.newGroupFromTab, "MBing > FE > PRs > G")] as [(Int, String, String)])
+    @Test(arguments: [(0, SidebarView.newGroup, "G"), (5, SidebarView.newGroupInside, "Work > FE > PRs > G"),
+                      (6, SidebarView.newGroupFromTab, "Work > FE > PRs > G")] as [(Int, String, String)])
     func makeAGroup(row: Int, item: String, made: String) async {
         let browser = groupBrowser()
         defer { browser.closeAfterTest() }
@@ -46,38 +46,38 @@ struct GroupMenuTests {
         let browser = groupBrowser()
         defer { browser.closeAfterTest() }
         await press(browser, row: 5, "Rename Group…", name: "Pull requests", button: "Rename")
-        #expect(groupState(browser).groupPaths[2] == "MBing > FE > Pull requests")
+        #expect(groupState(browser).groupPaths[2] == "Work > FE > Pull requests")
         browser.sidebar.doubleClick(row: 3)
         #expect(groupState(browser).sheet.contains("Rename Group"))
         #expect(browser.probeAnswer(.sheetButton("Cancel"), menu: nil) == .done)
         await sheetGone(browser)
     }
 
-    /// Move Group to > Top Level, and back to MBing > FE; a group never into itself or too deep (item off).
+    /// Move Group to > Top Level, and back to Work > FE; a group never into itself or too deep (item off).
     @Test func moveAGroupOutAndBack() async {
         let browser = groupBrowser()
         defer { browser.closeAfterTest() }
         await press(browser, row: 5, "Move Group to > Top Level")
-        #expect(groupState(browser).groupPaths == ["MBing", "MBing > FE", "PRs", "PRs > Feedback"])
+        #expect(groupState(browser).groupPaths == ["Work", "Work > FE", "PRs", "PRs > Feedback"])
         let row = groupState(browser).rows.firstIndex(of: "PRs") ?? -1
-        await press(browser, row: row, "Move Group to > MBing > FE")
+        await press(browser, row: row, "Move Group to > Work > FE")
         #expect(groupState(browser).groupPaths == headmatePaths)
-        for refused in ["MBing > FE > PRs", "MBing > FE > PRs > Feedback"] {
+        for refused in ["Work > FE > PRs", "Work > FE > PRs > Feedback"] {
             #expect(browser.probeAnswer(.rowMenu(row: 3, item: "Move Group to > \(refused)"), menu: nil) != .done)
         }
     }
 
-    /// Ungroup FE: its tab and its group move up into MBing, in its place; no tab closes.
+    /// Ungroup FE: its tab and its group move up into Work, in its place; no tab closes.
     @Test func ungroupMovesItsItemsUp() async {
         let browser = groupBrowser()
         defer { browser.closeAfterTest() }
         await press(browser, row: 3, "Ungroup")
-        #expect(groupState(browser).groupPaths == ["MBing", "MBing > PRs", "MBing > PRs > Feedback"])
-        #expect(groupState(browser).rows == ["t1", "MBing", "t2", "t3", "PRs", "t4", "Feedback", "t5", "t6"])
+        #expect(groupState(browser).groupPaths == ["Work", "Work > PRs", "Work > PRs > Feedback"])
+        #expect(groupState(browser).rows == ["t1", "Work", "t2", "t3", "PRs", "t4", "Feedback", "t5", "t6"])
     }
 
     /// Move Tab to Group (a path) and Move Out of Group (one level up, after its group).
-    @Test(arguments: [(0, "Move Tab to Group > MBing > FE > PRs > Feedback", ["t2", "t3", "t4", "t5", "t1", "t6"]),
+    @Test(arguments: [(0, "Move Tab to Group > Work > FE > PRs > Feedback", ["t2", "t3", "t4", "t5", "t1", "t6"]),
                       (8, "Move Out of Group", ["t1", "t2", "t3", "t4", "t5", "t6"])])
     func moveATab(row: Int, item: String, order: [String]) async {
         let browser = groupBrowser()
@@ -92,7 +92,7 @@ struct GroupMenuTests {
         let browser = groupBrowser()
         defer { browser.closeAfterTest() }
         #expect(browser.sidebar.drop(TabPath([1, 1, 1]), onto: nil, at: 0))
-        #expect(groupState(browser).groupPaths == ["PRs", "PRs > Feedback", "MBing", "MBing > FE"])
+        #expect(groupState(browser).groupPaths == ["PRs", "PRs > Feedback", "Work", "Work > FE"])
         let feedback = try #require(browser.sidebar.node(at: TabPath([0, 1])))
         #expect(!browser.sidebar.drop(TabPath([0]), onto: feedback, at: 0))
         #expect(!browser.sidebar.drop(TabPath([0]), onto: try #require(browser.sidebar.node(at: TabPath([1]))), at: 0))

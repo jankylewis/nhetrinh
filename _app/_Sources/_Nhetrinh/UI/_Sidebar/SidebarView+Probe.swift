@@ -6,7 +6,7 @@ extension SidebarView {
     /// The probe's R13: a right click at the row's centre asks the table for its menu (`menu(for:)`, the
     /// path of the user's right click, with its hit test), and `item` is pressed. P7: an item of a submenu
     /// is named by its path, "Move Tab to Group > work"; an item's own title may hold " > " (P8-GROUPS-1:
-    /// "Move Tab to Group > MBing > FE"), the longest title that is there wins. An item that is off is not
+    /// "Move Tab to Group > Work > FE"), the longest title that is there wins. An item that is off is not
     /// pressed, as a click on it does nothing.
     func pressRowMenu(_ row: Int, item: String) -> Bool {
         guard let click = table.rightClick(onRow: row), let menu = table.menu(for: click),
