@@ -17,7 +17,7 @@ public enum ProbeError: Error, Equatable, CustomStringConvertible {
     }
 }
 
-/// The Unix-socket plumbing both ends share: an address, timeouts, one line in, one line out.
+/// The Unix-socket code both ends share: an address, timeouts, one line in, one line out.
 enum ProbeSocket {
     /// The longest line either end reads; a longer one is cut and then fails to decode.
     static let maxLine = 1 << 20
