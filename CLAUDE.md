@@ -22,7 +22,7 @@ Read first, in this order:
 4. **Readback is part of done.** `nhetrinh-readback` uses the installed app as its end user and
    gives a verdict per step. NOT READ BACK is never a pass. "Merged" and "tests green" are not a
    readback. It runs on one seat at a time, the seat a brief names: there is only one app instance.
-5. **Lightness budget:** app process 40 MB, app + helpers 110 MB, bundle 1 MB, idle CPU 2 %.
+5. **Lightness budget:** app process 40 MB, app + helpers 110 MB, bundle 1.1 MB, idle CPU 2 %.
    A change that breaks it stops until the cost is removed or the headmate accepts a new number.
 6. **Hubs in the same change.** Every bug, failure, lesson, tool gap and feature gets its entry
    (`hubs/_SCHEMA.md`). Every claim cites a source. Write "not proven" for what is not proven.

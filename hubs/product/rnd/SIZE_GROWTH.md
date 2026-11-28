@@ -1,6 +1,6 @@
 # What grows the app's size
 
-status: MEASURED, 2026-11-27, asked by the headmate before any size ruling ("find out what grows the app size first").
+status: RULED 8A, 2026-11-28 (D32). Measured 2026-11-27 for the headmate's size ruling.
 
 ## How it was measured
 
@@ -40,7 +40,7 @@ The bundle adds the icon (107 KB `AppIcon.icns`, 16 KB `AppIcon.png`) and 5 KB o
   timing hooks (`Bench`) 14 KB. It is there on purpose (D23): the readback drives the installed app itself.
 - Not measured: how much each source line costs by feature inside one phase.
 
-## Ways to stay under 1 MB (for the headmate's ruling)
+## Size options reviewed for D32
 
 | Way | Saves | Cost |
 |---|---|---|

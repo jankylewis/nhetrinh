@@ -11,7 +11,7 @@ R&D baseline it is measured against.
 |---|---|---|---|---|
 | App process, one simple tab | 40 MB | 34.5 MB | 32.2 MB, highest of 9 samples | not measured |
 | App + all helpers, one simple tab | 110 MB | 95.7 MB | 90.0 MB, median of 9, 5 helpers | not measured |
-| `nhetrinh.app` on disk | 1 MB (1024 KB) | 516 KB | 760 KB | not measured |
+| `nhetrinh.app` on disk | 1.1 MB (1126 KB) | 516 KB | 760 KB | not measured |
 | Idle CPU, tabs open, nothing playing | 2 % | 1.3 % (10 sites) | 0.1 % (1 tab, 5 s) | not measured |
 | 3 tabs, 2 unloaded: app (R38, P6) | 55 MB | — | 34.5 MB | not measured |
 | 3 tabs, 2 unloaded: app + helpers (R38) | 125 MB | — | 102.8 MB, 6 helpers | not measured |

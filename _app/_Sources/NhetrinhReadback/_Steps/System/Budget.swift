@@ -4,7 +4,7 @@ import Foundation
 enum Budget {
     static let appMegabytes = 40.0
     static let totalMegabytes = 110.0
-    static let bundleKilobytes = 1024
+    static let bundleKilobytes = 1126
     static let idleCpuPercent = 2.0
     /// R38 (P6): 3 tabs opened and 2 of them unloaded cost the one-tab budget + this, for the app
     /// and for the app with its helpers.

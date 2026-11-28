@@ -2,7 +2,7 @@
 
 A very small macOS browser: WebKit (built into macOS), a vertical tab sidebar, and the basics.
 No extensions, no sync, no accounts, no telemetry. Lightness first: one simple tab costs about 32 MB
-in the app and 90 MB with WebKit's helpers; the app is under 1 MB (`hubs/product/rnd/LIGHTNESS_1_0.md`).
+in the app and 90 MB with WebKit's helpers; the app has a 1.1 MB budget (`hubs/product/rnd/LIGHTNESS_1_0.md`).
 
 ## Install
 

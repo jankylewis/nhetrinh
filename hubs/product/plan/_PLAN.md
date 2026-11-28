@@ -58,7 +58,7 @@ A step the readback cannot drive is reported as "not read back". It is never cou
 |---|---|---|
 | App process, one simple tab | 40 MB | 34.5 MB |
 | App + all helper processes, one simple tab | 110 MB | 95.7 MB |
-| `nhetrinh.app` on disk | 1 MB | 1,012 KB (2026-11-22, `p11/history` with the icon cut, D31; P10 will need a ruling) |
+| `nhetrinh.app` on disk | 1.1 MB (1126 KB) | 1,012 KB (2026-11-28, installed `p11/history`, D32) |
 | Idle CPU, tabs open, nothing playing | 2 % | 1.3 % (10 sites) |
 | 3 tabs opened, 2 unloaded (P6, R38): app, and app + helpers | one-tab budget + 15 MB (55 MB, 125 MB) | not measured yet |
 
