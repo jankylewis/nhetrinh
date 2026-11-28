@@ -37,18 +37,18 @@ private let movedBackCountedWrong: ProbeState = {
 }()
 
 /// A broken ungroup: page 3 left at the top level's end.
-private let ungroupedOutOfMBing: ProbeState = {
+private let ungroupedOutOfWork: ProbeState = {
     var broken = state(.ungrouped)
     broken.groupCounts = [3, 2, 1]
     broken.folderTabs = [[page(2)], [page(4)], [page(5)]]
-    broken.rows = [page(1), "MBing", page(2), "Pull requests", page(4), "Feedback entry", page(5), page(3)]
+    broken.rows = [page(1), "Work", page(2), "Pull requests", page(4), "Feedback entry", page(5), page(3)]
     return broken
 }()
 
 @Test(arguments: [
     (reopenedAtTheEnd, GroupShape.ungrouped, "tab counts [3, 1, 0], not [4, 2, 1]"),
     (movedBackCountedWrong, GroupShape.renamed, "tab counts [4, 1, 2, 1], not [4, 3, 2, 1]"),
-    (ungroupedOutOfMBing, GroupShape.ungrouped, "tab counts [3, 2, 1], not [4, 2, 1]"),
+    (ungroupedOutOfWork, GroupShape.ungrouped, "tab counts [3, 2, 1], not [4, 2, 1]"),
 ] as [(ProbeState, GroupShape, String)])
 func groupStepFailsATabInTheWrongPlace(seen: ProbeState, expected: GroupShape, says: String) {
     #expect(seen.groupPaths == expected.paths, "the paths alone read right")

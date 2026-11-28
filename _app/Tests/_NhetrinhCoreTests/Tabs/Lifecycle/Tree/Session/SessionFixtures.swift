@@ -27,12 +27,12 @@ enum SessionFixtures {
         "selected":{"item":1,"tab":1},"sidebarWidth":220,"version":2}
         """#
 
-    /// P8-GROUPS-1, version 3: a | MBing (b | FE, collapsed (c)); c selected. What `encode` writes.
+    /// P8-GROUPS-1, version 3: a | Work (b | FE, collapsed (c)); c selected. What `encode` writes.
     static let v3Nested = #"""
         {"collapsed":false,"items":[{"tab":{"title":"a","url":"https:\/\/a.example\/"}},\#
         {"folder":{"collapsed":false,"items":[{"tab":{"title":"b","url":"https:\/\/b.example\/"}},\#
         {"folder":{"collapsed":true,"items":[{"tab":{"title":"c","url":"https:\/\/c.example\/"}}],"name":"FE"}}],\#
-        "name":"MBing"}}],"selected":[1,1,0],"sidebarWidth":220,"version":3}
+        "name":"Work"}}],"selected":[1,1,0],"sidebarWidth":220,"version":3}
         """#
 
     /// Version 3, 5 group levels: one too many.

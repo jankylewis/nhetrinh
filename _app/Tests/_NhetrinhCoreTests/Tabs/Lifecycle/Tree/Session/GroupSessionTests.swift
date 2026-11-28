@@ -11,25 +11,25 @@ private func nested(_ name: String, collapsed: Bool = false, _ items: TabTree.It
     .folder(TabFolder(name: name, collapsed: collapsed, items: items))
 }
 
-/// a | MBing (b | FE, collapsed (c)); c selected: the fixture `v3Nested`.
-private let mbing = TreeSession(
-    tree: TabTree(items: [treeRoot("a"), nested("MBing", treeRoot("b"), nested("FE", collapsed: true, treeRoot("c")))]),
+/// a | Work (b | FE, collapsed (c)); c selected: the fixture `v3Nested`.
+private let work = TreeSession(
+    tree: TabTree(items: [treeRoot("a"), nested("Work", treeRoot("b"), nested("FE", collapsed: true, treeRoot("c")))]),
     selected: TabPath([1, 1, 0]), sidebarWidth: 220, collapsed: false)
 
 /// The headmate's 4 levels, a tab at each, the deepest selected.
 private let fourLevels = TreeSession(
-    tree: TabTree(items: [nested("MBing", treeRoot("b"), nested("FE", treeRoot("c"), nested(
+    tree: TabTree(items: [nested("Work", treeRoot("b"), nested("FE", treeRoot("c"), nested(
         "PRs", collapsed: true, treeRoot("d"), nested("Feedback entry", treeRoot("Thumbnail")))))]),
     selected: TabPath([0, 1, 1, 1, 0]), sidebarWidth: 260, collapsed: false)
 
 @Test func versionThreeIsWrittenAsTheFixture() throws {
-    let written = try TreeSessionStore.encode(mbing)
+    let written = try TreeSessionStore.encode(work)
     #expect(String(decoding: written, as: UTF8.self) == SessionFixtures.v3Nested)
-    #expect(TreeSessionStore.decode(Data(SessionFixtures.v3Nested.utf8)) == mbing)
+    #expect(TreeSessionStore.decode(Data(SessionFixtures.v3Nested.utf8)) == work)
 }
 
 /// What is saved is what comes back, at every depth; the selection's path too.
-@Test(arguments: [mbing, fourLevels])
+@Test(arguments: [work, fourLevels])
 func versionThreeRoundTrip(session: TreeSession) throws {
     let folder = FileManager.default.temporaryDirectory.appendingPathComponent("nhetrinh-groups-\(UUID())")
     defer { try? FileManager.default.removeItem(at: folder) }
