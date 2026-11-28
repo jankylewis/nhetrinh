@@ -26,7 +26,7 @@ func folderFieldsRoundTrip(folders: [String], tabs: [[String]], collapsed: [Bool
     state.folders = folders
     state.folderTabs = tabs
     state.collapsedFolders = collapsed
-    state.groupPaths = folders.map { "MBing > \($0)" }
+    state.groupPaths = folders.map { "Work > \($0)" }
     state.groupCounts = folders.map { _ in 2 }
     state.rowLevels = folders.map { _ in 3 }
     state.tabTitles = tabs.flatMap { $0 }

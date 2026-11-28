@@ -56,7 +56,7 @@ func pushAfterPopKeepsTheOrder(count: Int) {
 @Test func aClosedGroupIsOneEntry() {
     var tabs = pushed(1)
     let group = ClosedGroup(group: TabFolder(name: "PRs", tabs: [treeTab("a")]), path: TabPath([0, 1]),
-                            groups: ["MBing"])
+                            groups: ["Work"])
     tabs.push(.group(group))
     tabs.push(closed(2))
     #expect(tabs.count == 3 && tabs.pop() == .tab(closed(2)) && tabs.pop() == .group(group))
