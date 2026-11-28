@@ -3,7 +3,7 @@ import NhetrinhCore
 
 /// R49 (P8-GROUPS-1, headmate request): nested groups, 4 levels. Through the probe (D23), every action a
 /// row's menu item, no focus, no keys, no drag (D18; a drop is unit tested). Local test pages only, 5 tabs,
-/// loaded one at a time. Builds MBing > FE > PRs > Feedback entry with a tab at each level, reads a 5th
+/// loaded one at a time. Builds Work > FE > PRs > Feedback entry with a tab at each level, reads a 5th
 /// level refused with its reason, renames PRs, moves it to the top level and back, ungroups FE (its items
 /// move up, no tab closes), closes Feedback entry and reopens it, relaunches and reads the same tree. The
 /// start state (one home tab) is put back.
@@ -26,12 +26,12 @@ enum GroupStep {
     /// New Group…, Move Tab to Group, New Group Inside… twice, New Group from Selected Tab….
     static func build(_ app: AppSession) throws -> String {
         let page = GroupDriving.page
-        try GroupDriving.named(app, on: page(1), "New Group…", name: "MBing")
-        try GroupDriving.press(app, on: page(2), "Move Tab to Group > MBing")
-        try GroupDriving.named(app, on: "MBing", "New Group Inside…", name: "FE")
-        try GroupDriving.press(app, on: page(3), "Move Tab to Group > MBing > FE")
+        try GroupDriving.named(app, on: page(1), "New Group…", name: "Work")
+        try GroupDriving.press(app, on: page(2), "Move Tab to Group > Work")
+        try GroupDriving.named(app, on: "Work", "New Group Inside…", name: "FE")
+        try GroupDriving.press(app, on: page(3), "Move Tab to Group > Work > FE")
         try GroupDriving.named(app, on: "FE", "New Group Inside…", name: "PRs")
-        for tab in 4...5 { try GroupDriving.press(app, on: page(tab), "Move Tab to Group > MBing > FE > PRs") }
+        for tab in 4...5 { try GroupDriving.press(app, on: page(tab), "Move Tab to Group > Work > FE > PRs") }
         try GroupDriving.named(app, on: page(5), "New Group from Selected Tab…", name: "Feedback entry")
         let state = try GroupDriving.shape(app, .built, after: "the tree built")
         return "built \(state.groupPaths.last ?? ""): rows at levels \(state.rowLevels), tab counts "
@@ -56,10 +56,10 @@ enum GroupStep {
         try GroupDriving.shape(app, .renamed, after: "Rename Group…")
         try GroupDriving.press(app, on: "Pull requests", "Move Group to > Top Level")
         let top = try GroupDriving.shape(app, .atTop, after: "Move Group to > Top Level")
-        try GroupDriving.press(app, on: "Pull requests", "Move Group to > MBing > FE")
-        let back = try GroupDriving.shape(app, .renamed, after: "Move Group to > MBing > FE")
+        try GroupDriving.press(app, on: "Pull requests", "Move Group to > Work > FE")
+        let back = try GroupDriving.shape(app, .renamed, after: "Move Group to > Work > FE")
         try GroupDriving.tabs(back, 1...5, after: "the moves")
-        return "PRs renamed Pull requests; moved to the top level (\(top.groupPaths)) and back into MBing > FE"
+        return "PRs renamed Pull requests; moved to the top level (\(top.groupPaths)) and back into Work > FE"
     }
 
     static func ungroupFE(_ app: AppSession) throws -> String {
