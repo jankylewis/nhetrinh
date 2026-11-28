@@ -2,7 +2,7 @@ import AppKit
 import NhetrinhCore
 
 /// A row's menu (P7; groups since P8-GROUPS-1). A tab's: Close Tab, New Group from Selected Tab…, Move Tab to
-/// Group ▸ (every group, as a path "MBing > FE"), Move Out of Group. A group's: Rename Group…, Collapse /
+/// Group ▸ (every group, as a path "Work > FE"), Move Out of Group. A group's: Rename Group…, Collapse /
 /// Expand Group, New Group Inside…, Move Group to ▸ (Top Level, every group; one it cannot go into is
 /// off, its tooltip says why), Ungroup, Close Group…. Every menu: New Group… at the top level, after the
 /// row's top item; off the rows only that. The readback presses these as a user does (no drag, D18).
@@ -86,7 +86,7 @@ extension SidebarView {
         return move
     }
 
-    /// A group's path as the menus show it: "MBing > FE > PRs".
+    /// A group's path as the menus show it: "Work > FE > PRs".
     func pathTitle(_ path: TabPath) -> String {
         path.indexes.indices.compactMap { level in
             node(at: TabPath(Array(path.indexes.prefix(level + 1))))?.row.title
